@@ -1,77 +1,78 @@
 import os
-import alpaca_trade_api as tradeapi
 from dotenv import load_dotenv
+
+try:
+    import alpaca_trade_api as tradeapi
+except Exception as e:
+    tradeapi = None
+    print(f"[alpha_client] Error: {e}")
 
 load_dotenv()
 
-ALPACA_API_KEY  = os.getenv("ALPACA_API_KEY")
-ALPACA_SECRET   = os.getenv("ALPACA_SECRET_KEY")
+APCA_API_KEY_ID = os.getenv("APCA_API_KEY_ID", "")
+APCA_API_SECRET_KEY = os.getenv("APCA_API_SECRET_KEY", "")
 ALPACA_BASE_URL = os.getenv("ALPACA_BASE_URL", "https://paper-api.alpaca.markets")
 
 
 def get_client():
-    """
-    Create and return Alpaca API client.
-    """
     try:
-        client = tradeapi.REST(          # ✅ save to variable
-            ALPACA_API_KEY,              # ✅ use constants not undefined names
-            ALPACA_SECRET,
+        if tradeapi is None:
+            return None
+
+        if not APCA_API_KEY_ID or not APCA_API_SECRET_KEY:
+            print("[get_client] Error: Missing Alpaca credentials")
+            return None
+
+        client = tradeapi.REST(
+            APCA_API_KEY_ID,
+            APCA_API_SECRET_KEY,
             ALPACA_BASE_URL,
             api_version="v2"
         )
-        return client                    # ✅ return it
-
+        return client
     except Exception as e:
         print(f"[get_client] Error: {e}")
         return None
 
 
 def get_portfolio_value(client) -> float:
-    """
-    Get current total portfolio value from Alpaca.
-    """
     try:
-        account = client.get_account()
-        return float(account.portfolio_value)  # ✅ always wrap in float()
+        if client is None:
+            return 0.0
 
+        account = client.get_account()
+        return float(account.portfolio_value)
     except Exception as e:
         print(f"[get_portfolio_value] Error: {e}")
         return 0.0
 
 
 def get_current_exposure(client) -> float:
-    """
-    Get total dollar value of all open positions.
-    """
     try:
+        if client is None:
+            return 0.0
+
         positions = client.list_positions()
-
-        # list comprehension — float() each market_value, then sum
-        return sum([float(p.market_value) for p in positions])  # ✅ Python style
-
-    except Exception as e:                          # ✅ fixed typo: excpet → except
+        return sum(float(position.market_value) for position in positions or [])
+    except Exception as e:
         print(f"[get_current_exposure] Error: {e}")
         return 0.0
 
 
 def submit_order(client, ticker: str, shares: int,
                  stop_loss_price: float) -> dict:
-    """
-    Submit market buy order + stop loss to Alpaca.
-    """
     try:
-        # Step 1: market buy order — save to variable to get order id
-        buy_order = client.submit_order(     # ✅ saved to buy_order
+        if client is None:
+            return {"status": "failed", "reason": "alpaca client unavailable"}
+
+        buy_order = client.submit_order(
             symbol=ticker,
             qty=shares,
             side="buy",
             type="market",
             time_in_force="day"
         )
-
-        # Step 2: stop loss order — triggers automatically if price drops
-        stop_order = client.submit_order(    # ✅ saved to stop_order
+        stop_order = client.submit_order(
             symbol=ticker,
             qty=shares,
             side="sell",
@@ -79,16 +80,14 @@ def submit_order(client, ticker: str, shares: int,
             time_in_force="day",
             stop_price=round(stop_loss_price, 2)
         )
-
-        # Step 3: return confirmation — proper dict syntax
         return {
             "ticker":          ticker,
             "shares":          shares,
             "status":          "submitted",
-            "order_id":        str(buy_order.id),   # ✅ buy_order exists now
+            "order_id":        str(buy_order.id),
             "stop_order_id":   str(stop_order.id),
             "stop_loss_price": stop_loss_price
         }
-
     except Exception as e:
+        print(f"[submit_order] Error: {e}")
         return {"status": "failed", "reason": str(e)}

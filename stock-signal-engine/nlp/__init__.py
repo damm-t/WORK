@@ -3,28 +3,27 @@ from .finbert      import analyze_sentiment
 from .ner          import extract_entities
 
 
+def analyze_sentiment_only(article: dict) -> dict:
+    try:
+        article_data = preprocess(article)
+        if not article_data:
+            return {}
+
+        article_data = analyze_sentiment(article_data)
+        return article_data if article_data else {}
+    except Exception as e:
+        print(f"[analyze_sentiment_only] Error: {e}")
+        return {}
+
+
 def analyze(article: dict) -> dict:
-    """
-    Run full NLP pipeline on a single article.
-    preprocessor → finbert → ner
-    Returns fully enriched article dict.
-    """
+    try:
+        article_data = analyze_sentiment_only(article)
+        if not article_data:
+            return {}
 
-    try :
-
-        article = preprocess(article)
-        article = analyze_sentiment(article)
-        article = extract_entities(article)
-        
-
-        return article
-
-    except Exception as e :
-        print(f"[fetch_all] Error for {article}: {e}")
-        return []
-    
-
-    # HINT: same pattern as fetch_all in Layer 1
-    # call each function, passing the result of the previous one
-    # each function takes a dict and returns an enriched dict
-    # wrap in try/except and return article unchanged if anything fails
+        article_data = extract_entities(article_data)
+        return article_data if article_data else {}
+    except Exception as e:
+        print(f"[analyze] Error: {e}")
+        return {}

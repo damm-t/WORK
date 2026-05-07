@@ -3,8 +3,7 @@
 ```
 stock-signal-engine/
 ├── ingestion/
-│   ├── news_fetcher.py        # NewsAPI + RSS
-│   ├── reddit_fetcher.py      # PRAW
+│   ├── news_fetcher.py        # yfinance / Benzinga news
 │   ├── twitter_fetcher.py     # X API v2
 │   └── earnings_fetcher.py    # SEC EDGAR
 ├── nlp/
@@ -42,7 +41,7 @@ our only jobis fetching the raw text from the external sources, and normalizes i
 so in returning 
 the output of the fetcher should be like this 
 {
-    "source" : "newsapi"
+    "source" : "yfinance_news"
     "ticker" : "AAPL" 
     "title" : "Apple ... " 
     "body" : "Full article text .. "
@@ -50,7 +49,6 @@ the output of the fetcher should be like this
     "url" : "https://..."
 }
 
-this is [schema contract], this downstream code should be output as this shape regradless where it is come from Reddit, NewsAPI or X. 
-
+this is [schema contract], this downstream code should be output as this shape regradless where it is come from yfinance, SEC EDGAR or X. 
 
 

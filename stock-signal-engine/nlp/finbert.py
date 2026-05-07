@@ -1,35 +1,50 @@
-from transformers import pipeline
+try:
+    from transformers import pipeline
+except Exception as e:
+    pipeline = None
+    print(f"[finbert] Error: {e}")
 
-# Load FinBERT once at module level — expensive to load, do it only once
-# Think of this like a static singleton in C#
-finbert = pipeline("text-classification", model="ProsusAI/finbert")
+finbert = None
+
+
+def _get_finbert():
+    try:
+        global finbert
+
+        if pipeline is None:
+            return None
+
+        if finbert is None:
+            finbert = pipeline("text-classification", model="ProsusAI/finbert")
+
+        return finbert
+    except Exception as e:
+        print(f"[finbert] Error: {e}")
+        return None
 
 def analyze_sentiment(article: dict) -> dict:
-    """
-    Takes an article dict that already has "clean_text" from preprocessor.
-    Adds "sentiment" and "sentiment_score" keys.
-    Returns enriched dict.
-    """
+    try:
+        article_data = dict(article or {})
+        text = str(article_data.get("clean_text", ""))[:512]
+        if not text:
+            article_data["sentiment"] = "neutral"
+            article_data["sentiment_score"] = 0.0
+            return article_data
 
-    # Step 1: truncate FIRST before passing to FinBERT
-    # FinBERT crashes on input longer than 512 tokens
-    text = article["clean_text"][:512]
+        finbert_model = _get_finbert()
+        if finbert_model is None:
+            article_data["sentiment"] = "neutral"
+            article_data["sentiment_score"] = 0.0
+            return article_data
 
-    # Step 2: call FinBERT — returns a list like:
-    # [{"label": "positive", "score": 0.92}]
-    result = finbert(text)
-
-    # Step 3: grab index [0] — we passed one text, we get one result
-    # result is a list, result[0] is the dict inside
-    top = result[0]
-
-    # Step 4: extract label and score
-    # FinBERT returns plain dicts — use ["key"] not .key
-    sentiment = top["label"]         # "positive" / "negative" / "neutral"
-    score     = top["score"]         # float like 0.92
-
-    # Step 5: add to article dict — like dict["key"] = value
-    article["sentiment"]       = sentiment
-    article["sentiment_score"] = round(score, 4)   # round to 4 decimal places
-
-    return article
+        result = finbert_model(text)
+        top = result[0] if result else {}
+        article_data["sentiment"] = str(top.get("label", "neutral")).lower()
+        article_data["sentiment_score"] = round(float(top.get("score", 0.0) or 0.0), 4)
+        return article_data
+    except Exception as e:
+        print(f"[analyze_sentiment] Error: {e}")
+        article_data = dict(article or {})
+        article_data["sentiment"] = "neutral"
+        article_data["sentiment_score"] = 0.0
+        return article_data

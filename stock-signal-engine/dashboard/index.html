@@ -1,0 +1,382 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-mono,'Courier New',monospace)}
+.db{padding:1rem 0;color:var(--color-text-primary)}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.logo{font-size:13px;font-weight:500;letter-spacing:0.08em;color:var(--color-text-secondary)}
+.logo span{color:var(--color-text-primary)}
+.status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-secondary)}
+.dot{width:6px;height:6px;border-radius:50%;background:#639922}
+.search-row{display:flex;gap:8px;margin-bottom:1.5rem}
+.search-row input{flex:1;font-family:var(--font-mono,'Courier New',monospace);font-size:13px}
+.search-row button{font-family:var(--font-mono,'Courier New',monospace);font-size:12px;padding:0 16px;letter-spacing:0.05em}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.5rem}
+.mcard{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.mcard .label{font-size:11px;color:var(--color-text-tertiary);letter-spacing:0.06em;margin-bottom:6px}
+.mcard .val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.mcard .sub{font-size:11px;color:var(--color-text-secondary);margin-top:3px}
+.pos{color:#3B6D11}.neg{color:#A32D2D}.neu{color:var(--color-text-secondary)}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.panel{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px}
+.panel-full{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:12px}
+.ph{font-size:11px;font-weight:500;letter-spacing:0.07em;color:var(--color-text-secondary);margin-bottom:12px}
+.signal-box{border-radius:var(--border-radius-md);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.signal-buy{background:#EAF3DE;border:0.5px solid #97C459}
+.signal-hold{background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary)}
+.signal-label{font-size:22px;font-weight:500;letter-spacing:0.04em}
+.signal-buy .signal-label{color:#27500A}
+.signal-hold .signal-label{color:var(--color-text-secondary)}
+.conf-bar-wrap{margin-top:10px}
+.conf-bar-bg{height:4px;background:var(--color-border-tertiary);border-radius:2px;overflow:hidden}
+.conf-bar-fill{height:4px;border-radius:2px;background:#639922;transition:width 0.6s ease}
+.conf-txt{font-size:11px;color:var(--color-text-secondary);margin-top:4px}
+.ind-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.ind-row:last-child{border-bottom:none}
+.ind-name{color:var(--color-text-secondary)}
+.ind-val{font-weight:500;color:var(--color-text-primary)}
+.badge{font-size:10px;padding:2px 7px;border-radius:var(--border-radius-md);font-weight:500}
+.badge-green{background:#EAF3DE;color:#27500A}
+.badge-red{background:#FCEBEB;color:#791F1F}
+.badge-gray{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.art-row{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.art-row:last-child{border-bottom:none}
+.art-src{font-size:10px;color:var(--color-text-tertiary);letter-spacing:0.04em;min-width:60px}
+.art-title{color:var(--color-text-primary);line-height:1.4;flex:1}
+.art-score{font-weight:500;font-size:11px;min-width:36px;text-align:right}
+.risk-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.risk-row:last-child{border-bottom:none}
+.risk-label{color:var(--color-text-secondary)}
+.risk-val{font-weight:500}
+.exec-btn{width:100%;padding:10px;font-family:var(--font-mono,'Courier New',monospace);font-size:12px;letter-spacing:0.06em;margin-top:12px;cursor:pointer;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);color:var(--color-text-primary)}
+.exec-btn:hover{background:var(--color-background-secondary)}
+.exec-btn.active{background:#EAF3DE;border-color:#97C459;color:#27500A}
+.loading{text-align:center;padding:2rem;font-size:12px;color:var(--color-text-tertiary);letter-spacing:0.06em}
+.err{text-align:center;padding:1.5rem;font-size:12px;color:#A32D2D;background:#FCEBEB;border-radius:var(--border-radius-md)}
+.chart-wrap{position:relative;width:100%;height:180px}
+.heat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:4px}
+.heat-cell{border-radius:4px;padding:6px 4px;text-align:center;font-size:10px;font-weight:500}
+</style>
+
+<div class="db">
+  <h2 class="sr-only">Stock signal engine dashboard — search a ticker to see live signals, indicators, and sentiment</h2>
+
+  <div class="topbar">
+    <div class="logo"><span>SIGNAL</span>ENGINE v1.0</div>
+    <div class="status"><div class="dot"></div>API connected — localhost:8000</div>
+  </div>
+
+  <div class="search-row">
+    <input type="text" id="ticker-input" placeholder="enter ticker — AAPL, TSLA, NVDA..." maxlength="5" />
+    <button onclick="runPipeline()" id="run-btn">RUN ↗</button>
+  </div>
+
+  <div class="metrics" id="metrics">
+    <div class="mcard"><div class="label">TICKER</div><div class="val" id="m-ticker">—</div><div class="sub">NYSE / NASDAQ</div></div>
+    <div class="mcard"><div class="label">SIGNAL</div><div class="val" id="m-signal">—</div><div class="sub" id="m-conf">confidence —</div></div>
+    <div class="mcard"><div class="label">SENTIMENT</div><div class="val" id="m-sent">—</div><div class="sub" id="m-score">score —</div></div>
+    <div class="mcard"><div class="label">RSI (14)</div><div class="val" id="m-rsi">—</div><div class="sub" id="m-rsi-state">—</div></div>
+  </div>
+
+  <div class="panel-full">
+    <div class="ph">SIGNAL DECISION</div>
+    <div class="signal-box signal-hold" id="signal-box">
+      <div>
+        <div class="signal-label" id="signal-label">AWAITING INPUT</div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px" id="signal-reason">enter a ticker above and click run</div>
+      </div>
+      <i class="ti ti-chart-bar" style="font-size:28px;color:var(--color-text-tertiary)" aria-hidden="true"></i>
+    </div>
+    <div class="conf-bar-wrap">
+      <div class="conf-bar-bg"><div class="conf-bar-fill" id="conf-bar" style="width:0%"></div></div>
+      <div class="conf-txt" id="conf-txt">confidence: —</div>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <div class="ph">TECHNICAL INDICATORS</div>
+      <div id="indicators-list">
+        <div class="ind-row"><span class="ind-name">RSI (14)</span><span class="ind-val" id="i-rsi">—</span></div>
+        <div class="ind-row"><span class="ind-name">MACD</span><span class="ind-val" id="i-macd">—</span></div>
+        <div class="ind-row"><span class="ind-name">BB upper</span><span class="ind-val" id="i-bbu">—</span></div>
+        <div class="ind-row"><span class="ind-name">BB lower</span><span class="ind-val" id="i-bbl">—</span></div>
+        <div class="ind-row"><span class="ind-name">BB width</span><span class="ind-val" id="i-bbw">—</span></div>
+        <div class="ind-row"><span class="ind-name">ATR (14)</span><span class="ind-val" id="i-atr">—</span></div>
+        <div class="ind-row"><span class="ind-name">Close price</span><span class="ind-val" id="i-close">—</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph">RISK EVALUATION</div>
+      <div id="risk-list">
+        <div class="risk-row"><span class="risk-label">decision</span><span class="risk-val" id="r-approved">—</span></div>
+        <div class="risk-row"><span class="risk-label">shares to buy</span><span class="risk-val" id="r-shares">—</span></div>
+        <div class="risk-row"><span class="risk-label">position value</span><span class="risk-val" id="r-posval">—</span></div>
+        <div class="risk-row"><span class="risk-label">stop loss price</span><span class="risk-val" id="r-stop">—</span></div>
+        <div class="risk-row"><span class="risk-label">portfolio value</span><span class="risk-val" id="r-port">—</span></div>
+        <div class="risk-row"><span class="risk-label">exposure</span><span class="risk-val" id="r-exp">—</span></div>
+      </div>
+      <button class="exec-btn" id="exec-btn" onclick="executeSignal()">EXECUTE PAPER TRADE ↗</button>
+    </div>
+  </div>
+
+  <div class="panel-full">
+    <div class="ph">PRICE CHART (6 MONTHS)</div>
+    <div class="chart-wrap"><canvas id="priceChart" role="img" aria-label="Price chart for selected ticker">No data loaded yet.</canvas></div>
+  </div>
+
+  <div class="panel-full">
+    <div class="ph">SENTIMENT HEATMAP — SOURCES</div>
+    <div class="heat-grid" id="heat-grid">
+      <div class="heat-cell" style="background:var(--color-background-secondary);color:var(--color-text-tertiary)">NEWSAPI</div>
+      <div class="heat-cell" style="background:var(--color-background-secondary);color:var(--color-text-tertiary)">YFINANCE</div>
+      <div class="heat-cell" style="background:var(--color-background-secondary);color:var(--color-text-tertiary)">TWITTER</div>
+      <div class="heat-cell" style="background:var(--color-background-secondary);color:var(--color-text-tertiary)">SEC EDGAR</div>
+      <div class="heat-cell" style="background:var(--color-background-secondary);color:var(--color-text-tertiary)">OVERALL</div>
+    </div>
+  </div>
+
+  <div class="panel-full">
+    <div class="ph">LATEST ARTICLES</div>
+    <div id="articles-list"><div class="loading">NO DATA — RUN A TICKER ABOVE</div></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const API = 'http://localhost:8000';
+let priceChart = null;
+let currentTicker = '';
+let currentDecision = null;
+
+document.getElementById('ticker-input').addEventListener('keydown', e => {
+  if(e.key === 'Enter') runPipeline();
+  e.target.value = e.target.value.toUpperCase();
+});
+
+function sentColor(s){
+  if(s==='positive') return {bg:'#EAF3DE',color:'#27500A'};
+  if(s==='negative') return {bg:'#FCEBEB',color:'#791F1F'};
+  return {bg:'var(--color-background-secondary)',color:'var(--color-text-secondary)'};
+}
+
+function scoreToHeat(score, sentiment){
+  if(!score && score!==0) return {bg:'var(--color-background-secondary)',color:'var(--color-text-tertiary)'};
+  const s = sentiment==='negative' ? -score : sentiment==='positive' ? score : 0;
+  if(s > 0.6) return {bg:'#EAF3DE',color:'#27500A'};
+  if(s > 0.2) return {bg:'#C0DD97',color:'#3B6D11'};
+  if(s < -0.6) return {bg:'#F09595',color:'#791F1F'};
+  if(s < -0.2) return {bg:'#F7C1C1',color:'#A32D2D'};
+  return {bg:'var(--color-background-secondary)',color:'var(--color-text-secondary)'};
+}
+
+async function runPipeline(){
+  const ticker = document.getElementById('ticker-input').value.trim().toUpperCase();
+  if(!ticker){ return; }
+  currentTicker = ticker;
+  currentDecision = null;
+
+  document.getElementById('run-btn').textContent = 'LOADING...';
+  document.getElementById('articles-list').innerHTML = '<div class="loading">FETCHING DATA...</div>';
+  setMetrics({});
+
+  try{
+    const [sigRes, mktRes, sentRes] = await Promise.all([
+      fetch(`${API}/signal/${ticker}`).then(r=>r.json()),
+      fetch(`${API}/market/${ticker}`).then(r=>r.json()),
+      fetch(`${API}/sentiment/${ticker}`).then(r=>r.json())
+    ]);
+
+    currentDecision = sigRes;
+    renderSignal(sigRes);
+    renderMarket(mktRes, ticker);
+    renderSentiment(sentRes, ticker);
+    renderRisk(sigRes);
+    await renderPriceChart(ticker);
+
+  } catch(e){
+    document.getElementById('articles-list').innerHTML = `<div class="err">API ERROR — is uvicorn running on localhost:8000?<br><br>${e.message}</div>`;
+  }
+
+  document.getElementById('run-btn').textContent = 'RUN ↗';
+}
+
+function setMetrics(d){
+  document.getElementById('m-ticker').textContent = d.ticker || '—';
+  document.getElementById('m-signal').textContent = d.action || '—';
+  document.getElementById('m-conf').textContent = d.conf ? `confidence ${(d.conf*100).toFixed(0)}%` : 'confidence —';
+  document.getElementById('m-sent').textContent = d.sentiment || '—';
+  document.getElementById('m-score').textContent = d.score ? `score ${d.score.toFixed(2)}` : 'score —';
+  document.getElementById('m-rsi').textContent = d.rsi ? d.rsi.toFixed(1) : '—';
+  document.getElementById('m-rsi-state').textContent = d.rsiState || '—';
+}
+
+function renderSignal(sig){
+  const action = sig?.signal?.action || 'HOLD';
+  const conf   = sig?.signal?.confidence || 0;
+  const reason = sig?.signal?.reason || '—';
+
+  const box = document.getElementById('signal-box');
+  box.className = 'signal-box ' + (action==='BUY' ? 'signal-buy' : 'signal-hold');
+  document.getElementById('signal-label').textContent = action;
+  document.getElementById('signal-reason').textContent = reason;
+  document.getElementById('conf-bar').style.width = (conf*100).toFixed(0) + '%';
+  document.getElementById('conf-txt').textContent = `confidence: ${(conf*100).toFixed(0)}%`;
+
+  setMetrics({
+    ticker: sig?.ticker,
+    action,
+    conf,
+    sentiment: '—',
+    score: null,
+    rsi: null,
+    rsiState: '—'
+  });
+}
+
+function renderMarket(mkt){
+  const rsi  = mkt['RSI_14'];
+  const macd = mkt['MACDh_12_26_9'];
+  const bbu  = mkt['BBU_20_2.0'];
+  const bbl  = mkt['BBL_20_2.0'];
+  const atr  = mkt['ATRr_14'];
+  const close= mkt['Close'];
+
+  document.getElementById('i-rsi').textContent  = rsi  ? rsi.toFixed(1)  : '—';
+  document.getElementById('i-macd').textContent = macd ? macd.toFixed(3) : '—';
+  document.getElementById('i-bbu').textContent  = bbu  ? '$'+bbu.toFixed(2) : '—';
+  document.getElementById('i-bbl').textContent  = bbl  ? '$'+bbl.toFixed(2) : '—';
+  document.getElementById('i-bbw').textContent  = (bbu&&bbl) ? '$'+(bbu-bbl).toFixed(2) : '—';
+  document.getElementById('i-atr').textContent  = atr  ? atr.toFixed(2)  : '—';
+  document.getElementById('i-close').textContent= close? '$'+close.toFixed(2) : '—';
+
+  const rsiState = rsi > 70 ? 'OVERBOUGHT' : rsi < 30 ? 'OVERSOLD' : 'NEUTRAL';
+  document.getElementById('m-rsi').textContent = rsi ? rsi.toFixed(1) : '—';
+  document.getElementById('m-rsi-state').textContent = rsiState;
+}
+
+function renderRisk(sig){
+  const dec = sig?.decision;
+  if(!dec){ return; }
+  document.getElementById('r-approved').innerHTML = dec.approved
+    ? '<span class="badge badge-green">APPROVED</span>'
+    : '<span class="badge badge-red">REJECTED</span>';
+  document.getElementById('r-shares').textContent  = dec.shares != null ? dec.shares : '—';
+  document.getElementById('r-posval').textContent  = dec.position_value != null ? '$'+dec.position_value.toFixed(2) : '—';
+  document.getElementById('r-stop').textContent    = dec.stop_loss_price != null ? '$'+dec.stop_loss_price.toFixed(2) : '—';
+
+  fetch(`${API}/portfolio`).then(r=>r.json()).then(p=>{
+    document.getElementById('r-port').textContent = p.portfolio_value != null ? '$'+p.portfolio_value.toFixed(2) : '—';
+    document.getElementById('r-exp').textContent  = p.current_exposure != null ? '$'+p.current_exposure.toFixed(2) : '—';
+  }).catch(()=>{});
+
+  const btn = document.getElementById('exec-btn');
+  btn.className = dec.approved ? 'exec-btn active' : 'exec-btn';
+  btn.textContent = dec.approved ? 'EXECUTE PAPER TRADE ↗' : 'TRADE NOT APPROVED';
+}
+
+function renderSentiment(arts, ticker){
+  if(!arts || !arts.length){
+    document.getElementById('articles-list').innerHTML = '<div class="loading">NO ARTICLES FOUND</div>';
+    return;
+  }
+
+  const bySource = {};
+  arts.forEach(a => {
+    if(!bySource[a.source]) bySource[a.source] = [];
+    bySource[a.source].push(a);
+  });
+
+  const sourceKeys = ['newsapi','yfinance_news','twitter','sec_edgar','overall'];
+  const sourceLabels = {'newsapi':'NEWSAPI','yfinance_news':'YFINANCE','twitter':'TWITTER','sec_edgar':'SEC EDGAR','overall':'OVERALL'};
+
+  const allScores = arts.map(a=>({score:a.sentiment_score||0, sentiment:a.sentiment||'neutral'}));
+  const avgScore  = allScores.reduce((s,x)=>s+x.score,0) / (allScores.length||1);
+  const posCnt    = allScores.filter(x=>x.sentiment==='positive').length;
+  const negCnt    = allScores.filter(x=>x.sentiment==='negative').length;
+  const overallSent = posCnt > negCnt ? 'positive' : negCnt > posCnt ? 'negative' : 'neutral';
+
+  const heatGrid = document.getElementById('heat-grid');
+  heatGrid.innerHTML = '';
+  sourceKeys.forEach(k => {
+    const items = k==='overall' ? allScores : (bySource[k]||[]).map(a=>({score:a.sentiment_score||0,sentiment:a.sentiment||'neutral'}));
+    const sc    = k==='overall' ? avgScore : items.reduce((s,x)=>s+x.score,0)/(items.length||1);
+    const sent  = k==='overall' ? overallSent : (items.filter(x=>x.sentiment==='positive').length > items.filter(x=>x.sentiment==='negative').length ? 'positive' : 'negative');
+    const h     = scoreToHeat(sc, sent);
+    heatGrid.innerHTML += `<div class="heat-cell" style="background:${h.bg};color:${h.color}">${sourceLabels[k]}<br><span style="font-size:9px;opacity:0.8">${sc ? sc.toFixed(2) : 'n/a'}</span></div>`;
+  });
+
+  document.getElementById('m-sent').textContent = overallSent;
+  document.getElementById('m-score').textContent = `score ${avgScore.toFixed(2)}`;
+
+  const html = arts.slice(0,8).map(a=>{
+    const sc = a.sentiment_score || 0;
+    const h  = sentColor(a.sentiment);
+    return `<div class="art-row">
+      <span class="art-src">${(a.source||'').replace('_',' ').toUpperCase().slice(0,8)}</span>
+      <span class="art-title">${(a.title||'').slice(0,80)}${(a.title||'').length>80?'…':''}</span>
+      <span class="art-score" style="color:${h.color}">${sc.toFixed(2)}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('articles-list').innerHTML = html;
+}
+
+async function renderPriceChart(ticker){
+  try{
+    const res  = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=6mo`);
+    const data = await res.json();
+    const ts   = data?.chart?.result?.[0]?.timestamp || [];
+    const closes = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+    const labels = ts.map(t => new Date(t*1000).toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+
+    if(priceChart){ priceChart.destroy(); }
+    priceChart = new Chart(document.getElementById('priceChart'),{
+      type:'line',
+      data:{
+        labels,
+        datasets:[{
+          label: ticker + ' close price',
+          data: closes.map(v => v ? parseFloat(v.toFixed(2)) : null),
+          borderColor:'#185FA5',
+          borderWidth:1.5,
+          pointRadius:0,
+          tension:0.3,
+          fill:false
+        }]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{font:{size:10},maxTicksLimit:8,autoSkip:true},grid:{display:false}},
+          y:{ticks:{font:{size:10},callback:v=>'$'+v.toFixed(0)},grid:{color:'rgba(128,128,128,0.1)'}}
+        }
+      }
+    });
+  } catch(e){
+    document.getElementById('priceChart').parentElement.innerHTML = '<div class="loading">PRICE CHART UNAVAILABLE</div>';
+  }
+}
+
+async function executeSignal(){
+  if(!currentDecision?.decision?.approved){
+    alert('Trade not approved by risk manager.');
+    return;
+  }
+  const btn = document.getElementById('exec-btn');
+  btn.textContent = 'SUBMITTING...';
+  try{
+    const res = await fetch(`${API}/execute`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ticker: currentTicker})
+    });
+    const data = await res.json();
+    btn.textContent = data.status==='submitted' ? 'ORDER SUBMITTED ✓' : 'FAILED — '+data.reason;
+  } catch(e){
+    btn.textContent = 'ERROR — check API';
+  }
+}
+</script>

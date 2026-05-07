@@ -3,35 +3,30 @@ from .risk_manager import calculate_position_size, check_portfolio_heat
 
 def evaluate_trade(signal: dict, current_price: float,
                    portfolio_value: float, current_exposure: float) -> dict:
-    """
-    Full risk evaluation for a potential trade.
-    Returns final trade decision with position sizing.
-    """
+    try:
+        if signal.get("action") != "BUY":
+            return {"approved": False, "reason": "No signal"}
 
-    # Step 1: skip risk checks if no BUY signal
-    if signal.get("action") != "BUY":
-        return {"approved": False, "reason": "No signal"}
+        confidence = float(signal.get("confidence", 0.0) or 0.0)
+        position = calculate_position_size(portfolio_value, current_price, confidence)
+        if not position:
+            return {"approved": False, "reason": "Position sizing failed"}
 
-    # Step 2: get confidence FIRST — then use it
-    confidence = signal.get("confidence", 0.0)        # ✅ defined before use
-    position   = calculate_position_size(             # ✅ now confidence exists
-        portfolio_value, current_price, confidence
-    )
+        heat = check_portfolio_heat(
+            current_exposure,
+            portfolio_value,
+            float(position.get("position_value", 0.0) or 0.0)
+        )
+        if not heat.get("approved", False):
+            return {"approved": False, "reason": heat.get("reason", "Portfolio heat exceeded")}
 
-    # Step 3: check portfolio heat
-    heat = check_portfolio_heat(
-        current_exposure, portfolio_value, position["position_value"]
-    )
-
-    # Step 4: reject if too hot
-    if not heat["approved"]:
-        return {"approved": False, "reason": heat["reason"]}
-
-    # Step 5: full approval with position details
-    return {
-        "approved":        True,
-        "shares":          position["shares"],
-        "position_value":  position["position_value"],
-        "stop_loss_price": position["stop_loss_price"],
-        "reason":          signal["reason"]
-    }
+        return {
+            "approved":        True,
+            "shares":          int(position.get("shares", 0) or 0),
+            "position_value":  float(position.get("position_value", 0.0) or 0.0),
+            "stop_loss_price": float(position.get("stop_loss_price", 0.0) or 0.0),
+            "reason":          signal.get("reason", "")
+        }
+    except Exception as e:
+        print(f"[evaluate_trade] Error: {e}")
+        return {"approved": False, "reason": "error"}
