@@ -1,33 +1,66 @@
+"""
+Quantitative Model Training Script
+===================================
+Automates historical dataset creation and LightGBM model training with
+Triple-Barrier labeling and Walk-Forward TimeSeriesSplit cross-validation.
+
+Usage:
+    python train.py                     # Train on cached dataset or generate if missing
+    python train.py --build-dataset     # Rebuild dataset from market data + train
+    python train.py --period 2y         # Set lookback period
+"""
+
+import argparse
+import logging
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 
+from data.dataset_generator import build_historical_dataset
 from model.trainer import FEATURE_COLS, LABEL_COL, train
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger(__name__)
 
-def load_training_dataframe() -> pd.DataFrame:
-    try:
-        candidate_paths = [
-            Path("data/training_features.csv"),
-            Path("data/training_features.parquet"),
-            Path("training_features.csv"),
-            Path("training_features.parquet"),
-        ]
 
-        for candidate_path in candidate_paths:
-            if not candidate_path.exists():
-                continue
+def load_or_build_training_dataframe(
+    rebuild: bool = False,
+    universe_name: str = "core",
+    period: str = "2y",
+) -> pd.DataFrame:
+    """
+    Loads historical training dataset. If missing or rebuild=True,
+    generates fresh dataset via Triple-Barrier labeling across the universe.
+    """
+    candidate_paths = [
+        Path("data/training_features.parquet"),
+        Path("data/training_features.csv"),
+    ]
 
-            if candidate_path.suffix == ".csv":
-                return pd.read_csv(candidate_path)
+    if not rebuild:
+        for p in candidate_paths:
+            if p.exists():
+                try:
+                    if p.suffix == ".parquet":
+                        df = pd.read_parquet(p)
+                    else:
+                        df = pd.read_csv(p)
+                    if not df.empty and len(df) > 100:
+                        logger.info(f"Loaded {len(df):,} training rows from {p}")
+                        return df
+                except Exception as e:
+                    logger.debug(f"Could not load {p}: {e}")
 
-            if candidate_path.suffix == ".parquet":
-                return pd.read_parquet(candidate_path)
+    # Build fresh dataset
+    logger.info(f"Generating historical dataset for {universe_name} universe (period={period})...")
+    df = build_historical_dataset(universe_name=universe_name, period=period)
+    if not df.empty:
+        return df
 
-        return build_bootstrap_dataframe()
-    except Exception as e:
-        print(f"[train.py] Error: {e}")
-        return pd.DataFrame()
+    # Final fallback: minimal bootstrap dataset
+    logger.warning("Generating bootstrap fallback dataset.")
+    return build_bootstrap_dataframe()
 
 
 def build_bootstrap_dataframe() -> pd.DataFrame:
@@ -55,17 +88,27 @@ def build_bootstrap_dataframe() -> pd.DataFrame:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Train Quantitative Stock Signal Model")
+    parser.add_argument("--build-dataset", action="store_true", help="Force rebuild of historical dataset")
+    parser.add_argument("--universe", choices=["core", "wide"], default="core", help="Universe for dataset (core=28, wide=~90)")
+    parser.add_argument("--period", type=str, default="2y", help="Lookback period (e.g. 1y, 2y, 5y)")
+    parser.add_argument("--model-path", type=str, default="model/lgbm_model.pkl", help="Destination path for trained model")
+    parser.add_argument("--splits", type=int, default=5, help="Number of TimeSeriesSplit folds")
+    args = parser.parse_args()
+
     try:
-        training_df = load_training_dataframe()
+        training_df = load_or_build_training_dataframe(
+            rebuild=args.build_dataset,
+            universe_name=args.universe,
+            period=args.period,
+        )
         if training_df.empty:
             print("[train.py] Error: Empty training dataframe")
-            return None
+            return
 
-        train(training_df)
-        return None
+        train(training_df, model_path=args.model_path, n_splits=args.splits)
     except Exception as e:
         print(f"[train.py] Error: {e}")
-        return None
 
 
 if __name__ == "__main__":

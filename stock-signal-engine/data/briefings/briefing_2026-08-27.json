@@ -1,0 +1,327 @@
+{
+  "date": "2026-08-27",
+  "generated_at": "2026-08-27T23:55:59",
+  "universe": "core",
+  "scraped": 28,
+  "with_news": 28,
+  "tickers": [
+    {
+      "ticker": "NVDA",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.8362,
+      "avg_score": 0.7238,
+      "pos": 2,
+      "neg": 1,
+      "headline": "Procter & Gamble Has Raised Its Dividend for 70 Straight Years. Here's How Much $25,000 Invested Pays Annually.",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "AAPL",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9371,
+      "avg_score": 0.922,
+      "pos": 0,
+      "neg": 1,
+      "headline": "Here are the launches John Ternus needs to nail as Apple's next CEO",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "MSFT",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.6971,
+      "avg_score": 0.7555,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Redwood Software Orchestrates the Enterprise, From Hybrid Cloud to Agentic AI -- Named a Leader for the Third Consecutiv",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "AMD",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.9283,
+      "avg_score": 0.8427,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Nutanix Surges as Cloud and Agentic AI Partnerships With AMD Pay Off",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "GOOGL",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.6082,
+      "avg_score": 0.7371,
+      "pos": 0,
+      "neg": 2,
+      "headline": "Nexteq\u2019s Densitron enters automotive market with EV display contract",
+      "sector": "Communication"
+    },
+    {
+      "ticker": "META",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.647,
+      "avg_score": 0.696,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Market Chatter: Meta Internally Projected $10 Billion Annual Spend on Anthropic AI Models",
+      "sector": "Communication"
+    },
+    {
+      "ticker": "NFLX",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9383,
+      "avg_score": 0.899,
+      "pos": 0,
+      "neg": 0,
+      "headline": "Dear Netflix Stock Fans, Mark Your Calendars for August 27",
+      "sector": "Communication"
+    },
+    {
+      "ticker": "AMZN",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.647,
+      "avg_score": 0.5952,
+      "pos": 3,
+      "neg": 0,
+      "headline": "Market Chatter: Meta Internally Projected $10 Billion Annual Spend on Anthropic AI Models",
+      "sector": "Consumer Disc."
+    },
+    {
+      "ticker": "TSLA",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.4597,
+      "avg_score": 0.7098,
+      "pos": 1,
+      "neg": 0,
+      "headline": "The Demand Signal Underneath Tesla Stock's Cash-Burn Debate",
+      "sector": "Consumer Disc."
+    },
+    {
+      "ticker": "HD",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.819,
+      "avg_score": 0.7607,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Home Depot Expands AI Assistant's Capabilities to Include Localized Store Knowledge",
+      "sector": "Consumer Disc."
+    },
+    {
+      "ticker": "JPM",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.8837,
+      "avg_score": 0.8664,
+      "pos": 1,
+      "neg": 1,
+      "headline": "Can JPMorgan's Stablecoin Push Strengthen Its Digital Payments Edge?",
+      "sector": "Financials"
+    },
+    {
+      "ticker": "V",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.9322,
+      "avg_score": 0.828,
+      "pos": 2,
+      "neg": 0,
+      "headline": "Can Visa's Bluefin Partnership Strengthen Its Merchant Growth?",
+      "sector": "Financials"
+    },
+    {
+      "ticker": "GS",
+      "articles": 3,
+      "best_label": "negative",
+      "best_score": 0.8941,
+      "avg_score": 0.919,
+      "pos": 0,
+      "neg": 3,
+      "headline": "Goldman Sachs expresses doubts about Scott Bessent's plan",
+      "sector": "Financials"
+    },
+    {
+      "ticker": "JNJ",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9269,
+      "avg_score": 0.7859,
+      "pos": 0,
+      "neg": 0,
+      "headline": "What Is Johnson & Johnson (JNJ) Telling Investors With Its First WAIHA Approval?",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "UNH",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.932,
+      "avg_score": 0.8245,
+      "pos": 0,
+      "neg": 0,
+      "headline": "Is UnitedHealth (UNH) the Healthcare Stock to Watch Right Now?",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "LLY",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.9444,
+      "avg_score": 0.8231,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Salesforce's Outlook Strengthens on Organic Momentum, Acquisitions, RBC Says",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "XOM",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.852,
+      "avg_score": 0.8436,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Sintana Energy highlights robust position as Atlantic Margin assets advance",
+      "sector": "Energy"
+    },
+    {
+      "ticker": "CVX",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9315,
+      "avg_score": 0.8656,
+      "pos": 0,
+      "neg": 1,
+      "headline": "Why ExxonMobil's Financial Strength Matters for Investors",
+      "sector": "Energy"
+    },
+    {
+      "ticker": "CAT",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.941,
+      "avg_score": 0.8999,
+      "pos": 0,
+      "neg": 0,
+      "headline": "Here's How Much You'd Have If You Invested $1000 in Caterpillar a Decade Ago",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "BA",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.5189,
+      "avg_score": 0.7508,
+      "pos": 1,
+      "neg": 2,
+      "headline": "Trump bought up to $500,000 of Boeing on the same day the Navy handed Boeing a deal worth up to $880 million",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "PG",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.8362,
+      "avg_score": 0.8594,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Procter & Gamble Has Raised Its Dividend for 70 Straight Years. Here's How Much $25,000 Invested Pays Annually.",
+      "sector": "Staples"
+    },
+    {
+      "ticker": "KO",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.9384,
+      "avg_score": 0.7937,
+      "pos": 2,
+      "neg": 0,
+      "headline": "Coca-Cola (KO) Up 1.1% Since Last Earnings Report: Can It Continue?",
+      "sector": "Staples"
+    },
+    {
+      "ticker": "NEE",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.7971,
+      "avg_score": 0.7584,
+      "pos": 0,
+      "neg": 1,
+      "headline": "OKLO's Aurora Reactor: New Design, Proven Nuclear Principles",
+      "sector": "Utilities"
+    },
+    {
+      "ticker": "DUK",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.8689,
+      "avg_score": 0.7628,
+      "pos": 0,
+      "neg": 0,
+      "headline": "CEG Stock Outperforms Industry in the Past Month: Buy, Hold or Sell",
+      "sector": "Utilities"
+    },
+    {
+      "ticker": "LIN",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.8769,
+      "avg_score": 0.766,
+      "pos": 1,
+      "neg": 1,
+      "headline": "Is Linde (LIN) Set to Benefit\u00a0From\u00a0a Global Industrial Recovery?",
+      "sector": "Materials"
+    },
+    {
+      "ticker": "FCX",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.5698,
+      "avg_score": 0.8112,
+      "pos": 1,
+      "neg": 1,
+      "headline": "Sophus IT Solutions Named an OpenAI Select Partner, Expanding Production AI Deployments and Geospatial Intelligence Solu",
+      "sector": "Materials"
+    },
+    {
+      "ticker": "PLD",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9456,
+      "avg_score": 0.9393,
+      "pos": 0,
+      "neg": 0,
+      "headline": "Dimensional Fund Advisors Ltd. : Form 8.3 - PROLOGIS INC - Ordinary Shares",
+      "sector": "Real Estate"
+    },
+    {
+      "ticker": "AMT",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.895,
+      "avg_score": 0.8951,
+      "pos": 0,
+      "neg": 1,
+      "headline": "HST vs. AMT: Which Stock Is the Better Value Option?",
+      "sector": "Real Estate"
+    }
+  ],
+  "bullish_top": [
+    "LLY",
+    "KO",
+    "V",
+    "AMD",
+    "JPM"
+  ],
+  "bearish_top": [
+    "GS"
+  ]
+}

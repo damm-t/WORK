@@ -5,26 +5,31 @@ feedparser==6.0.10
 
 # ── NLP ────────────────────────────────────────────────
 transformers==4.40.0
-torch==2.11.0
-spacy==3.8.14
+torch==2.2.0
+spacy==3.7.4
 
 # ── Market Data ────────────────────────────────────────
 yfinance==0.2.40
-pandas==2.3.3
-pandas-ta==0.4.67b0
+pandas
+pandas-ta
 
 # ── ML Model ───────────────────────────────────────────
 lightgbm==4.3.0
 scikit-learn==1.4.2
 joblib==1.4.0
-numpy==2.2.6
+numpy<2.0.0
 
 # ── API ────────────────────────────────────────────────
-fastapi==0.111.0
+fastapi
 uvicorn==0.29.0
+pydantic-settings==2.2.1
 
 # ── Execution ──────────────────────────────────────────
-alpaca-trade-api==3.2.0
+alpaca-py
 
-# ── Environment ────────────────────────────────────────
+# ── Terminal CLI & AI ──────────────────────────────────
+google-genai
+
+# ── Environment & Logging ──────────────────────────────
 python-dotenv==1.0.1
+loguru==0.7.2

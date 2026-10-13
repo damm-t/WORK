@@ -1,161 +1,120 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from ingestion import fetch_all
-from nlp       import analyze, analyze_sentiment_only
-from market    import get_market_features
-from features  import build_features
-from model     import get_signal
-from risk      import evaluate_trade
-from execution import client, get_portfolio_value, get_current_exposure
+from fastapi import FastAPI, HTTPException, Depends, Security, Request
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security.api_key import APIKeyHeader
 
-class ExecuteRequest(BaseModel):
-    ticker: str
+from api.schemas import ExecuteRequest, EngineException, NoArticlesFoundError, MarketDataNotFoundError, NLPAnalysisError
+from api import services
+from config import get_settings
 
-app = FastAPI(title="Stock Signal Engine", version="1.0")
+settings = get_settings()
+API_KEY_HEADER = APIKeyHeader(name="X-API-KEY", auto_error=True)
 
-@app.post("/execute")
-def execute_endpoint(request: ExecuteRequest):
-    ticker = request.ticker.upper()
-    try:
-        # Re-run the pipeline to get decision (since no state is stored)
-        articles = fetch_all(ticker)[:3]
-        enriched = []
-        for article in articles:
-            analyzed_article = analyze_sentiment_only(article)
-            if analyzed_article:
-                enriched.append(analyzed_article)
+app = FastAPI(title="Stock Signal Engine", version="2.1")
 
-        if not enriched:
-            raise HTTPException(status_code=404, detail="No articles found")
+# --- Middleware: CORS for your Dashboard ---
+allowed_origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(',') if origin.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-        best = max(enriched, key=lambda article: article.get("sentiment_score", 0.0))
-        market = get_market_features(ticker)
-        if not market:
-            raise HTTPException(status_code=404, detail="No market data")
+# --- Security: API Key Validation ---
+def validate_api_key(api_key_header: str = Security(API_KEY_HEADER)):
+    if api_key_header != settings.INTERNAL_API_KEY:
+        raise HTTPException(status_code=403, detail="Unauthorized: Invalid Internal API Key")
+    return api_key_header
 
-        features = build_features(best, market)
-        signal = get_signal(
-            features,
-            float(best.get("sentiment_score", 0.0) or 0.0),
-            str(best.get("sentiment", "neutral"))
-        )
+# --- Global Exception Handlers ---
+@app.exception_handler(NoArticlesFoundError)
+@app.exception_handler(MarketDataNotFoundError)
+@app.exception_handler(NLPAnalysisError)
+async def domain_not_found_handler(request: Request, exc: Exception):
+    return JSONResponse(status_code=404, content={"error": type(exc).__name__, "message": str(exc)})
 
-        portfolio_value = get_portfolio_value(client)
-        exposure        = get_current_exposure(client)
-        current_price   = float(market.get("Close", 0.0) or 0.0)
-        decision        = evaluate_trade(signal, current_price, portfolio_value, exposure)
+@app.exception_handler(EngineException)
+async def engine_logic_handler(request: Request, exc: EngineException):
+    return JSONResponse(status_code=400, content={"error": "LogicError", "message": str(exc)})
 
-        from execution import execute_trade
-        result = execute_trade(decision, ticker)
-        return result
+@app.exception_handler(Exception)
+async def global_crash_handler(request: Request, exc: Exception):
+    # Log the full stack trace here in a real production environment
+    return JSONResponse(status_code=500, content={"error": "InternalServerError", "message": "An unexpected error occurred."})
 
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# --- Endpoints ---
 
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
-
+@app.post("/execute", dependencies=[Depends(validate_api_key)])
+async def execute_endpoint(request: ExecuteRequest):
+    return services.process_trade_execution(request.ticker)
 
 @app.get("/signal/{ticker}")
-def signal_endpoint(ticker: str):
-    try:
-        normalized_ticker = ticker.upper()
-        articles = fetch_all(normalized_ticker)[:3]
-        enriched = []
-        for article in articles:
-            analyzed_article = analyze_sentiment_only(article)
-            if analyzed_article:
-                enriched.append(analyzed_article)
-
-        if not enriched:
-            raise HTTPException(status_code=404, detail="No articles found")
-
-        best = max(enriched, key=lambda article: article.get("sentiment_score", 0.0))
-        market = get_market_features(normalized_ticker)
-        if not market:
-            raise HTTPException(status_code=404, detail="No market data")
-
-        features = build_features(best, market)
-        signal = get_signal(
-            features,
-            float(best.get("sentiment_score", 0.0) or 0.0),
-            str(best.get("sentiment", "neutral"))
-        )
-
-        portfolio_value = get_portfolio_value(client)
-        exposure        = get_current_exposure(client)
-        current_price   = float(market.get("Close", 0.0) or 0.0)
-        decision        = evaluate_trade(signal, current_price, portfolio_value, exposure)
-
-        return {"ticker": normalized_ticker, "signal": signal, "decision": decision}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
+async def signal_endpoint(ticker: str):
+    normalized_ticker, signal, best, market, _ = services.get_processed_signal(ticker)
+    
+    # Logic extracted from services to keep main clean
+    from risk import evaluate_trade
+    from execution import client, get_portfolio_value, get_current_exposure
+    
+    portfolio_value = get_portfolio_value(client)
+    exposure = get_current_exposure(client)
+    current_price = float(market.get("Close", 0.0) or 0.0)
+    
+    decision = evaluate_trade(signal, current_price, portfolio_value, exposure)
+    return {"ticker": normalized_ticker, "signal": signal, "decision": decision}
 
 @app.get("/market/{ticker}")
-def market_endpoint(ticker: str):
-    try:
-        result = get_market_features(ticker.upper())
-        if not result:
-            raise HTTPException(status_code=404, detail="No market data")
-
-        return result
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
+async def market_endpoint(ticker: str):
+    from market import get_market_features
+    result = get_market_features(ticker.upper())
+    if not result:
+        raise MarketDataNotFoundError(f"No market data found for {ticker}")
+    return result
 
 @app.get("/sentiment/{ticker}")
-def sentiment_endpoint(ticker: str):
-    try:
-        normalized_ticker = ticker.upper()
-        articles = fetch_all(normalized_ticker)
-        enriched = []
-        for article in articles:
-            analyzed_article = analyze_sentiment_only(article)
-            if analyzed_article:
-                enriched.append(analyzed_article)
-
-        if not enriched:
-            raise HTTPException(status_code=404, detail="No articles found")
-
-        return [
-            {
-                "source": article.get("source", ""),
-                "title": article.get("title", ""),
-                "sentiment": article.get("sentiment", "neutral"),
-                "sentiment_score": article.get("sentiment_score", 0.0),
-                "published_at": article.get("published_at", "")
-            }
-            for article in enriched
-        ]
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
+async def sentiment_endpoint(ticker: str):
+    _, _, _, _, enriched = services.get_processed_signal(ticker)
+    return [
+        {
+            "source": a.get("source", ""),
+            "title": a.get("title", ""),
+            "sentiment": a.get("sentiment", "neutral"),
+            "sentiment_score": a.get("sentiment_score", 0.0),
+            "published_at": a.get("published_at", "")
+        } for a in enriched
+    ]
 
 @app.get("/portfolio")
-def portfolio_endpoint():
-    try:
-        portfolio_value = get_portfolio_value(client)
-        exposure        = get_current_exposure(client)
+async def portfolio_endpoint():
+    return services.get_portfolio_summary()
 
-        return {
-            "portfolio_value":    round(portfolio_value, 2),
-            "current_exposure":   round(exposure, 2),
-            "available":          round(portfolio_value - exposure, 2)
-        }
+@app.get("/regime")
+async def regime_endpoint(benchmark: str = "SPY"):
+    """Market regime detection: BULL_MOMENTUM / CHOP_NEUTRAL / BEAR_VOLATILITY."""
+    return services.get_regime(benchmark)
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/hedge/evaluate/{ticker}")
+async def hedge_evaluate_endpoint(ticker: str):
+    """Dry-run paired trade plan: signal + risk decision + beta hedge diagnostics."""
+    return services.get_hedge_evaluation(ticker)
+
+@app.post("/autopilot/run-once")
+async def autopilot_run_once(request: ExecuteRequest):
+    """Single autopilot cycle over the watchlist (position mgmt + scan)."""
+    from execution.autopilot import run_autopilot
+    run_autopilot(watchlist=[request.ticker.upper()], once=True, dry_run=False)
+    return {"status": "cycle_complete", "ticker": request.ticker.upper()}
+
+@app.get("/purchases")
+async def purchases_endpoint(limit: int = 50):
+    from execution.purchase_logger import get_purchase_logs, get_purchase_log_text
+    return {
+        "purchases": get_purchase_logs(limit=limit),
+        "raw_text": get_purchase_log_text(),
+    }
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "version": "2.2-hedged", "model_runtime": settings.USE_LGBM_RUNTIME}

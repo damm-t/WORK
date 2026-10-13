@@ -1,0 +1,152 @@
+[
+  {
+    "ticker": "FCX",
+    "sector": "Materials",
+    "scanner_score": 92.9,
+    "sentiment_conviction": 100.0,
+    "tech_score": 39.4,
+    "tech_grade": "C",
+    "composite": 82.0,
+    "price_ref": 79.91,
+    "premarket_gap_pct": null,
+    "qty": 375,
+    "tp": 85.9,
+    "sl": 73.92,
+    "risk_dollars": 2246.95,
+    "notional": 29966.25,
+    "headlines": [
+      {
+        "title": "These 3 Sectors Will Outperform if the Fed Hikes Rates",
+        "label": "positive",
+        "score": 0.7128,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Freeport-McMoRan Diversifies Your Return, Not Your Risk",
+        "label": "neutral",
+        "score": 0.9177,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "William O'Neil Initiates Freeport-McMoRan at Buy",
+        "label": "neutral",
+        "score": 0.9292,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Dow Jones Futures Waver; Nvidia, Tariffs, Warsh In Focus",
+        "label": "neutral",
+        "score": 0.6016,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Palantir, Freeport Clear Buy Points, Lead Five Stocks To Watch",
+        "label": "neutral",
+        "score": 0.7823,
+        "source": "yfinance_news"
+      }
+    ],
+    "order_ready": true,
+    "premarket": null
+  },
+  {
+    "ticker": "V",
+    "sector": "Financials",
+    "scanner_score": 85.8,
+    "sentiment_conviction": 100.0,
+    "tech_score": 45.4,
+    "tech_grade": "C",
+    "composite": 80.7,
+    "price_ref": 384.14,
+    "premarket_gap_pct": null,
+    "qty": 78,
+    "tp": 398.34,
+    "sl": 369.94,
+    "risk_dollars": 1107.28,
+    "notional": 29962.92,
+    "headlines": [
+      {
+        "title": "KARTY LLC Receives the Visa FinTech Innovation Award Following its Qatar Launch",
+        "label": "positive",
+        "score": 0.9146,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Stocks making big moves yesterday: Funko, Hims & Hers Health, Azenta, Strategy, and RUM Group",
+        "label": "neutral",
+        "score": 0.8105,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Visa's Record Run Pauses as Services Outgrow Swipes",
+        "label": "negative",
+        "score": 0.9489,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Visa or Mastercard: One Stock Will Outpace the Other at Record Highs \u2014 Here\u2019s Our Pick",
+        "label": "positive",
+        "score": 0.8085,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Higher GMV, More Consumers: What Could Drive Affirm's Q4 Earnings?",
+        "label": "neutral",
+        "score": 0.8072,
+        "source": "yfinance_news"
+      }
+    ],
+    "order_ready": true,
+    "premarket": null
+  },
+  {
+    "ticker": "JNJ",
+    "sector": "Healthcare",
+    "scanner_score": 70.8,
+    "sentiment_conviction": 50.0,
+    "tech_score": 52.6,
+    "tech_grade": "C",
+    "composite": 59.0,
+    "price_ref": 273.14,
+    "premarket_gap_pct": null,
+    "qty": 110,
+    "tp": 284.49,
+    "sl": 261.79,
+    "risk_dollars": 1248.05,
+    "notional": 30045.4,
+    "headlines": [
+      {
+        "title": "How Large Does Your Portfolio Need to Be to Generate $16,500 a Month?",
+        "label": "neutral",
+        "score": 0.9442,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Eli Lilly Found a New Gear. You Paid For It.",
+        "label": "neutral",
+        "score": 0.6901,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "J&J's First-In-Disease Approval Barely Moves a $666 Billion Stock",
+        "label": "neutral",
+        "score": 0.8567,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "J&J\u2019s Imaavy secures expanded US approval in rare blood disorder",
+        "label": "positive",
+        "score": 0.9515,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "J&J's Imaavy Gets FDA Approval as the First Treatment for wAIHA",
+        "label": "positive",
+        "score": 0.844,
+        "source": "yfinance_news"
+      }
+    ],
+    "order_ready": true,
+    "premarket": null
+  }
+]

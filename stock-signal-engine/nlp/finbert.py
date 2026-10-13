@@ -15,7 +15,15 @@ def _get_finbert():
             return None
 
         if finbert is None:
-            finbert = pipeline("text-classification", model="ProsusAI/finbert")
+            from transformers import AutoTokenizer, AutoModelForSequenceClassification
+            try:
+                # Fast path: use cached local weights without blocking on HuggingFace network checks
+                tok = AutoTokenizer.from_pretrained("ProsusAI/finbert", local_files_only=True)
+                mdl = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert", local_files_only=True)
+                finbert = pipeline("text-classification", model=mdl, tokenizer=tok)
+            except Exception:
+                # Fallback path if model not yet cached locally
+                finbert = pipeline("text-classification", model="ProsusAI/finbert")
 
         return finbert
     except Exception as e:

@@ -1,0 +1,13 @@
+{
+  "_day": {
+    "date": "2026-10-13",
+    "start_equity": 96512.22,
+    "peak_equity": 96512.22
+  },
+  "MSFT": {
+    "stop_price": 529.89,
+    "highest_price": 542.13,
+    "tp1_done": false,
+    "be_armed": true
+  }
+}

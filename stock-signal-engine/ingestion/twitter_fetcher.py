@@ -11,7 +11,16 @@ load_dotenv()
 
 # Bearer token is all you need for read-only search
 # Add to your .env: TWITTER_BEARER_TOKEN=your_token_here
-BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")
+BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN", "").strip()
+
+
+def _is_valid_token(token: str) -> bool:
+    if not token or len(token) < 30:
+        return False
+    lower = token.lower()
+    if any(p in lower for p in ["your_", "token", "default", "dummy", "placeholder", "optional"]):
+        return False
+    return True
 
 
 def fetch_tweets(ticker: str, max_tweets: int = 20) -> list[dict]:
@@ -19,8 +28,8 @@ def fetch_tweets(ticker: str, max_tweets: int = 20) -> list[dict]:
         if tweepy is None:
             return []
 
-        if not BEARER_TOKEN:
-            print("[twitter_fetcher] Error: Missing TWITTER_BEARER_TOKEN")
+        if not _is_valid_token(BEARER_TOKEN):
+            # Not configured or placeholder — skip silently without errors
             return []
 
         client = tweepy.Client(bearer_token=BEARER_TOKEN)

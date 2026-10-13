@@ -1,0 +1,52 @@
+[
+  {
+    "ticker": "NVDA",
+    "sector": "Technology",
+    "scanner_score": 71.1,
+    "sentiment_conviction": 50.0,
+    "tech_score": 25.2,
+    "tech_grade": "C",
+    "composite": 52.2,
+    "price_ref": 227.98,
+    "premarket_gap_pct": null,
+    "qty": 131,
+    "tp": 242.57,
+    "sl": 213.39,
+    "risk_dollars": 1911.23,
+    "notional": 29865.38,
+    "headlines": [
+      {
+        "title": "Dow Jones Futures: Fed Chief Warsh Due; Nvidia, These 7 Stocks Are In Buy Zones",
+        "label": "neutral",
+        "score": 0.8997,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Shares turn cautious ahead of Warsh speech; FX, bonds hold breath",
+        "label": "negative",
+        "score": 0.7912,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Why Wendy's Stock Dropped Today",
+        "label": "negative",
+        "score": 0.9401,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Nvidia Just Guided for 70% Revenue Growth in Fiscal Year 2028. Here's What That Means for AI Stocks.",
+        "label": "neutral",
+        "score": 0.7168,
+        "source": "yfinance_news"
+      },
+      {
+        "title": "Nvidia Insists It Can Keep Printing Money to Fund the AI Boom",
+        "label": "neutral",
+        "score": 0.8673,
+        "source": "yfinance_news"
+      }
+    ],
+    "order_ready": true,
+    "premarket": null
+  }
+]

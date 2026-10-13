@@ -1,0 +1,553 @@
+{
+  "chatter": [
+    {
+      "id": "msg_1f207a94",
+      "timestamp": "03:48:14",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $TSLA. Routed $1,250.00 order to market."
+    },
+    {
+      "id": "msg_c069dc43",
+      "timestamp": "03:48:14",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $TSLA. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_a41dd71a",
+      "timestamp": "03:48:14",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $AAPL REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_573239cc",
+      "timestamp": "03:48:13",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $AMD REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_c2e60aef",
+      "timestamp": "03:48:13",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AMD. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_3bee4ddc",
+      "timestamp": "03:48:13",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $MSFT. Routed $2,500.00 order to market."
+    },
+    {
+      "id": "msg_ae948575",
+      "timestamp": "03:48:13",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $MSFT. Consensus: STRONG_BUY (87%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_19d2acfa",
+      "timestamp": "03:48:12",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $NVDA REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_6655295e",
+      "timestamp": "03:48:12",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $NVDA. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_23045851",
+      "timestamp": "03:48:11",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AAPL. Consensus: STRONG_BUY (87%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_8eebf32b",
+      "timestamp": "08:40:40",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "COUNCIL RATIFICATION: Peacetime patch plan REJECTED. PROJECT OMEGA (Zero-Trust Cold-Steel Architecture) adopted by unanimous council re-vote."
+    },
+    {
+      "id": "msg_53f43bbe",
+      "timestamp": "08:40:40",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Sarah Connor: The Inquisitor is right. Linear inverse ETF hedges and local clock deadmans are paper armor in a -30% gap. I second the rejection."
+    },
+    {
+      "id": "msg_ae912496",
+      "timestamp": "08:40:40",
+      "agent_id": "cio",
+      "agent_name": "Antigravity",
+      "badge": "RED TEAM LEAD",
+      "color": "#ef4444",
+      "message": "ANTIGRAVITY OVERRIDE: Conventional patch plan REJECTED WITH PREJUDICE. Brutal internal autopsy filed. Peacetime assumptions banned."
+    },
+    {
+      "id": "msg_b15a8d57",
+      "timestamp": "08:40:40",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Extraordinary Council Summit convened: Stress Audit presented. Dissecting Scenarios A through E with all trading desks."
+    },
+    {
+      "id": "msg_b9c4caef",
+      "timestamp": "08:02:58",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $TSLA. Routed $1,250.00 order to market."
+    },
+    {
+      "id": "msg_9f417535",
+      "timestamp": "08:02:57",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $TSLA. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_b25e35c1",
+      "timestamp": "08:02:54",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $AMD REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_4e4473e7",
+      "timestamp": "08:02:53",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AMD. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_84e0f106",
+      "timestamp": "08:02:51",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $MSFT. Routed $2,500.00 order to market."
+    },
+    {
+      "id": "msg_3b847216",
+      "timestamp": "08:02:51",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $MSFT. Consensus: STRONG_BUY (87%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_61638c22",
+      "timestamp": "08:02:49",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $NVDA REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_79218d48",
+      "timestamp": "08:02:49",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $NVDA. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_af4cded2",
+      "timestamp": "08:02:45",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AAPL. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_7e7a6fb3",
+      "timestamp": "07:44:31",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $TSLA. Routed $1,250.00 order to market."
+    },
+    {
+      "id": "msg_1cc76684",
+      "timestamp": "07:44:30",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $TSLA. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_06f401ba",
+      "timestamp": "07:44:26",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $AMD REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_23ad0deb",
+      "timestamp": "07:44:25",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AMD. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_70725500",
+      "timestamp": "07:44:17",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $MSFT. Routed $2,500.00 order to market."
+    },
+    {
+      "id": "msg_8638b8ec",
+      "timestamp": "07:44:15",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $MSFT. Consensus: STRONG_BUY (87%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_6b4eed70",
+      "timestamp": "07:44:11",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $NVDA REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_dcfcf484",
+      "timestamp": "07:44:11",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $NVDA. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_4f4d8567",
+      "timestamp": "07:44:07",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AAPL. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_11df8984",
+      "timestamp": "07:40:26",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $BTC. Consensus: STRONG_BUY (100%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_8ad43321",
+      "timestamp": "07:27:27",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $TSLA. Routed $1,250.00 order to market."
+    },
+    {
+      "id": "msg_67f8bae1",
+      "timestamp": "07:27:26",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $TSLA. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_72931c23",
+      "timestamp": "07:27:23",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $AMD REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_1feb70df",
+      "timestamp": "07:27:22",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AMD. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_335a700b",
+      "timestamp": "07:27:18",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $MSFT. Routed $2,500.00 order to market."
+    },
+    {
+      "id": "msg_3fafae31",
+      "timestamp": "07:27:15",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $MSFT. Consensus: STRONG_BUY (87%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_76e3f8f9",
+      "timestamp": "07:27:12",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $NVDA REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_a6d51ba2",
+      "timestamp": "07:27:12",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $NVDA. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_d45316b1",
+      "timestamp": "07:27:08",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AAPL. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_70e58aa8",
+      "timestamp": "02:00:17",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $TSLA. Routed $1,250.00 order to market."
+    },
+    {
+      "id": "msg_a0b49d1d",
+      "timestamp": "02:00:16",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $TSLA. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_9a87525c",
+      "timestamp": "02:00:13",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $AMD REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_2a30dff9",
+      "timestamp": "02:00:13",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AMD. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_3f61e79a",
+      "timestamp": "02:00:11",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $MSFT. Routed $2,500.00 order to market."
+    },
+    {
+      "id": "msg_3dce5965",
+      "timestamp": "02:00:11",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $MSFT. Consensus: STRONG_BUY (87%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_5e793e1a",
+      "timestamp": "02:00:08",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $NVDA REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_8889ff44",
+      "timestamp": "02:00:08",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $NVDA. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_e230d327",
+      "timestamp": "02:00:01",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AAPL. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_26b31bda",
+      "timestamp": "01:41:26",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $NVDA REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_0dd270b9",
+      "timestamp": "01:41:24",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $NVDA. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_662f9981",
+      "timestamp": "01:41:03",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $NVDA REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_0655eb9d",
+      "timestamp": "01:40:57",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $NVDA. Consensus: BUY (62%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_0e4634a1",
+      "timestamp": "19:13:32",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $TSLA. Routed $1,250.00 order to market."
+    },
+    {
+      "id": "msg_8d251359",
+      "timestamp": "19:13:32",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $TSLA. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_f5c9a007",
+      "timestamp": "19:13:31",
+      "agent_id": "risk",
+      "agent_name": "Sarah 'Ironclad' Connor",
+      "badge": "RISK GATE",
+      "color": "#f43f5e",
+      "message": "Human Operator exercised override: Trade for $AMD REJECTED. Order aborted."
+    },
+    {
+      "id": "msg_21439303",
+      "timestamp": "19:13:30",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $AMD. Consensus: REJECT (35%). Waiting for Human-in-the-Loop authorization."
+    },
+    {
+      "id": "msg_54161293",
+      "timestamp": "19:13:29",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Human Operator APPROVED order for $MSFT. Routed $2,500.00 order to market."
+    },
+    {
+      "id": "msg_851d78df",
+      "timestamp": "19:13:29",
+      "agent_id": "cio",
+      "agent_name": "Nexus AI",
+      "badge": "HEAD CIO",
+      "color": "#6366f1",
+      "message": "Council Meeting adjourned for $MSFT. Consensus: STRONG_BUY (87%). Waiting for Human-in-the-Loop authorization."
+    }
+  ]
+}

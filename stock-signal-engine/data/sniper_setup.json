@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-09",
+  "ticker": "XOM",
+  "sector": "Energy",
+  "score": 52.9,
+  "price": 164.0500030517578,
+  "atr": 3.47,
+  "rsi": 54.8,
+  "reasons": [
+    "3m mom +19.3% (+16)",
+    "-4.3% from 52wH (+9)",
+    "vol x0.7 (+2)",
+    "MACD+ (+10)",
+    "XLE sector uptrend (+10)",
+    "Fundamentals unverified (neutral 0)"
+  ],
+  "regime": "BULL_MOMENTUM",
+  "hedge_multiplier": 0.25,
+  "effective_risk_pct": 0.02,
+  "dollar_risk": 1917.29,
+  "shares": 175,
+  "notional": 28708.75,
+  "stop_price": 157.1,
+  "stop_dist": 6.95,
+  "tp1_price": 177.94,
+  "tp1_scale_pct": "50%",
+  "trail_atr": 5.21,
+  "beta": -0.97,
+  "sh_shares": 219,
+  "sh_price": 31.82,
+  "sh_notional": 6968.58,
+  "is_shock": false,
+  "skipped_candidates": [
+    "MSFT (overbought RSI 68.1 > 68)"
+  ]
+}

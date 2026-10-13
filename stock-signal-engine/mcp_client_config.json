@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "stock-signal-engine": {
+      "command": "/Users/voonfamily/Desktop/WORK/stock-signal-engine/.venv/bin/python",
+      "args": [
+        "/Users/voonfamily/Desktop/WORK/stock-signal-engine/mcp_server.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "graphify": {
+      "command": "graphify",
+      "args": [
+        "mcp",
+        "/Users/voonfamily/Desktop/WORK/stock-signal-engine/graphify-out/graph.json"
+      ]
+    }
+  }
+}

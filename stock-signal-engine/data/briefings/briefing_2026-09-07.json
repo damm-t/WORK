@@ -1,0 +1,327 @@
+{
+  "date": "2026-09-07",
+  "generated_at": "2026-09-07T09:40:19",
+  "universe": "core",
+  "scraped": 28,
+  "with_news": 28,
+  "tickers": [
+    {
+      "ticker": "NVDA",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.7753,
+      "avg_score": 0.6536,
+      "pos": 3,
+      "neg": 0,
+      "headline": "Salesforce Stock Has Surged as AI and Anthropic Bets Pay Off, But Technical Risks Remain",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "AAPL",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.3921,
+      "avg_score": 0.356,
+      "pos": 1,
+      "neg": 1,
+      "headline": "Foxconn Says Q3 Will Beat Expectations As AI Demand Surges, August Revenue Hits Record",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "MSFT",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.7753,
+      "avg_score": 0.547,
+      "pos": 2,
+      "neg": 0,
+      "headline": "Salesforce Stock Has Surged as AI and Anthropic Bets Pay Off, But Technical Risks Remain",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "AMD",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0417,
+      "avg_score": 0.0429,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Nvidia Confirms $12.9B Hugging Face Deal as Huang Lauds 'Growth Driver'",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "GOOGL",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.2869,
+      "avg_score": 0.3355,
+      "pos": 0,
+      "neg": 1,
+      "headline": "Elon Musk Says Chess Will Be \u2018Fully Solved\u2019 One Day \u2014 Chess.com Fires Back With a Brutal Two-Word Roast",
+      "sector": "Communication"
+    },
+    {
+      "ticker": "META",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.084,
+      "avg_score": 0.0689,
+      "pos": 0,
+      "neg": 2,
+      "headline": "Elon Musk's SpaceX Is Already Renting AI Compute. Can Meta Catch Up?",
+      "sector": "Communication"
+    },
+    {
+      "ticker": "NFLX",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0008,
+      "avg_score": 0.0008,
+      "pos": 1,
+      "neg": 1,
+      "headline": "Stella Artois And Netflix Unveil Global Partnership Spanning Eight Countries Ahead Of The Gentlemen Season 2 Premiere",
+      "sector": "Communication"
+    },
+    {
+      "ticker": "AMZN",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.7753,
+      "avg_score": 0.527,
+      "pos": 1,
+      "neg": 1,
+      "headline": "Salesforce Stock Has Surged as AI and Anthropic Bets Pay Off, But Technical Risks Remain",
+      "sector": "Consumer Disc."
+    },
+    {
+      "ticker": "TSLA",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.4663,
+      "avg_score": 0.4241,
+      "pos": 0,
+      "neg": 1,
+      "headline": "Maye Musk Recounts 'Strange' Experience With Tesla's Cybercab Without a Steering Wheel And Pedals in 2024 Amid Austin Ro",
+      "sector": "Consumer Disc."
+    },
+    {
+      "ticker": "HD",
+      "articles": 3,
+      "best_label": "negative",
+      "best_score": 0.0764,
+      "avg_score": 0.2558,
+      "pos": 0,
+      "neg": 3,
+      "headline": "FICO Stock Falls Pre-Market After Bill Pulte Declares \u2018No More\u2019 to FICO\u2019s Mortgage Scoring Monopoly \u2014 Orders Fannie Mae,",
+      "sector": "Consumer Disc."
+    },
+    {
+      "ticker": "JPM",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.4189,
+      "avg_score": 0.1635,
+      "pos": 1,
+      "neg": 1,
+      "headline": "AI Adoption Spreads Beyond Tech as Finance, Manufacturing Businesses Race to Catch Up",
+      "sector": "Financials"
+    },
+    {
+      "ticker": "V",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0122,
+      "avg_score": 0.0176,
+      "pos": 1,
+      "neg": 1,
+      "headline": "ADVASA Upgrades Visa Card With USDC Payment Support, Expands Digital Payment Infrastructure And Eyes Real-World Asset To",
+      "sector": "Financials"
+    },
+    {
+      "ticker": "GS",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.4189,
+      "avg_score": 0.3465,
+      "pos": 2,
+      "neg": 0,
+      "headline": "AI Adoption Spreads Beyond Tech as Finance, Manufacturing Businesses Race to Catch Up",
+      "sector": "Financials"
+    },
+    {
+      "ticker": "JNJ",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0115,
+      "avg_score": 0.0095,
+      "pos": 1,
+      "neg": 0,
+      "headline": "UBS Maintains Buy on Johnson & Johnson, Raises Price Target to $320",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "UNH",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0105,
+      "avg_score": 0.0114,
+      "pos": 1,
+      "neg": 1,
+      "headline": "Bill Ackman Backs Mark Cuban's Drug Pricing Model: These Healthcare Stocks Could Win\u2014Or Lose",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "LLY",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.1055,
+      "avg_score": 0.0405,
+      "pos": 0,
+      "neg": 1,
+      "headline": "Deal Dispatch: Nvidia Buys Hugging Face for $12.9 Billion, Barilla Acquires Goodles, Park Place Partners Bankruptcy",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "XOM",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.0369,
+      "avg_score": 0.0189,
+      "pos": 0,
+      "neg": 0,
+      "headline": "Piper Sandler Maintains Neutral on ExxonMobil Holdings, Raises Price Target to $185",
+      "sector": "Energy"
+    },
+    {
+      "ticker": "CVX",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0405,
+      "avg_score": 0.0351,
+      "pos": 3,
+      "neg": 0,
+      "headline": "BMO Capital Maintains Outperform on Chevron, Raises Price Target to $235",
+      "sector": "Energy"
+    },
+    {
+      "ticker": "CAT",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.011,
+      "avg_score": 0.015,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Caterpillar Partnering With FieldAI Over Advancement Of Physical AI, Autonomy And Robotics For Jobsites, Factories",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "BA",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0314,
+      "avg_score": 0.2995,
+      "pos": 1,
+      "neg": 1,
+      "headline": "'Subaru, Other Japan Suppliers To Team On Delivery As Boeing Raises Output' - Nikkei Asia",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "PG",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0008,
+      "avg_score": 0.0738,
+      "pos": 1,
+      "neg": 2,
+      "headline": "Hotter PCE Inflation: 5 Defensive ETFs Investors Can Turn to as Rate-Cut Hopes Fade",
+      "sector": "Staples"
+    },
+    {
+      "ticker": "KO",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0018,
+      "avg_score": 0.0011,
+      "pos": 2,
+      "neg": 1,
+      "headline": "Warren Buffett Set Berkshire Hathaway Up for Years: Top 5 Stocks Yield $589 Million Each Quarter",
+      "sector": "Staples"
+    },
+    {
+      "ticker": "NEE",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0034,
+      "avg_score": 0.0033,
+      "pos": 1,
+      "neg": 1,
+      "headline": "Elon Musk Noted Natural Gas Will Still Fuel Data Centers, Gene Munster Says 'Makes Sense' to Put 'New Money to Work in P",
+      "sector": "Utilities"
+    },
+    {
+      "ticker": "DUK",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0034,
+      "avg_score": 0.0016,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Elon Musk Noted Natural Gas Will Still Fuel Data Centers, Gene Munster Says 'Makes Sense' to Put 'New Money to Work in P",
+      "sector": "Utilities"
+    },
+    {
+      "ticker": "LIN",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0009,
+      "avg_score": 0.0007,
+      "pos": 2,
+      "neg": 0,
+      "headline": "BMO Capital Maintains Outperform on Linde, Lowers Price Target to $546",
+      "sector": "Materials"
+    },
+    {
+      "ticker": "FCX",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0009,
+      "avg_score": 0.0253,
+      "pos": 2,
+      "neg": 0,
+      "headline": "Bitcoin Jumps Above $77,000, Gold Hits 3-Month Highs: Stock Market Today",
+      "sector": "Materials"
+    },
+    {
+      "ticker": "PLD",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.001,
+      "avg_score": 0.0018,
+      "pos": 1,
+      "neg": 0,
+      "headline": "RBC Capital Upgrades Prologis to Outperform, Raises Price Target to $160",
+      "sector": "Real Estate"
+    },
+    {
+      "ticker": "AMT",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.0008,
+      "avg_score": 0.0007,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Barclays Upgrades American Tower to Overweight, Raises Price Target to $198",
+      "sector": "Real Estate"
+    }
+  ],
+  "bullish_top": [
+    "NVDA",
+    "MSFT",
+    "AMZN",
+    "JPM",
+    "GS"
+  ],
+  "bearish_top": [
+    "HD"
+  ]
+}

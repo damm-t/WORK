@@ -1,0 +1,327 @@
+{
+  "date": "2026-08-26",
+  "generated_at": "2026-08-26T23:35:38",
+  "universe": "core",
+  "scraped": 28,
+  "with_news": 28,
+  "tickers": [
+    {
+      "ticker": "NVDA",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9453,
+      "avg_score": 0.93,
+      "pos": 0,
+      "neg": 0,
+      "headline": "All Eyes Are on Nvidia's Balance Sheet",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "AAPL",
+      "articles": 3,
+      "best_label": "negative",
+      "best_score": 0.962,
+      "avg_score": 0.8808,
+      "pos": 0,
+      "neg": 1,
+      "headline": "Kohl's Continues to Expect Subdued Full-Year Sales Amid Macro Pressures",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "MSFT",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.8369,
+      "avg_score": 0.7248,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Bill Gates is Scared of AI And Says You Should Be Too",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "AMD",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9457,
+      "avg_score": 0.7965,
+      "pos": 2,
+      "neg": 0,
+      "headline": "Price Prediction: TSM Will Trade at This Price in 2027",
+      "sector": "Technology"
+    },
+    {
+      "ticker": "GOOGL",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9265,
+      "avg_score": 0.8227,
+      "pos": 0,
+      "neg": 1,
+      "headline": "The Robo-Taxi Championship Bout Is Set: Tesla vs. Waymo",
+      "sector": "Communication"
+    },
+    {
+      "ticker": "META",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9423,
+      "avg_score": 0.8724,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Meta, Nvidia, Intuit, Salesforce, Moderna, Abercrombie, Zoom, and More Stocks That Explain Today\u2019s Market",
+      "sector": "Communication"
+    },
+    {
+      "ticker": "NFLX",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9265,
+      "avg_score": 0.8265,
+      "pos": 2,
+      "neg": 0,
+      "headline": "Stock Market News for Aug 26, 2026",
+      "sector": "Communication"
+    },
+    {
+      "ticker": "AMZN",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9391,
+      "avg_score": 0.9376,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Amazon's AWS to Acquire DuckLabs",
+      "sector": "Consumer Disc."
+    },
+    {
+      "ticker": "TSLA",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9265,
+      "avg_score": 0.8703,
+      "pos": 0,
+      "neg": 1,
+      "headline": "The Robo-Taxi Championship Bout Is Set: Tesla vs. Waymo",
+      "sector": "Consumer Disc."
+    },
+    {
+      "ticker": "HD",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9236,
+      "avg_score": 0.9149,
+      "pos": 0,
+      "neg": 0,
+      "headline": "If You'd Invested $1,000 in Home Depot 15 Years Ago, Here's How Much You'd Have Today",
+      "sector": "Consumer Disc."
+    },
+    {
+      "ticker": "JPM",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9445,
+      "avg_score": 0.9264,
+      "pos": 0,
+      "neg": 0,
+      "headline": "Brokers Suggest Investing in JPMorgan Chase & Co. (JPM): Read This Before Placing a Bet",
+      "sector": "Financials"
+    },
+    {
+      "ticker": "V",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.9146,
+      "avg_score": 0.8602,
+      "pos": 1,
+      "neg": 0,
+      "headline": "KARTY LLC Receives the Visa FinTech Innovation Award Following its Qatar Launch",
+      "sector": "Financials"
+    },
+    {
+      "ticker": "GS",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9161,
+      "avg_score": 0.7728,
+      "pos": 0,
+      "neg": 0,
+      "headline": "Should You Invest in MS Stock Following Impressive 1H26 Results?",
+      "sector": "Financials"
+    },
+    {
+      "ticker": "JNJ",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.937,
+      "avg_score": 0.9073,
+      "pos": 0,
+      "neg": 0,
+      "headline": "SimuTech Group Engineers Co-Author Chapter in Open-Access Medical Device VVUQ Handbook",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "UNH",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.8281,
+      "avg_score": 0.7415,
+      "pos": 0,
+      "neg": 0,
+      "headline": "Billionaire David Tepper Sold Every Single Share of UnitedHealth in Q2. Here's Whether He Made a Costly Mistake.",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "LLY",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.8312,
+      "avg_score": 0.7845,
+      "pos": 1,
+      "neg": 0,
+      "headline": "LLY Stock In Spotlight After Study Shows Zepbound Use Linked To Up To 38% Lower Healthcare Costs In Adults Above 55 Year",
+      "sector": "Healthcare"
+    },
+    {
+      "ticker": "XOM",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9282,
+      "avg_score": 0.7956,
+      "pos": 0,
+      "neg": 0,
+      "headline": "ExxonMobil to Speak at Barclays 40th Annual Energy-Power Conference",
+      "sector": "Energy"
+    },
+    {
+      "ticker": "CVX",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9127,
+      "avg_score": 0.7649,
+      "pos": 0,
+      "neg": 2,
+      "headline": "Big Oil Is Betting Billions On Nuclear Fusion",
+      "sector": "Energy"
+    },
+    {
+      "ticker": "CAT",
+      "articles": 3,
+      "best_label": "negative",
+      "best_score": 0.9016,
+      "avg_score": 0.7834,
+      "pos": 1,
+      "neg": 2,
+      "headline": "Caterpillar (CAT) Could Be 20% Undervalued On Its Margin And Cash Flow Narrative",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "BA",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.9134,
+      "avg_score": 0.8881,
+      "pos": 2,
+      "neg": 0,
+      "headline": "Boeing, RTX Win $766 Mil In B-52 Modernization Contracts, Northrop Tapped For Deep Space Radar",
+      "sector": "Industrials"
+    },
+    {
+      "ticker": "PG",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9442,
+      "avg_score": 0.9142,
+      "pos": 0,
+      "neg": 0,
+      "headline": "How Large Does Your Portfolio Need to Be to Generate $16,500 a Month?",
+      "sector": "Staples"
+    },
+    {
+      "ticker": "KO",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9402,
+      "avg_score": 0.7755,
+      "pos": 0,
+      "neg": 1,
+      "headline": "Coca-Cola\u2019s stock splits: history (& prospects) explained",
+      "sector": "Staples"
+    },
+    {
+      "ticker": "NEE",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9381,
+      "avg_score": 0.8442,
+      "pos": 0,
+      "neg": 1,
+      "headline": "PG&E Stock Runs On A Legislative Calendar, Not The Market's",
+      "sector": "Utilities"
+    },
+    {
+      "ticker": "DUK",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9381,
+      "avg_score": 0.8598,
+      "pos": 1,
+      "neg": 0,
+      "headline": "PG&E Stock Runs On A Legislative Calendar, Not The Market's",
+      "sector": "Utilities"
+    },
+    {
+      "ticker": "LIN",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.8942,
+      "avg_score": 0.766,
+      "pos": 1,
+      "neg": 1,
+      "headline": "How to Build $8,200 a Month in Dividend Income (And the Tax Bill Almost Nobody Plans For)",
+      "sector": "Materials"
+    },
+    {
+      "ticker": "FCX",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.9292,
+      "avg_score": 0.8532,
+      "pos": 1,
+      "neg": 0,
+      "headline": "William O'Neil Initiates Freeport-McMoRan at Buy",
+      "sector": "Materials"
+    },
+    {
+      "ticker": "PLD",
+      "articles": 3,
+      "best_label": "positive",
+      "best_score": 0.9471,
+      "avg_score": 0.9398,
+      "pos": 1,
+      "neg": 0,
+      "headline": "Realty Income Diversifies Funding: Will This Boost Long-Term Growth?",
+      "sector": "Real Estate"
+    },
+    {
+      "ticker": "AMT",
+      "articles": 3,
+      "best_label": "neutral",
+      "best_score": 0.895,
+      "avg_score": 0.7919,
+      "pos": 0,
+      "neg": 0,
+      "headline": "HST vs. AMT: Which Stock Is the Better Value Option?",
+      "sector": "Real Estate"
+    }
+  ],
+  "bullish_top": [
+    "PLD",
+    "V",
+    "BA",
+    "LLY"
+  ],
+  "bearish_top": [
+    "AAPL",
+    "CAT"
+  ]
+}

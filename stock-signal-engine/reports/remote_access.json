@@ -1,0 +1,17 @@
+{
+  "status": "online",
+  "tunnel_url": "https://analyze-disclose-observer-comp.trycloudflare.com",
+  "tunnel_type": "cloudflare",
+  "local_ip": "192.168.10.65",
+  "local_port": 8080,
+  "local_url": "http://192.168.10.65:8080",
+  "local_widget_url": "http://192.168.10.65:8080/widget",
+  "tunnel_widget_url": "https://analyze-disclose-observer-comp.trycloudflare.com/widget",
+  "caffeinate_active": true,
+  "updated_at": "2026-10-13 11:43:47",
+  "instructions": {
+    "ios": "Open URL in Safari -> Tap Share -> Tap 'Add to Home Screen' for full-screen App mode",
+    "android": "Open URL in Chrome -> Tap 3-dots Menu -> Tap 'Install app' or 'Add to Home screen'",
+    "mac_note": "Keep Mac connected to charger; caffeinate keeps the machine awake while lid is open/idle."
+  }
+}

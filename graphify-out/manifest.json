@@ -1,0 +1,1382 @@
+{
+  "Quant/interview_test.py": {
+    "mtime": 1765423258.620712,
+    "seen": 1791864065.5100281,
+    "ast_hash": "942b97e34258478f0b16f6f974cc91ed",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/.gemini/settings.json": {
+    "mtime": 1791789521.089879,
+    "seen": 1791864065.510031,
+    "ast_hash": "c4c31be0fa4dfc2246a464849bd7f5cc",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/.vscode/settings.json": {
+    "mtime": 1777466324.4732845,
+    "seen": 1791864065.510032,
+    "ast_hash": "0ed355f77cdd4b8829589bd278dee3df",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/agents/__init__.py": {
+    "mtime": 1791652895.3513224,
+    "seen": 1791864065.510032,
+    "ast_hash": "d83cced0bcb0678aadb3522b06fe39f4",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/agents/council.py": {
+    "mtime": 1791652950.1903813,
+    "seen": 1791864065.510033,
+    "ast_hash": "d7b9c351938c527b6f8b20c0ee420493",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/api/main.py": {
+    "mtime": 1788693226.4120681,
+    "seen": 1791864065.510033,
+    "ast_hash": "9beda7f6ee97d0fe11ed0df7e2d934c9",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/api/schemas.py": {
+    "mtime": 1778168082.579564,
+    "seen": 1791864065.5100338,
+    "ast_hash": "6836ffbb17ba47846f41b103a71d5bc0",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/api/services.py": {
+    "mtime": 1791099374.9960694,
+    "seen": 1791864065.5100338,
+    "ast_hash": "176c9c685a1c4d47f41289b04ec46715",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/__init__.py": {
+    "mtime": 1787715905.5101116,
+    "seen": 1791864065.510035,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/daily_routine.py": {
+    "mtime": 1789828174.027563,
+    "seen": 1791864065.510035,
+    "ast_hash": "85e981322ddcc98560b87c15b5bcd803",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/daily_sniper.py": {
+    "mtime": 1790254441.5413558,
+    "seen": 1791864065.510036,
+    "ast_hash": "e181e36b0c8a9a9e10164edddc291686",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/financial_modeling.py": {
+    "mtime": 1791101966.8859065,
+    "seen": 1791864065.510036,
+    "ast_hash": "10d2098fae5ff19dbdfe94051bbfcebe",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/five_year_stats.py": {
+    "mtime": 1789750768.8993592,
+    "seen": 1791864065.510037,
+    "ast_hash": "e21e8208dc822448c7660e485f688268",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/hedging_backtester.py": {
+    "mtime": 1787717528.1385624,
+    "seen": 1791864065.510037,
+    "ast_hash": "7e5e47ef6095f0f80c3b8f0e1289eed0",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/leakage_experiment.py": {
+    "mtime": 1790866446.5423338,
+    "seen": 1791864065.510038,
+    "ast_hash": "a72c33a55f850a60baace14084ea9cee",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/market_scanner.py": {
+    "mtime": 1790697572.046452,
+    "seen": 1791864065.510038,
+    "ast_hash": "78e49f9914724fb8fc4c0c276cd3e40d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/multi_asset_benchmark.py": {
+    "mtime": 1791863187.4667673,
+    "seen": 1791864065.510038,
+    "ast_hash": "9383822aaaed0b407b28dfaa29ff975a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/reality_check.py": {
+    "mtime": 1787717963.9680042,
+    "seen": 1791864065.510039,
+    "ast_hash": "ddd2ed5cc0aaa133bffbde37a0d615be",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/ross_momentum_sim.py": {
+    "mtime": 1790957440.0965679,
+    "seen": 1791864065.510039,
+    "ast_hash": "5559fe836970c94c00357366260c35d9",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/sentiment_hedged_vs_unhedged.py": {
+    "mtime": 1787844970.1496737,
+    "seen": 1791864065.51004,
+    "ast_hash": "d515ecdbad9ceb62f1b8d2b47fc23319",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/simulate_20y_portfolio.py": {
+    "mtime": 1791862929.2321382,
+    "seen": 1791864065.51004,
+    "ast_hash": "cab8f36e7632fca0c801fcdfb1855c09",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/test_20y_engine.py": {
+    "mtime": 1791862880.0414302,
+    "seen": 1791864065.510041,
+    "ast_hash": "74f84b9abcb44b8be75d88ff91fdfb8a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/test_alpha_models.py": {
+    "mtime": 1791862989.5076153,
+    "seen": 1791864065.510041,
+    "ast_hash": "0da212f5a4635c07cba5b3bfc9045ac4",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/test_mean_reversion_20y.py": {
+    "mtime": 1791863052.006015,
+    "seen": 1791864065.5100422,
+    "ast_hash": "fe2685918a739e20662ed315c9b59090",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/time_to_goal.py": {
+    "mtime": 1789980673.9550085,
+    "seen": 1791864065.5100422,
+    "ast_hash": "5ff99e02a8be74132b4d3aea8a90243c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/twenty_year_strategy.py": {
+    "mtime": 1791863238.5875247,
+    "seen": 1791864065.510043,
+    "ast_hash": "89315eba93b5aaf25079c5131932feef",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/universe.py": {
+    "mtime": 1791863153.6067474,
+    "seen": 1791864065.510043,
+    "ast_hash": "f0643158f0f3905e780c3620c8fec962",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/walk_forward.py": {
+    "mtime": 1787724094.3510966,
+    "seen": 1791864065.510043,
+    "ast_hash": "e826cd31303ff1ffeaa9d732a4713c85",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/wr_hunt.py": {
+    "mtime": 1790007454.1456563,
+    "seen": 1791864065.5100439,
+    "ast_hash": "951d3fb525ec7b51122a416a777e7c31",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/benchmark/__init__.py": {
+    "mtime": 1791303940.656606,
+    "seen": 1791864065.5100439,
+    "ast_hash": "64f2188a1b1ece93cebd01987aaa76ab",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/benchmark/institutional_benchmark.py": {
+    "mtime": 1791303933.3239117,
+    "seen": 1791864065.5100448,
+    "ast_hash": "7c892d015daa92aacfbcf27159d60e15",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/compliance/__init__.py": {
+    "mtime": 1791302573.5265622,
+    "seen": 1791864065.5100448,
+    "ast_hash": "3c21ee623249d16be2d8ee7674bc67b4",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/compliance/ai_revision_checker.py": {
+    "mtime": 1791770184.301532,
+    "seen": 1791864065.510046,
+    "ast_hash": "dd6b9430c18ce045221d1ed78535c8a7",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/compliance/autonomous_checker.py": {
+    "mtime": 1791770193.6506062,
+    "seen": 1791864065.510046,
+    "ast_hash": "98fe773eac79b8639dc6c06dd247e86a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/config.py": {
+    "mtime": 1791567370.8238542,
+    "seen": 1791864065.510046,
+    "ast_hash": "c953178679311d58540323a09a912748",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/eslint.config.mjs": {
+    "mtime": 1778139675.4716115,
+    "seen": 1791864065.510047,
+    "ast_hash": "dfa1f5f6a7037bf39dc510f30b180002",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/next.config.ts": {
+    "mtime": 1778139675.4717734,
+    "seen": 1791864065.510047,
+    "ast_hash": "9b77af189a21a7a64e4bd7a426f64176",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/package.json": {
+    "mtime": 1779468095.0947983,
+    "seen": 1791864065.510048,
+    "ast_hash": "eef871b528b4fa8ff667da57bea6805c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/postcss.config.mjs": {
+    "mtime": 1778139675.4718525,
+    "seen": 1791864065.510048,
+    "ast_hash": "239f3ebf717465dc636818a1a619398d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/app/api/auth/[...nextauth]/route.ts": {
+    "mtime": 1779468095.0944035,
+    "seen": 1791864065.510049,
+    "ast_hash": "ec7115a99c39a36e07c9a2be9a280390",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/app/api/proxy/[...path]/route.ts": {
+    "mtime": 1779468577.9916859,
+    "seen": 1791864065.510049,
+    "ast_hash": "229a0da7b7745eb18b66176ebbaf41a3",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/app/auth/signin/page.tsx": {
+    "mtime": 1779468095.139597,
+    "seen": 1791864065.510049,
+    "ast_hash": "1e2d3e3a8e2a1af0ffd7fe9a93a0a78d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/app/dashboard/page.tsx": {
+    "mtime": 1779634665.4251633,
+    "seen": 1791864065.51005,
+    "ast_hash": "43e78572ea40dbf8743b6d06a708c8a4",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/app/layout.tsx": {
+    "mtime": 1779468095.0944111,
+    "seen": 1791864065.510051,
+    "ast_hash": "f4f7843972af88689d2dfc53f430e8ad",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/app/page.tsx": {
+    "mtime": 1779468095.0944083,
+    "seen": 1791864065.510051,
+    "ast_hash": "051d131fc7553e7d31a215c2a6c9a397",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/components/ArticlesFeed.tsx": {
+    "mtime": 1779468095.0943906,
+    "seen": 1791864065.510051,
+    "ast_hash": "fd03eefa19814894a83b47edf6f70181",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/components/IndicatorPanel.tsx": {
+    "mtime": 1779634665.4252107,
+    "seen": 1791864065.5100522,
+    "ast_hash": "05c693ea7cdb677e0a0ec01d58b49738",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/components/PortfolioBar.tsx": {
+    "mtime": 1779634665.4720528,
+    "seen": 1791864065.5100522,
+    "ast_hash": "7806eee2b5a8accc63854fc5ff94c7f0",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/components/PriceChart.tsx": {
+    "mtime": 1779468095.1395512,
+    "seen": 1791864065.5100532,
+    "ast_hash": "f04e6c26e7c55d8cca2b9dc7c0cabe59",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/components/RiskPanel.tsx": {
+    "mtime": 1779468095.0943902,
+    "seen": 1791864065.5100532,
+    "ast_hash": "58e121f361177182593c658b01e67482",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/components/SentimentFeed.tsx": {
+    "mtime": 1779634665.475595,
+    "seen": 1791864065.5100532,
+    "ast_hash": "b06799e1bcaf181999a2f803d0605dd9",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/components/SentimentHeatmap.tsx": {
+    "mtime": 1779468095.1395507,
+    "seen": 1791864065.5100539,
+    "ast_hash": "1a4151ee00bb83332d93a548223617ae",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/components/SignalCard.tsx": {
+    "mtime": 1779634665.4251742,
+    "seen": 1791864065.5100539,
+    "ast_hash": "477be11a56319ab81d721c307ea76ef6",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/components/TickerSearch.tsx": {
+    "mtime": 1779634665.470225,
+    "seen": 1791864065.5100548,
+    "ast_hash": "43bb306a354c5884591da52030a7702f",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/hooks/useMarket.ts": {
+    "mtime": 1779634665.4252176,
+    "seen": 1791864065.5100548,
+    "ast_hash": "0612915e2f043319a644c93044a55469",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/hooks/usePortfolio.ts": {
+    "mtime": 1779634665.4275696,
+    "seen": 1791864065.510056,
+    "ast_hash": "ad569d5d54031498bb946402e668c05d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/hooks/useSentiment.ts": {
+    "mtime": 1779634665.4253175,
+    "seen": 1791864065.510056,
+    "ast_hash": "bf8a04a24d23e9036b2bf800b460f4bc",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/hooks/useSignal.ts": {
+    "mtime": 1779634665.425192,
+    "seen": 1791864065.510056,
+    "ast_hash": "96bd0e657b157968f212cf6a1abe9caf",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/hooks/useWebSocket.ts": {
+    "mtime": 1779468577.991724,
+    "seen": 1791864065.510057,
+    "ast_hash": "2532473c6d0de15e1076b873ade679f7",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/lib/api.ts": {
+    "mtime": 1779634665.4252033,
+    "seen": 1791864065.510057,
+    "ast_hash": "5015bbcc8ce15a609a5b95fcb81ec475",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/lib/store.ts": {
+    "mtime": 1779468577.9917068,
+    "seen": 1791864065.510058,
+    "ast_hash": "1135dfda9f8ed0813eac84b986a48fee",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/lib/types.ts": {
+    "mtime": 1779634665.4702258,
+    "seen": 1791864065.510058,
+    "ast_hash": "00370e225417737bdb8c8fce1124e23e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/src/store/tickerStore.ts": {
+    "mtime": 1779634665.466518,
+    "seen": 1791864065.510059,
+    "ast_hash": "96099cd6ed931a596c0ba4e5fc72abd9",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/tailwind.config.ts": {
+    "mtime": 1779468095.0947874,
+    "seen": 1791864065.510059,
+    "ast_hash": "11c245dfd19c62ba6dee776a457cc250",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/tsconfig.json": {
+    "mtime": 1778139675.4731545,
+    "seen": 1791864065.510059,
+    "ast_hash": "ee17fd1c97c735e9f3564e3f5251f125",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/briefings/briefing_2026-08-26.json": {
+    "mtime": 1787758538.1522646,
+    "seen": 1791864065.51006,
+    "ast_hash": "e94dd9e7c6c521e70eaa569a348472f3",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/briefings/briefing_2026-08-27.json": {
+    "mtime": 1787846159.6178586,
+    "seen": 1791864065.51006,
+    "ast_hash": "a8425dff3f1f841a08f68760a22fd12e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/briefings/briefing_2026-09-05.json": {
+    "mtime": 1788611729.4950356,
+    "seen": 1791864065.510061,
+    "ast_hash": "25d472d5b12d6b3b8a482cf2690288fb",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/briefings/briefing_2026-09-07.json": {
+    "mtime": 1788745219.5899808,
+    "seen": 1791864065.510061,
+    "ast_hash": "64a91910cd2761aa2908edcdb241f172",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/briefings/briefing_2026-09-08.json": {
+    "mtime": 1788833725.474702,
+    "seen": 1791864065.510062,
+    "ast_hash": "339b02684e411ca2f542e7ef73ccc73a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/briefings/briefing_2026-09-14.json": {
+    "mtime": 1789400048.3137276,
+    "seen": 1791864065.510062,
+    "ast_hash": "920d923220d91277b16b7c1cd402986a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/briefings/briefing_2026-09-19.json": {
+    "mtime": 1789752034.7491689,
+    "seen": 1791864065.510062,
+    "ast_hash": "872fbb9bfdda13df97487455bc8d48b3",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/briefings/briefing_2026-09-21.json": {
+    "mtime": 1789998670.1596217,
+    "seen": 1791864065.5100632,
+    "ast_hash": "3a1646873b938afe4c53baf28996501b",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/council_meetings.json": {
+    "mtime": 1791863294.9884152,
+    "seen": 1791864065.5100632,
+    "ast_hash": "03de716fe6b24c2df5349a2331999d5f",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/dataset_generator.py": {
+    "mtime": 1788701825.8727305,
+    "seen": 1791864065.5100641,
+    "ast_hash": "451a8ba0f320cdb425e1746da911a4cc",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/factor_dag.py": {
+    "mtime": 1790866473.5205736,
+    "seen": 1791864065.5100641,
+    "ast_hash": "04f07378a8917e18daaa386a0dd88a5a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/floor_chatter.json": {
+    "mtime": 1791863294.976325,
+    "seen": 1791864065.5100641,
+    "ast_hash": "4846b269403dfee9bf3e1ad12302cd5c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/point_in_time.py": {
+    "mtime": 1790866402.3504894,
+    "seen": 1791864065.5100648,
+    "ast_hash": "074e2b8842c859de6c39ea897cc8ec24",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/sniper_setup.json": {
+    "mtime": 1791531689.2863228,
+    "seen": 1791864065.5100648,
+    "ast_hash": "cae68161bdfb69228afed0fa80b441a0",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/early-signal-scanner/scanner.py": {
+    "mtime": 1791286351.465441,
+    "seen": 1791864065.510066,
+    "ast_hash": "bc38d2139765f6f086926284b6fc8cec",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/__init__.py": {
+    "mtime": 1790959267.7400606,
+    "seen": 1791864065.510066,
+    "ast_hash": "748a7bc5b727aa7cb41f5fe3635db86d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/alpha_client.py": {
+    "mtime": 1791795520.5112042,
+    "seen": 1791864065.510067,
+    "ast_hash": "5b34ae553fb2f3df0948ef9f40f1a547",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/autopilot.py": {
+    "mtime": 1791830535.9780662,
+    "seen": 1791864065.510067,
+    "ast_hash": "c9d9e18084cbb1c360bd10b31d2426b4",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/autopilot_state.json": {
+    "mtime": 1791834605.4917538,
+    "seen": 1791864065.510068,
+    "ast_hash": "f8ff87357feda59f365b0a62311af462",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/cme_futures_autopilot.py": {
+    "mtime": 1791792423.4542017,
+    "seen": 1791864065.510068,
+    "ast_hash": "e1f1e32106e67dc5ca137c1be14e1f55",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/cme_futures_state.json": {
+    "mtime": 1791858735.4034815,
+    "seen": 1791864065.510068,
+    "ast_hash": "06fb5608bed535141e9656589bf2ae07",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/crypto_futures_archive.json": {
+    "mtime": 1791770301.0684316,
+    "seen": 1791864065.510069,
+    "ast_hash": "837f26afd2f2df76b2a3af7d923a9917",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/crypto_futures_autopilot.py": {
+    "mtime": 1791790971.0092175,
+    "seen": 1791864065.51007,
+    "ast_hash": "881d8c499579dd4d7df4773d2d198566",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/crypto_futures_state.json": {
+    "mtime": 1791864077.4718902,
+    "seen": 1791864085.605115,
+    "ast_hash": "b4bea97115c9fe9cd9917edbe2cfba65",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/deadmans_switch.py": {
+    "mtime": 1791795226.8586984,
+    "seen": 1791864065.510071,
+    "ast_hash": "aadba679ab03d8707730989eb49f289c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/forex_autopilot.py": {
+    "mtime": 1791792104.6011453,
+    "seen": 1791864065.510071,
+    "ast_hash": "cb54b37a6a30951e86a887862ea18b50",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/forex_state.json": {
+    "mtime": 1791864020.6532521,
+    "seen": 1791864065.510072,
+    "ast_hash": "13710422a4ccf9fb278c41d7d4f93b03",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/jev_execution.py": {
+    "mtime": 1791208875.0312304,
+    "seen": 1791864065.510072,
+    "ast_hash": "5e7f6ae98b388421211c5d9739501e00",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/json_state.py": {
+    "mtime": 1791603656.2053704,
+    "seen": 1791864065.510072,
+    "ast_hash": "9e47101784e5392d14e7e0a3f8bcf627",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/purchase_logger.py": {
+    "mtime": 1788693184.5562813,
+    "seen": 1791864065.5100732,
+    "ast_hash": "c7d656b96fde40a4e6c73ff5514b6fc0",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/ross_execution.py": {
+    "mtime": 1791560877.6436236,
+    "seen": 1791864065.5100732,
+    "ast_hash": "163d0336908adc91daf0d66c3036881c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/trade_journal.py": {
+    "mtime": 1791560944.9351404,
+    "seen": 1791864065.5100741,
+    "ast_hash": "ef8f69bf58402f7d27f08e681144f193",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/features/__init__.py": {
+    "mtime": 1777515721.8956473,
+    "seen": 1791864065.5100741,
+    "ast_hash": "384bd0a2ed0b973bb20605013b2cb068",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/features/features_store.py": {
+    "mtime": 1778575803.999365,
+    "seen": 1791864065.5100749,
+    "ast_hash": "fb7ce17d19b4c2d9951586dc09c6f470",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/gateway/__init__.py": {
+    "mtime": 1791304076.565475,
+    "seen": 1791864065.5100749,
+    "ast_hash": "5cc121e1385ddf3358bee7f84cceb43c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/gateway/broker_client.py": {
+    "mtime": 1791304134.21812,
+    "seen": 1791864065.5100749,
+    "ast_hash": "63c2c1e0b7230a8964cac7f619de228e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/gateway/mirror_dispatcher.py": {
+    "mtime": 1791304051.4324536,
+    "seen": 1791864065.5100758,
+    "ast_hash": "2ee2d3f54578ff1b3bb048d8567aaf5d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/gateway/subscriber_registry.py": {
+    "mtime": 1791303963.8381057,
+    "seen": 1791864065.5100758,
+    "ast_hash": "69c4b4f8779f9bd5e36799e328052dbe",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/ingestion/__init__.py": {
+    "mtime": 1788700284.463978,
+    "seen": 1791864065.510077,
+    "ast_hash": "90685a094289233fb7fd96dae19a0bf0",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/ingestion/earnings_fetcher.py": {
+    "mtime": 1777520841.9725149,
+    "seen": 1791864065.510077,
+    "ast_hash": "b9070c05113ef689a7c9d585af79c634",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/ingestion/news_fetcher.py": {
+    "mtime": 1790866522.9494917,
+    "seen": 1791864065.510077,
+    "ast_hash": "323f9c00a9846fa8a67e7ceb8ad0d84a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/ingestion/twitter_fetcher.py": {
+    "mtime": 1788699985.9417784,
+    "seen": 1791864065.510078,
+    "ast_hash": "511b32ff871fc4d51da4b4281f411358",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/mac_widget/build.sh": {
+    "mtime": 1791280302.329145,
+    "seen": 1791864065.510078,
+    "ast_hash": "bfb5e74803ece621448cca2c5789baab",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/mac_widget/launch.sh": {
+    "mtime": 1791280310.492342,
+    "seen": 1791864065.510079,
+    "ast_hash": "407e8d9d14a5005f02c408fa9bf5fa2e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/mac_widget/main.swift": {
+    "mtime": 1791449344.0393236,
+    "seen": 1791864065.510079,
+    "ast_hash": "0def9e806bf39da6995b7f5b0a11eecf",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/market/__init__.py": {
+    "mtime": 1790253808.6028123,
+    "seen": 1791864065.51008,
+    "ast_hash": "47bc73424c3d1019d5bd561054db67a2",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/market/anti_volatility.py": {
+    "mtime": 1790960707.9588108,
+    "seen": 1791864065.51008,
+    "ast_hash": "9dd827710bcae5d314a7be1a3c0b360d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/market/beta_calculator.py": {
+    "mtime": 1791795245.3715634,
+    "seen": 1791864065.510081,
+    "ast_hash": "8bd3bb8f913c9b4d9aad1889d16d65d2",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/market/fundamentals.py": {
+    "mtime": 1790701881.6912673,
+    "seen": 1791864065.510081,
+    "ast_hash": "60d116c4e7f0b2b698734d71b712d84d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/market/indicators.py": {
+    "mtime": 1790697516.2126563,
+    "seen": 1791864065.510081,
+    "ast_hash": "d2671af929766142b18537b1a6db0324",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/market/low_float_scanner.py": {
+    "mtime": 1790702394.5881634,
+    "seen": 1791864065.510082,
+    "ast_hash": "4843da26a99eb8b610d3af4019a2556d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/market/price_fetcher.py": {
+    "mtime": 1791862775.2200217,
+    "seen": 1791864065.510082,
+    "ast_hash": "43e747fd23c926a96100d15ae6e4e3f1",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/market/shock_detector.py": {
+    "mtime": 1791863455.6695905,
+    "seen": 1791864065.510083,
+    "ast_hash": "dec4483323ca8cb70a852d77d0485c84",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/market/technicals.py": {
+    "mtime": 1787717525.7579653,
+    "seen": 1791864065.510083,
+    "ast_hash": "b4aa0dbdd7462ca2d9952bdca4cc06c5",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/mcp_client_config.json": {
+    "mtime": 1791789824.1552668,
+    "seen": 1791864065.5100842,
+    "ast_hash": "1b28b7cadcc877745fe297ca67a2abbe",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/mcp_server.py": {
+    "mtime": 1791789665.5667512,
+    "seen": 1791864065.5100842,
+    "ast_hash": "5b6911c3c2a9f1c7eb6b5440dd9407fe",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/model/__init__.py": {
+    "mtime": 1778169179.6714792,
+    "seen": 1791864065.5100842,
+    "ast_hash": "e49c6c6c1f45282a997f0a7ab03d4b28",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/model/bayesian_confidence.py": {
+    "mtime": 1790960353.407441,
+    "seen": 1791864065.510085,
+    "ast_hash": "f8bcbd23312b94ab6b2389892bd8e9f7",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/model/ensemble.py": {
+    "mtime": 1778168984.8666186,
+    "seen": 1791864065.510085,
+    "ast_hash": "d3ebec50a472904a829c792f878b2790",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/model/predictor.py": {
+    "mtime": 1788700708.5766175,
+    "seen": 1791864065.5100858,
+    "ast_hash": "5cc426ea4e38d7f414d2b283fde0c850",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/model/trainer.py": {
+    "mtime": 1788701856.9194064,
+    "seen": 1791864065.5100858,
+    "ast_hash": "aeda4b01da50d43be4c2acbc5fa19b18",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/nlp/__init__.py": {
+    "mtime": 1788700024.9260154,
+    "seen": 1791864065.5100858,
+    "ast_hash": "5c2b9df66fac93f5745b6ad97f8c9b98",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/nlp/finbert.py": {
+    "mtime": 1788700141.575985,
+    "seen": 1791864065.510087,
+    "ast_hash": "8985373af353676389fadec849b7c353",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/nlp/ner.py": {
+    "mtime": 1777515641.596198,
+    "seen": 1791864065.510087,
+    "ast_hash": "e08b7a37dbcc4e040d07ed338dd829b7",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/nlp/news_memory.py": {
+    "mtime": 1787716226.9530392,
+    "seen": 1791864065.510088,
+    "ast_hash": "f323c50dd78b45d8f3a1d243b878b439",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/nlp/preprocessor.py": {
+    "mtime": 1777515641.5955737,
+    "seen": 1791864065.510088,
+    "ast_hash": "27568e1848bb406cc0e97d41a31fceea",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/nlp/topic_model.py": {
+    "mtime": 1778573088.1204548,
+    "seen": 1791864065.510089,
+    "ast_hash": "1b5d4e264de1856cae25aa349407cdcc",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/pipeline.py": {
+    "mtime": 1791604082.5727034,
+    "seen": 1791864065.510089,
+    "ast_hash": "6352537ece95eaaafd0c6939aa405add",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/quant": {
+    "mtime": 1791789705.398119,
+    "seen": 1791864065.510089,
+    "ast_hash": "c732f883a820f00845f58decfb27a34a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/__init__.py": {
+    "mtime": 1787726773.2415419,
+    "seen": 1791864065.5100899,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/dashboard.py": {
+    "mtime": 1787728484.8124259,
+    "seen": 1791864065.5100899,
+    "ast_hash": "a0dd7a25ebaed072a990ec75ce41c0fb",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/multi_asset_comparison.json": {
+    "mtime": 1791445277.2931085,
+    "seen": 1791864065.510091,
+    "ast_hash": "cfd99335b5cc4b1c2a6ebb6d24542599",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/night_2026-08-26.json": {
+    "mtime": 1787734921.409254,
+    "seen": 1791864065.510091,
+    "ast_hash": "cb0916577e0cb59f839f5c67100bb514",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/night_2026-08-28.json": {
+    "mtime": 1787883043.0801091,
+    "seen": 1791864065.510091,
+    "ast_hash": "344fff70fc5a9ddbea83878d996c2b64",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/night_2026-09-29.json": {
+    "mtime": 1790672502.4400105,
+    "seen": 1791864065.510092,
+    "ast_hash": "93264c1e7a5504c3e44c206ef14cd258",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/remote_access.json": {
+    "mtime": 1791863027.5266206,
+    "seen": 1791864065.510092,
+    "ast_hash": "390733149091f990caf5dc083e7e2387",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/risk/__init__.py": {
+    "mtime": 1791795424.1493368,
+    "seen": 1791864065.510093,
+    "ast_hash": "98c4e2aea8e9cf563cb3db7cea8d0c3c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/risk/book_allocator.py": {
+    "mtime": 1791560889.0114121,
+    "seen": 1791864065.510093,
+    "ast_hash": "42b98b06ac4ba32910aeba377b676970",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/risk/convex_tail.py": {
+    "mtime": 1791795701.6590593,
+    "seen": 1791864065.5100942,
+    "ast_hash": "12906b9557b8849113c084ec4381a10a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/risk/cost_model.py": {
+    "mtime": 1787710287.7099655,
+    "seen": 1791864065.5100942,
+    "ast_hash": "1980196854b47ad2058de5db0af83308",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/risk/exit_advisor.py": {
+    "mtime": 1788611371.146451,
+    "seen": 1791864065.5100942,
+    "ast_hash": "085f86a029f2eb4b4649e64053ec2edf",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/risk/hedging_engine.py": {
+    "mtime": 1791863431.314083,
+    "seen": 1791864065.5100951,
+    "ast_hash": "f8fadae2928e25bfa3b3ee862922489b",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/risk/risk_manager.py": {
+    "mtime": 1791863438.1628566,
+    "seen": 1791864065.5100951,
+    "ast_hash": "503a9e14c7da8d644362abfe4e5287ba",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/risk/stock_analysis.py": {
+    "mtime": 1788611362.0058806,
+    "seen": 1791864065.5100958,
+    "ast_hash": "0f4c79acf1de29aa45593e651d714077",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/risk/trade_scorer.py": {
+    "mtime": 1790697539.9558332,
+    "seen": 1791864065.5100958,
+    "ast_hash": "06a9cafbf7bd978eb81ed9bced6c827f",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/run_autopilot.sh": {
+    "mtime": 1787595349.3126955,
+    "seen": 1791864065.5100968,
+    "ast_hash": "0e8e98af182c55c4223590772b95f6f2",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/run_webapp.sh": {
+    "mtime": 1791604064.2513356,
+    "seen": 1791864065.5100968,
+    "ast_hash": "2a722d5b6dd9ea57806e04ae338ef8fe",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/scenario_c.sh": {
+    "mtime": 1787890736.2238288,
+    "seen": 1791864065.510098,
+    "ast_hash": "b024c3e8dd6cbf956863449ab0b37a76",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/scenario_small.sh": {
+    "mtime": 1790783433.8172882,
+    "seen": 1791864065.510098,
+    "ast_hash": "5e23b3a3e330112600292843877d0f6a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/scenario_sniper.sh": {
+    "mtime": 1790009755.4825668,
+    "seen": 1791864065.510098,
+    "ast_hash": "d1b133087cc9f092d5c1038e6df4814c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/strategy/cme_futures_strategy.py": {
+    "mtime": 1791792234.3535445,
+    "seen": 1791864065.510099,
+    "ast_hash": "9d496e26fe58f26186c6a1144a31da5f",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/strategy/confluence_matrix.py": {
+    "mtime": 1791303209.804347,
+    "seen": 1791864065.510099,
+    "ast_hash": "bbcaed95b52ccea77615144e2bdd294c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/strategy/crypto_perp_strategy.py": {
+    "mtime": 1791769933.0191464,
+    "seen": 1791864065.5101,
+    "ast_hash": "3267fff75abc5ad447e48791c71d5f7a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/strategy/forex_strategy.py": {
+    "mtime": 1791731385.1537673,
+    "seen": 1791864065.5101,
+    "ast_hash": "514da714ad091019198d6440659b1fd6",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/strategy/jev_scooper.py": {
+    "mtime": 1790960380.3037431,
+    "seen": 1791864065.510101,
+    "ast_hash": "97a35ed6ec1f98421a147fda44315ca2",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/__init__.py": {
+    "mtime": 1787716989.157833,
+    "seen": 1791864065.510101,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_adaptive_hedging.py": {
+    "mtime": 1791099397.8972926,
+    "seen": 1791864065.510102,
+    "ast_hash": "14928aaa4ac04c229d6158b0754ee2e4",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_agent_council.py": {
+    "mtime": 1791653184.3071876,
+    "seen": 1791864065.510102,
+    "ast_hash": "79f61fa28b333d7291419f50476446f8",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_anti_volatility.py": {
+    "mtime": 1790960659.4661663,
+    "seen": 1791864065.510103,
+    "ast_hash": "d6c97e3ae74111bf6dee2079146367ee",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_architecture_fixes.py": {
+    "mtime": 1791604225.1863933,
+    "seen": 1791864065.510103,
+    "ast_hash": "ff2a5a87e7585ec7f346026363aeb4e4",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_bayesian_confidence.py": {
+    "mtime": 1790960668.6900995,
+    "seen": 1791864065.510103,
+    "ast_hash": "fbd036b2f36342f21175729029d05308",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_book_split.py": {
+    "mtime": 1791561250.342387,
+    "seen": 1791864065.5101042,
+    "ast_hash": "5c5d37704ec0bd8b58b948cf89caa57f",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_compliance_checker.py": {
+    "mtime": 1791302643.0330334,
+    "seen": 1791864065.5101042,
+    "ast_hash": "0c7ed902b8e36f65bd783887b14e1dd2",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_confluence_matrix.py": {
+    "mtime": 1791303233.735679,
+    "seen": 1791864065.5101051,
+    "ast_hash": "c099415b96c976120744e2547b07d66a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_crypto_perp_fixes.py": {
+    "mtime": 1791808493.3659034,
+    "seen": 1791864065.5101051,
+    "ast_hash": "f7f225a338cb4b7e3c8a153caba34a75",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_financial_modeling_adaptive.py": {
+    "mtime": 1791102041.4442155,
+    "seen": 1791864065.5101051,
+    "ast_hash": "cf668c65d1f81cc0c041ad160e4ee255",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_institutional_benchmark.py": {
+    "mtime": 1791304088.83068,
+    "seen": 1791864065.5101068,
+    "ast_hash": "f1ffe760da365552f01a0ebd207f569d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_jev_scooper.py": {
+    "mtime": 1790960677.1661932,
+    "seen": 1791864065.5101068,
+    "ast_hash": "1e4c96711526a0421ef26cff7c1a214e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_mirror_gateway.py": {
+    "mtime": 1791304107.889966,
+    "seen": 1791864065.510108,
+    "ast_hash": "47708f1ffabc16304eb7330408f22fed",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_multi_desk.py": {
+    "mtime": 1791604320.147183,
+    "seen": 1791864065.510108,
+    "ast_hash": "450932005bb68124c91690dcc3904449",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_point_in_time.py": {
+    "mtime": 1790866498.8133712,
+    "seen": 1791864065.510108,
+    "ast_hash": "2a47b2ef8a6d9615925d605c6914b8c1",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_project_omega.py": {
+    "mtime": 1791795731.5965383,
+    "seen": 1791864065.510109,
+    "ast_hash": "aa727f4bcdd10f7d6a9ae5c1ef130cf1",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_units.py": {
+    "mtime": 1790702416.876261,
+    "seen": 1791864065.510109,
+    "ast_hash": "88967f94a8ae072e37fcacb2478cb0b6",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/train.py": {
+    "mtime": 1788701869.049866,
+    "seen": 1791864065.51011,
+    "ast_hash": "a0eb6a92fc365467467741842744c0a4",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/watchdog.sh": {
+    "mtime": 1791828646.1213775,
+    "seen": 1791864065.51011,
+    "ast_hash": "4826bb81c7499cccdbafd45a4af27ca6",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/__init__.py": {
+    "mtime": 1787729014.3954473,
+    "seen": 1791864065.51011,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/app.py": {
+    "mtime": 1791808086.8147,
+    "seen": 1791864065.510111,
+    "ast_hash": "3136890700ba46815ca1cdede44b1643",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/static/manifest.json": {
+    "mtime": 1791566556.3441634,
+    "seen": 1791864065.510111,
+    "ast_hash": "d0aa5f65a8686ef689cf316fee32548a",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/tunnel_manager.py": {
+    "mtime": 1791722558.5342655,
+    "seen": 1791864065.510112,
+    "ast_hash": "254974e97f81e728428cf3909718517d",
+    "semantic_hash": ""
+  },
+  "Quant/books.md": {
+    "mtime": 1764949525.730782,
+    "seen": 1791864065.510112,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "Quant/kaggle/orcl-1995-2014.txt": {
+    "mtime": 1765106393.882993,
+    "seen": 1791864065.510113,
+    "ast_hash": "e1305f0bc4e74011672777b0c118b8e3",
+    "semantic_hash": ""
+  },
+  "Quant/notes.md": {
+    "mtime": 1764949516.8559794,
+    "seen": 1791864065.510113,
+    "ast_hash": "9d33eb3679bdc0655507e25b31bb35c7",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/.github/agents/trader-saas.agent.md": {
+    "mtime": 1778167144.414666,
+    "seen": 1791864065.510113,
+    "ast_hash": "652fa2ae836379a009172b37d887e977",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/GEMINI.md": {
+    "mtime": 1791789521.0895889,
+    "seen": 1791864065.510114,
+    "ast_hash": "a278036c579e59f518c1010140482c4b",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/IOS_WIDGET_BLUEPRINT.md": {
+    "mtime": 1791341673.7496111,
+    "seen": 1791864065.510114,
+    "ast_hash": "fb7cf505139f9b4719e3af0924463d29",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/MCP_SETUP_GUIDE.md": {
+    "mtime": 1791651154.8399222,
+    "seen": 1791864065.5101151,
+    "ast_hash": "f0c1b805cdd35f508c421b048696a2f9",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/README.md": {
+    "mtime": 1789960581.9092507,
+    "seen": 1791864065.5101151,
+    "ast_hash": "cb677bc728e4bb03d0e3150cc61c2e17",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/Review(Claude)3OCT.md": {
+    "mtime": 1791097968.191921,
+    "seen": 1791864065.510116,
+    "ast_hash": "4c7ba443cc59dc2857cb4abfaf48d92f",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/AGENTS.md": {
+    "mtime": 1778139712.0199983,
+    "seen": 1791864065.510116,
+    "ast_hash": "9e09241799026ac05be315a2f0b50055",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/CLAUDE.md": {
+    "mtime": 1778139712.0200977,
+    "seen": 1791864065.510116,
+    "ast_hash": "5c27369b226fcf2be8a6cfe52224e767",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/README.md": {
+    "mtime": 1778139675.4715946,
+    "seen": 1791864065.510117,
+    "ast_hash": "f15aaa42d5d299d091b1171097ea56ad",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/docker-compose.yml": {
+    "mtime": 1776734336.8500898,
+    "seen": 1791864065.510117,
+    "ast_hash": "aa25063dcf62c2c5625f626b0cd8e027",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/docs/ios_mobile_widget_blueprint.md": {
+    "mtime": 1791341668.2736826,
+    "seen": 1791864065.5101178,
+    "ast_hash": "fb7cf505139f9b4719e3af0924463d29",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/dashboard.html": {
+    "mtime": 1787728663.7377179,
+    "seen": 1791864065.5101178,
+    "ast_hash": "1ea8ac01006f8a4dec777141cabd9ac8",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/financial_model_2026-09-19.md": {
+    "mtime": 1789755387.1322136,
+    "seen": 1791864065.510119,
+    "ast_hash": "85a1ee99eed467d45556b584d19de38b",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/financial_model_2026-09-20.md": {
+    "mtime": 1789843538.66439,
+    "seen": 1791864065.510119,
+    "ast_hash": "620a307fadaa42bb081691ee36316466",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/financial_model_2026-10-04.md": {
+    "mtime": 1791102002.8416088,
+    "seen": 1791864065.510119,
+    "ast_hash": "7b173eb7ccc451e153a7ed2b17162ae5",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/five_year_stats_2026-09-19.md": {
+    "mtime": 1789750918.164699,
+    "seen": 1791864065.51012,
+    "ast_hash": "4eaec3574110b7c745b695aa3d32e9bd",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/five_year_stats_2026-09-30.md": {
+    "mtime": 1790781915.1790414,
+    "seen": 1791864065.51012,
+    "ast_hash": "54709c57537b36013c3c11b63806784e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/plan_2026-08-26.md": {
+    "mtime": 1787758561.4383905,
+    "seen": 1791864065.5101209,
+    "ast_hash": "28b128e0f07e718d94a93aefbd674203",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/plan_2026-08-27.md": {
+    "mtime": 1787846198.0961301,
+    "seen": 1791864065.5101209,
+    "ast_hash": "e6d6d169a19b56d4c8819f9fb3823de8",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/plan_2026-09-05.md": {
+    "mtime": 1788614293.2892005,
+    "seen": 1791864065.510122,
+    "ast_hash": "a31b68426f4de3f3c02cbdb4f0fcfa5c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/plan_2026-09-07.md": {
+    "mtime": 1788745363.5406055,
+    "seen": 1791864065.510122,
+    "ast_hash": "7efbf8a4c81b790d75cd5a29f8409c7b",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/plan_2026-09-08.md": {
+    "mtime": 1788833752.575969,
+    "seen": 1791864065.510123,
+    "ast_hash": "3cc82925ef8b109ad63ec6c603c28a43",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/plan_2026-09-14.md": {
+    "mtime": 1789400088.5154107,
+    "seen": 1791864065.510123,
+    "ast_hash": "ad247e9fcfbe608a28230b5831474a82",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/plan_2026-09-19.md": {
+    "mtime": 1789752062.0525548,
+    "seen": 1791864065.510123,
+    "ast_hash": "ed202c01f3ea5040aa704893397e1113",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/plan_2026-09-21.md": {
+    "mtime": 1789998786.6742039,
+    "seen": 1791864065.510124,
+    "ast_hash": "10ae761441ca43461896e8427c684729",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/time_to_goal_2026-09-21.md": {
+    "mtime": 1789980778.0392792,
+    "seen": 1791864065.510124,
+    "ast_hash": "eb92f517a07579b0016ecc1d5df94c42",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/twenty_year_strategy_report.md": {
+    "mtime": 1791863261.9608104,
+    "seen": 1791864065.5101252,
+    "ast_hash": "0ab8e752fdc4912ffaf5e568ed4f7b55",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/wr_hunt_2026-09-22.md": {
+    "mtime": 1790007471.2160766,
+    "seen": 1791864065.5101252,
+    "ast_hash": "48f6e071ade08ca0cbb205e228099f55",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/requirements.txt": {
+    "mtime": 1778575839.0922954,
+    "seen": 1791864065.510126,
+    "ast_hash": "fc67ed8889106a77d80496620a61c04f",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/static/index.html": {
+    "mtime": 1791815686.6412303,
+    "seen": 1791864065.510126,
+    "ast_hash": "ddba4fbf8ce9f9b8332b1722a0ca56c0",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/static/office.html": {
+    "mtime": 1791789761.375674,
+    "seen": 1791864065.510127,
+    "ast_hash": "1b5686685f23ac92ac0dc8fc945ecf70",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/static/overview.html": {
+    "mtime": 1791808443.4283497,
+    "seen": 1791864065.510127,
+    "ast_hash": "8c77dfeb9db556c671ea31cc665a5bd1",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/static/widget.html": {
+    "mtime": 1791808463.7886894,
+    "seen": 1791864065.510128,
+    "ast_hash": "a6cabd7e5afa691e24c3a2717869dc31",
+    "semantic_hash": ""
+  },
+  "Quant/image.png": {
+    "mtime": 1763575967.4564738,
+    "seen": 1791864065.510128,
+    "ast_hash": "ef41168332ce5f7f2e7762756cde0ea4",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/public/file.svg": {
+    "mtime": 1778139675.4721942,
+    "seen": 1791864065.510128,
+    "ast_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/public/globe.svg": {
+    "mtime": 1778139675.472419,
+    "seen": 1791864065.510129,
+    "ast_hash": "2aaafa6a49b6563925fe440891e32717",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/public/next.svg": {
+    "mtime": 1778139675.4722853,
+    "seen": 1791864065.510129,
+    "ast_hash": "8e061864f388b47f33a1c3780831193e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/public/vercel.svg": {
+    "mtime": 1778139675.4722893,
+    "seen": 1791864065.51013,
+    "ast_hash": "c0af2f507b369b085b35ef4bbe3bcf1e",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/dashboard/public/window.svg": {
+    "mtime": 1778139675.4721968,
+    "seen": 1791864065.51013,
+    "ast_hash": "a2760511c65806022ad20adf74370ff3",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/stock_analysis_architecture.svg": {
+    "mtime": 1773503419.0985942,
+    "seen": 1791864065.510131,
+    "ast_hash": "4522b6d70382e3d6f56730d6b555141b",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/static/apple-touch-icon.png": {
+    "mtime": 1791566550.384835,
+    "seen": 1791864065.510131,
+    "ast_hash": "5da3df0cc36f2db228ded8fcf0ecb969",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/static/icon-192.png": {
+    "mtime": 1791566550.3800464,
+    "seen": 1791864065.510131,
+    "ast_hash": "c3b07d0db99ec7d941c5d1b66a3b0744",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/webapp/static/icon-512.png": {
+    "mtime": 1791566550.38389,
+    "seen": 1791864065.510132,
+    "ast_hash": "438db009a1c5c199c3a61d9d115e718b",
+    "semantic_hash": ""
+  }
+}

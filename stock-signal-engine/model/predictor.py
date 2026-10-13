@@ -15,6 +15,11 @@ def load_model(model_path: str = "model/lgbm_model.pkl"):
     """
     try:
         model = joblib.load(model_path)  # ✅ save the result
+        if hasattr(model, "set_params"):
+            try:
+                model.set_params(n_jobs=1)
+            except Exception:
+                pass
         print(f"Model loaded from {model_path}")
         return model                     # ✅ return it
 

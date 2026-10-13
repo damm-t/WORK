@@ -1,0 +1,152 @@
+[
+  {
+    "ticker": "AAPL",
+    "sector": "Technology",
+    "scanner_score": 73.7,
+    "sentiment_conviction": 50.0,
+    "tech_score": 65.0,
+    "tech_grade": "B",
+    "composite": 63.2,
+    "price_ref": 338.4,
+    "premarket_gap_pct": null,
+    "qty": 86,
+    "tp": 352.06,
+    "sl": 324.74,
+    "risk_dollars": 1174.92,
+    "notional": 29102.4,
+    "headlines": [
+      {
+        "title": "Anthropic Bets Big On AI, Bleeds Billions: Key Details From The Reported IPO Prospectus",
+        "label": "neutral",
+        "score": 0.6213,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "Oil Rises; Meta\u2019s Muse Trade Extends To CPU Stocks Like Intel, AMD, Arm, Qualcomm",
+        "label": "positive",
+        "score": 0.4813,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "What Is Going on With Qualcomm Stock on Monday?",
+        "label": "negative",
+        "score": 0.5038,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "Apple, Amazon Face UK Regulator Lawsuit Against Alleged Unlawful Anticompetitive Agreements",
+        "label": "negative",
+        "score": 0.496,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "Nvidia Tops $5.4T, Outvalues Russell 2000: Michael Burry\u2019s AI Warning Raises ETF Questions",
+        "label": "negative",
+        "score": 0.294,
+        "source": "alpaca_benzinga"
+      }
+    ],
+    "order_ready": true,
+    "premarket": null
+  },
+  {
+    "ticker": "MSFT",
+    "sector": "Technology",
+    "scanner_score": 72.9,
+    "sentiment_conviction": 50.0,
+    "tech_score": 38.0,
+    "tech_grade": "C",
+    "composite": 56.2,
+    "price_ref": 509.22,
+    "premarket_gap_pct": null,
+    "qty": 57,
+    "tp": 533.09,
+    "sl": 485.35,
+    "risk_dollars": 1360.43,
+    "notional": 29025.54,
+    "headlines": [
+      {
+        "title": "Anthropic Bets Big On AI, Bleeds Billions: Key Details From The Reported IPO Prospectus",
+        "label": "neutral",
+        "score": 0.6212,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "Reported September 28, 'OpenAI Scraps Release of New AI Model Over Safety Concerns' - WSJ Exclusive",
+        "label": "negative",
+        "score": 0.8328,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "AI Bubble? Market Expert Says Yes \u2014 and this Event Could \u2018Drag Down the Entire Sector\u2019",
+        "label": "neutral",
+        "score": 0.5742,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "Watching Cerebras Systems; Traders Circulate The Company Will Be Hosting An Event Titled 'DevDay AfterParty By Cerebras x OpenAI' On Tuesday, September 29",
+        "label": "neutral",
+        "score": 0.5519,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "President Trump, Vice President JD Vance, Secretary Of State Marco Rubio, Huang And SpaceX And Tesla Executive Elon Musk Will Attend Event For America.gov, A New AI-Powered Government Website Intended To Consolidate Services And Information From Across Agencies\u2019 Websites",
+        "label": "neutral",
+        "score": 0.5241,
+        "source": "alpaca_benzinga"
+      }
+    ],
+    "order_ready": true,
+    "premarket": null
+  },
+  {
+    "ticker": "CVX",
+    "sector": "Energy",
+    "scanner_score": 69.1,
+    "sentiment_conviction": 50.0,
+    "tech_score": 12.4,
+    "tech_grade": "C",
+    "composite": 48.2,
+    "price_ref": 206.37,
+    "premarket_gap_pct": null,
+    "qty": 141,
+    "tp": 215.01,
+    "sl": 197.73,
+    "risk_dollars": 1217.64,
+    "notional": 29098.17,
+    "headlines": [
+      {
+        "title": "This Blue-Chip Defense Prime Lands on Piper Sandler's Rate-Risk List",
+        "label": "neutral",
+        "score": 0.5462,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "Strong Refining Will Drive Chevron, ExxonMobil Q3 Results: Analyst",
+        "label": "positive",
+        "score": 0.5334,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "8 Of 11 Sectors Fall In Monday Trading As Defensives Lead",
+        "label": "negative",
+        "score": 0.487,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "TD Cowen Maintains Hold on Chevron, Raises Price Target to $215",
+        "label": "neutral",
+        "score": 0.2204,
+        "source": "alpaca_benzinga"
+      },
+      {
+        "title": "White House Has Few Options Left as Diesel Prices Surge Toward $7",
+        "label": "negative",
+        "score": 0.188,
+        "source": "alpaca_benzinga"
+      }
+    ],
+    "order_ready": true,
+    "premarket": null
+  }
+]
