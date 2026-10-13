@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QuantDesk HUD">
+  <meta name="theme-color" content="#07090e">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <title>QuantDesk HUD Widget</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(18, 24, 38, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-glow: rgba(0, 240, 255, 0.05);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #00f0ff;
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.25);
+      --red: #f43f5e;
+      --red-glow: rgba(244, 63, 94, 0.25);
+      --yellow: #f59e0b;
+      --purple: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 14px;
+      min-width: 320px;
+      max-width: 480px;
+      margin: 0 auto;
+      user-select: none;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background gradient */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.12) 0%, rgba(16, 185, 129, 0.04) 50%, transparent 80%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #00f0ff, #3b82f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #050b14;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-subtitle {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .equity-hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .hero-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .hero-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .hero-metrics {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .sub-metric {
+      flex: 1;
+    }
+
+    .sub-metric-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .sub-metric-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 10px 0 6px 2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .position-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .position-row:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .pos-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pos-ticker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .badge {
+      font-size: 9px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-momentum {
+      background: rgba(139, 92, 246, 0.18);
+      color: #c084fc;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .badge-core {
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+
+    .badge-hedge {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--yellow);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .pos-details {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .pos-pnl {
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .pos-pnl-dollars {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .pos-pnl-pct {
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .pnl-pos {
+      color: var(--green);
+    }
+
+    .pnl-neg {
+      color: var(--red);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 16px 8px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .rule-item {
+      background: rgba(255, 255, 255, 0.02);
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .rule-key {
+      color: var(--text-muted);
+      font-size: 10px;
+    }
+
+    .rule-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 11px;
+      color: #38bdf8;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(59, 130, 246, 0.2));
+      border-color: rgba(0, 240, 255, 0.4);
+      color: #38bdf8;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), rgba(59, 130, 246, 0.3));
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+    .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #2d3f60;background:transparent;transition:all .18s cubic-bezier(0.4,0,0.2,1)}
+    .pin-dot.filled{background:#00f0ff;border-color:#00f0ff;box-shadow:0 0 12px rgba(0,240,255,0.7);transform:scale(1.15)}
+    .pin-dot.error{background:#f85149;border-color:#f85149;box-shadow:0 0 12px rgba(248,81,73,0.7)}
+    .pin-key{height:50px;border-radius:12px;background:#111a2c;border:1px solid #1f2e4a;color:#fff;font-size:18px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s ease;-webkit-tap-highlight-color:transparent}
+    .pin-key:hover,.pin-key:active{background:#1a2742;border-color:#38bdf8;transform:scale(0.96)}
+    .pin-key.pin-ghost{background:transparent;color:var(--text-muted);font-size:15px}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+    .shake{animation:shake .35s ease-in-out}
+  </style>
+</head>
+<body>
+
+  <!-- 🔒 PIN AUTHENTICATION LOCK SCREEN OVERLAY -->
+  <div id="pin-lock-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(7,9,14,0.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);z-index:999999;flex-direction:column;align-items:center;justify-content:center;padding:16px;user-select:none">
+    <div style="background:#0e1628;border:1px solid #1f2d47;border-radius:20px;max-width:340px;width:100%;padding:26px 20px;box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(0,240,255,0.08);display:flex;flex-direction:column;align-items:center;text-align:center">
+      <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg, rgba(0,240,255,0.2), rgba(59,130,246,0.2));border:1px solid rgba(0,240,255,0.4);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px;box-shadow:0 0 16px rgba(0,240,255,0.25)">
+        🔒
+      </div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;margin-bottom:4px">QUANT DESK SECURED</div>
+      <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px">Enter Security PIN</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:18px">Authenticate to view live HUD metrics</div>
+      <div id="pin-dots-row" style="display:flex;gap:12px;margin-bottom:12px">
+        <div class="pin-dot" id="pdot-0"></div>
+        <div class="pin-dot" id="pdot-1"></div>
+        <div class="pin-dot" id="pdot-2"></div>
+        <div class="pin-dot" id="pdot-3"></div>
+      </div>
+      <div id="pin-status-msg" style="height:16px;font-size:11.5px;font-weight:600;color:var(--red);margin-bottom:12px"></div>
+      <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;width:100%;max-width:260px;margin-bottom:14px">
+        <button class="pin-key" onclick="pressPinKey('1')">1</button>
+        <button class="pin-key" onclick="pressPinKey('2')">2</button>
+        <button class="pin-key" onclick="pressPinKey('3')">3</button>
+        <button class="pin-key" onclick="pressPinKey('4')">4</button>
+        <button class="pin-key" onclick="pressPinKey('5')">5</button>
+        <button class="pin-key" onclick="pressPinKey('6')">6</button>
+        <button class="pin-key" onclick="pressPinKey('7')">7</button>
+        <button class="pin-key" onclick="pressPinKey('8')">8</button>
+        <button class="pin-key" onclick="pressPinKey('9')">9</button>
+        <button class="pin-key pin-ghost" onclick="clearPin()">C</button>
+        <button class="pin-key" onclick="pressPinKey('0')">0</button>
+        <button class="pin-key pin-ghost" onclick="backspacePin()">⌫</button>
+      </div>
+      <div style="font-size:10.5px;color:var(--text-muted)">Default PIN: <b style="color:#e2e8f0">8888</b></div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="widget-header">
+    <div class="brand">
+      <div class="brand-icon">QD</div>
+      <div>
+        <div class="brand-title">Quant Desk</div>
+        <div class="brand-subtitle">Autonomous Bot</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <a href="/office" style="font-size:11px;color:#a5b4fc;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);text-decoration:none;padding:3px 8px;border-radius:6px;font-weight:600">🏢 Office ↗</a>
+      <a href="/" style="font-size:11px;color:var(--text-muted);text-decoration:none;border:1px solid var(--card-border);padding:3px 8px;border-radius:6px;transition:all 0.15s ease">Cockpit ↗</a>
+      <button onclick="lockWidget()" style="font-size:11px;color:var(--text-muted);background:transparent;border:1px solid var(--card-border);padding:3px 8px;border-radius:6px;cursor:pointer">🔒 Lock</button>
+      <div class="status-pill" id="statusPill">
+        <div class="status-dot"></div>
+        <span id="statusText">AUTOPILOT ON</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Combined Capital & Multi-Desk Hero Card -->
+  <div class="card" style="border-top: 2px solid var(--accent);">
+    <div class="equity-hero">
+      <div>
+        <div class="hero-label">Combined Multi-Desk Capital</div>
+        <div class="hero-val" id="combinedCapVal">$170,808.73</div>
+      </div>
+      <div id="desksSummaryBadge" class="badge badge-core" style="padding: 4px 8px; font-size: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+        3/3 DESKS ACTIVE
+      </div>
+    </div>
+    <div class="hero-metrics">
+      <div class="sub-metric">
+        <div class="sub-metric-label">🏛️ Equities (D1)</div>
+        <div class="sub-metric-val" id="desk1CapVal">$95,808.73</div>
+      </div>
+      <div class="sub-metric">
+        <div class="sub-metric-label">⚡ Crypto 3x (D2)</div>
+        <div class="sub-metric-val" id="desk2CapVal" style="color: #f59e0b;">$50,000.00</div>
+      </div>
+      <div class="sub-metric">
+        <div class="sub-metric-label">📈 CME Micro (D3)</div>
+        <div class="sub-metric-val" id="desk3CapVal" style="color: #10b981;">$25,000.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-Asset Multi-Desk Daemons Card -->
+  <div class="section-title">
+    <span>Autonomous 3-Asset Desks</span>
+    <span style="font-size: 9px; color: #38bdf8;" id="totalDesksPill">ISOLATED LOCALHOST PIDS</span>
+  </div>
+  <div class="card" style="padding: 8px;">
+    <!-- Desk 1 -->
+    <div class="position-row" style="margin-bottom: 5px;">
+      <div class="pos-left">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="pos-ticker" style="color:#8ab4ff; font-size:12px;">🏛️ D1: US EQUITIES</span>
+            <span class="badge badge-core" id="d1StatusBadge">PID 13373</span>
+          </div>
+          <div class="pos-details">Alpaca Paper · <span id="d1PosCount">3</span> Pos · Market Standby</div>
+        </div>
+      </div>
+      <div class="pos-pnl">
+        <div class="pos-pnl-dollars" id="d1EquityVal" style="color:#fff;">$95,808.73</div>
+        <div class="pos-pnl-pct" id="d1BpVal" style="color:var(--text-muted);">BP: $285.6k</div>
+      </div>
+    </div>
+
+    <!-- Desk 2 -->
+    <div class="position-row" style="margin-bottom: 5px;">
+      <div class="pos-left">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="pos-ticker" style="color:#f59e0b; font-size:12px;">⚡ D2: CRYPTO PERPS</span>
+            <span class="badge badge-hedge" id="d2StatusBadge">PID 12053</span>
+          </div>
+          <div class="pos-details">CCXT 24/7 Demo · 3x Cross · BTC/ETH</div>
+        </div>
+      </div>
+      <div class="pos-pnl">
+        <div class="pos-pnl-dollars" id="d2EquityVal" style="color:#fff;">$50,000.00</div>
+        <div class="pos-pnl-pct" style="color:#10b981;">24/7/365 LOOP</div>
+      </div>
+    </div>
+
+    <!-- Desk 3 -->
+    <div class="position-row" style="margin-bottom: 0px;">
+      <div class="pos-left">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="pos-ticker" style="color:#10b981; font-size:12px;">📈 D3: CME FUTURES</span>
+            <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);" id="d3StatusBadge">PID 12072</span>
+          </div>
+          <div class="pos-details">CME Simulated · 23h · MES/MNQ Brackets</div>
+        </div>
+      </div>
+      <div class="pos-pnl">
+        <div class="pos-pnl-dollars" id="d3EquityVal" style="color:#fff;">$25,000.00</div>
+        <div class="pos-pnl-pct" style="color:#38bdf8;">23H BRACKETS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Equity Hero Card -->
+  <div class="card">
+    <div class="equity-hero">
+      <div>
+        <div class="hero-label">Desk 1 Equities Equity</div>
+        <div class="hero-val" id="equityVal">$---.--</div>
+      </div>
+      <div id="marketBadge" class="badge badge-momentum" style="padding: 4px 8px; font-size: 10px;">
+        MARKET CLOSED
+      </div>
+    </div>
+    <div class="hero-metrics">
+      <div class="sub-metric">
+        <div class="sub-metric-label">Cash</div>
+        <div class="sub-metric-val" id="cashVal">$---.--</div>
+      </div>
+      <div class="sub-metric">
+        <div class="sub-metric-label">Buying Power</div>
+        <div class="sub-metric-val" id="bpVal">$---.--</div>
+      </div>
+      <div class="sub-metric">
+        <div class="sub-metric-label">Positions PnL</div>
+        <div class="sub-metric-val" id="totalPnlVal">--</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Positions -->
+  <div class="section-title">
+    <span>Active Positions</span>
+    <span id="posCount" style="color: #38bdf8; font-family: 'JetBrains Mono';">0</span>
+  </div>
+  <div id="positionsList">
+    <div class="empty-state">Loading holdings...</div>
+  </div>
+
+  <!-- Compounding Guardrails -->
+  <div class="section-title">
+    <span>Compounding Guardrails</span>
+    <span style="font-size: 9px; color: #10b981;">DISCIPLINE ACTIVE</span>
+  </div>
+  <div class="card" style="padding: 10px;">
+    <div class="rules-grid">
+      <div class="rule-item">
+        <span class="rule-key">Risk / Trade</span>
+        <span class="rule-val">1.5% Kelly</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-key">Max Heat</span>
+        <span class="rule-val">45.0% Strict</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-key">Daily Stop</span>
+        <span class="rule-val">-3.0% Max</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-key">Whale Trap</span>
+        <span class="rule-val">Defended (Cand C)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Autonomous AI Compliance & Praise/Punish Matrix -->
+  <div class="section-title">
+    <span>AI Compliance & Strategy Matrix</span>
+    <span id="aiComplianceBadge" style="font-size: 9px; color: #00f0ff;">STRICT AUDITOR</span>
+  </div>
+  <div class="card" style="padding: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <span style="font-size: 11px; font-weight: 600; color: #f1f5f9;">Reinforcement Scoreboard</span>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px;">
+        <span style="color: #10b981;" id="praiseCount">🟢 0 Praises</span> &nbsp;|&nbsp;
+        <span style="color: #f43f5e;" id="punishCount">🔴 0 Penalties</span>
+      </div>
+    </div>
+    <div class="rules-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+      <div class="rule-item">
+        <span class="rule-key">JEV Scooper</span>
+        <span class="rule-val" id="jevMult">1.00x</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-key">Ross Mom</span>
+        <span class="rule-val" id="rossMult">1.00x</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-key">Core Swing</span>
+        <span class="rule-val" id="coreMult">1.00x</span>
+      </div>
+    </div>
+    <div id="latestRuleLearned" style="margin-top: 8px; font-size: 10px; color: #94a3b8; font-style: italic; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 6px;">
+      "Autonomous institutional checker active. Praising discipline, punishing traps."
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <a href="/" target="_blank" class="btn btn-primary" id="openTerminalLink">
+      🌐 Open Terminal
+    </a>
+    <button class="btn" onclick="refreshAll()">
+      🔄 Refresh
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>Autonomous run through Oct 31+</span>
+    <span id="lastUpdated">Updated: Just now</span>
+  </div>
+
+  <script>
+    // --- PIN Auth & Fetch Interceptor ---
+    let _pinBuffer = "";
+    let _isUnlocked = false;
+
+    const _rawFetch = window.fetch;
+    window.fetch = async function(url, options = {}) {
+      const token = localStorage.getItem('quantdesk_pin_token');
+      if (token) {
+        if (!options.headers) options.headers = {};
+        if (options.headers instanceof Headers) {
+          options.headers.set('X-Dash-PIN-Token', token);
+        } else {
+          options.headers['X-Dash-PIN-Token'] = token;
+        }
+      }
+      const resp = await _rawFetch(url, options);
+      if (resp.status === 401 && !String(url).includes('/api/auth/')) {
+        showPinLock();
+      }
+      return resp;
+    };
+
+    function updatePinDots(state = '') {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById('pdot-' + i);
+        if (!dot) continue;
+        dot.className = 'pin-dot' + (i < _pinBuffer.length ? ' filled' : '') + (state ? ' ' + state : '');
+      }
+    }
+
+    function pressPinKey(digit) {
+      if (_pinBuffer.length >= 4) return;
+      _pinBuffer += String(digit);
+      updatePinDots();
+      const msg = document.getElementById('pin-status-msg');
+      if (msg) msg.textContent = '';
+      if (_pinBuffer.length === 4) submitPin();
+    }
+
+    function clearPin() {
+      _pinBuffer = '';
+      updatePinDots();
+      const msg = document.getElementById('pin-status-msg');
+      if (msg) msg.textContent = '';
+    }
+
+    function backspacePin() {
+      if (_pinBuffer.length > 0) {
+        _pinBuffer = _pinBuffer.slice(0, -1);
+        updatePinDots();
+        const msg = document.getElementById('pin-status-msg');
+        if (msg) msg.textContent = '';
+      }
+    }
+
+    async function submitPin() {
+      const pin = _pinBuffer;
+      const msg = document.getElementById('pin-status-msg');
+      if (msg) { msg.style.color = 'var(--accent)'; msg.textContent = 'Verifying...'; }
+      try {
+        const res = await _rawFetch('/api/auth/verify-pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          localStorage.setItem('quantdesk_pin_token', data.token);
+          _isUnlocked = true;
+          if (msg) { msg.style.color = 'var(--green)'; msg.textContent = '✔ Unlocked!'; }
+          updatePinDots('filled');
+          setTimeout(() => {
+            hidePinLock();
+            refreshAll();
+          }, 300);
+        } else {
+          handlePinFailure(data.detail || 'Incorrect PIN');
+        }
+      } catch (e) {
+        handlePinFailure('Error verifying PIN');
+      }
+    }
+
+    function handlePinFailure(text) {
+      const row = document.getElementById('pin-dots-row');
+      if (row) row.classList.add('shake');
+      updatePinDots('error');
+      const msg = document.getElementById('pin-status-msg');
+      if (msg) { msg.style.color = 'var(--red)'; msg.textContent = text; }
+      setTimeout(() => {
+        if (row) row.classList.remove('shake');
+        clearPin();
+      }, 750);
+    }
+
+    function showPinLock() {
+      _isUnlocked = false;
+      const overlay = document.getElementById('pin-lock-overlay');
+      if (overlay) overlay.style.display = 'flex';
+      clearPin();
+    }
+
+    function hidePinLock() {
+      const overlay = document.getElementById('pin-lock-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    function lockWidget() {
+      localStorage.removeItem('quantdesk_pin_token');
+      _rawFetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+      showPinLock();
+    }
+
+    // Dynamically bind to current host & port, fallback to 127.0.0.1:8081 if opened via file:// or WebView
+    const API_URL = (window.location.protocol.startsWith('http'))
+      ? window.location.origin
+      : 'http://127.0.0.1:8081';
+
+    async function fetchData() {
+      try {
+        const res = await fetch(`${API_URL}/api/account`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        renderAccount(data);
+      } catch (err) {
+        console.warn('Account fetch failed:', err);
+        document.getElementById('statusPill').style.borderColor = 'rgba(244, 63, 94, 0.4)';
+        document.getElementById('statusPill').style.color = '#f43f5e';
+        document.querySelector('.status-dot').style.background = '#f43f5e';
+        document.querySelector('.status-dot').style.boxShadow = '0 0 8px #f43f5e';
+        document.getElementById('statusText').innerText = 'OFFLINE';
+      }
+    }
+
+    function renderAccount(data) {
+      document.getElementById('statusPill').style.borderColor = 'rgba(16, 185, 129, 0.3)';
+      document.getElementById('statusPill').style.color = '#10b981';
+      document.querySelector('.status-dot').style.background = '#10b981';
+      document.querySelector('.status-dot').style.boxShadow = '0 0 8px #10b981';
+      document.getElementById('statusText').innerText = 'AUTOPILOT ON';
+
+      document.getElementById('equityVal').innerText = '$' + Number(data.equity || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('cashVal').innerText = '$' + Number(data.cash || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('bpVal').innerText = '$' + Number(data.buying_power || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const mktBadge = document.getElementById('marketBadge');
+      if (data.market_open) {
+        mktBadge.innerText = 'MARKET OPEN';
+        mktBadge.className = 'badge badge-core';
+      } else {
+        mktBadge.innerText = 'MARKET CLOSED';
+        mktBadge.className = 'badge badge-momentum';
+      }
+
+      const positions = data.positions || [];
+      document.getElementById('posCount').innerText = positions.length;
+
+      let netPnl = 0;
+      const posContainer = document.getElementById('positionsList');
+
+      if (positions.length === 0) {
+        posContainer.innerHTML = '<div class="empty-state">No open positions. 100% Cash ready for Grade A setups.</div>';
+      } else {
+        let html = '';
+        positions.forEach(p => {
+          const pnl = Number(p.pnl_dollars || 0);
+          const pnlPct = Number(p.pnl_pct || 0);
+          netPnl += pnl;
+
+          let badgeClass = 'badge-core';
+          let badgeText = p.book || 'CORE';
+          if (p.symbol === 'SH' || p.symbol === 'PSQ') {
+            badgeClass = 'badge-hedge';
+            badgeText = 'HEDGE';
+          } else if (p.book === 'momentum') {
+            badgeClass = 'badge-momentum';
+            badgeText = 'ROSS MOM';
+          }
+
+          const pnlClass = pnl >= 0 ? 'pnl-pos' : 'pnl-neg';
+          const pnlSign = pnl >= 0 ? '+' : '';
+
+          html += `
+            <div class="position-row">
+              <div class="pos-left">
+                <div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="pos-ticker">${p.symbol}</span>
+                    <span class="badge ${badgeClass}">${badgeText}</span>
+                  </div>
+                  <div class="pos-details">
+                    ${p.qty} shs @ $${Number(p.avg_entry).toFixed(2)} → $${Number(p.now).toFixed(2)}
+                  </div>
+                </div>
+              </div>
+              <div class="pos-pnl">
+                <div class="pos-pnl-dollars ${pnlClass}">${pnl >= 0 ? '+' : '-'}$${Math.abs(pnl).toFixed(2)}</div>
+                <div class="pos-pnl-pct ${pnlClass}">${pnlPct >= 0 ? '+' : '-'}${Math.abs(pnlPct).toFixed(2)}%</div>
+              </div>
+            </div>
+          `;
+        });
+        posContainer.innerHTML = html;
+      }
+
+      const pnlEl = document.getElementById('totalPnlVal');
+      const pnlSign = netPnl >= 0 ? '+' : '-';
+      pnlEl.innerText = `${pnlSign}$${Math.abs(netPnl).toFixed(2)}`;
+      pnlEl.className = 'sub-metric-val ' + (netPnl >= 0 ? 'pnl-pos' : 'pnl-neg');
+
+      const now = new Date();
+      document.getElementById('lastUpdated').innerText = `Updated: ${now.toLocaleTimeString()}`;
+    }
+
+    async function fetchCompliance() {
+      try {
+        const res = await fetch(`${API_URL}/api/compliance/report`);
+        if (!res.ok) return;
+        const comp = await res.json();
+        renderCompliance(comp);
+      } catch (e) {
+        console.debug('Compliance fetch skipped:', e);
+      }
+    }
+
+    function renderCompliance(comp) {
+      const weights = comp.strategy_weights || {};
+      let totalPraise = 0;
+      let totalPunish = 0;
+
+      if (weights.jev_scooper) {
+        document.getElementById('jevMult').innerText = `${Number(weights.jev_scooper.multiplier || 1.0).toFixed(2)}x`;
+        totalPraise += weights.jev_scooper.praises || 0;
+        totalPunish += weights.jev_scooper.punishments || 0;
+      }
+      if (weights.ross_momentum) {
+        document.getElementById('rossMult').innerText = `${Number(weights.ross_momentum.multiplier || 1.0).toFixed(2)}x`;
+        totalPraise += weights.ross_momentum.praises || 0;
+        totalPunish += weights.ross_momentum.punishments || 0;
+      }
+      if (weights.core_swing) {
+        document.getElementById('coreMult').innerText = `${Number(weights.core_swing.multiplier || 1.0).toFixed(2)}x`;
+        totalPraise += weights.core_swing.praises || 0;
+        totalPunish += weights.core_swing.punishments || 0;
+      }
+
+      document.getElementById('praiseCount').innerText = `🟢 ${totalPraise} Praises`;
+      document.getElementById('punishCount').innerText = `🔴 ${totalPunish} Penalties`;
+
+      const evals = comp.recent_post_trade_evaluations || [];
+      const aiReviews = comp.recent_ai_model_reviews || [];
+      if (aiReviews && aiReviews.length > 0 && aiReviews[0].rule_learned) {
+        document.getElementById('latestRuleLearned').innerText = `[${aiReviews[0].ticker}] ${aiReviews[0].rule_learned}`;
+      } else if (evals && evals.length > 0 && evals[0].rule_learned) {
+        document.getElementById('latestRuleLearned').innerText = `[${evals[0].ticker}] ${evals[0].rule_learned}`;
+      }
+    }
+
+    async function fetchDesks() {
+      try {
+        const res = await fetch(`${API_URL}/api/desks/status`);
+        if (!res.ok) return;
+        const data = await res.json();
+        renderDesks(data);
+      } catch (e) {
+        console.debug('Desks status fetch skipped:', e);
+      }
+    }
+
+    function renderDesks(data) {
+      const sum = data.summary || {};
+      const d = data.desks || {};
+
+      const combinedCap = Number(sum.combined_portfolio_equity || 0);
+      document.getElementById('combinedCapVal').innerText = '$' + combinedCap.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      
+      const runningCount = sum.running_desks || 0;
+      const totalCount = sum.total_desks || 3;
+      const badge = document.getElementById('desksSummaryBadge');
+      if (badge) {
+        badge.innerText = `${runningCount}/${totalCount} DESKS ACTIVE`;
+        badge.style.color = runningCount === totalCount ? '#10b981' : '#f59e0b';
+      }
+
+      if (d.stocks) {
+        const d1Eq = Number(d.stocks.equity || 0);
+        document.getElementById('desk1CapVal').innerText = '$' + d1Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('d1EquityVal').innerText = '$' + d1Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const pidBadge = document.getElementById('d1StatusBadge');
+        if (pidBadge) pidBadge.innerText = d.stocks.status === 'RUNNING' ? `PID ${d.stocks.pid}` : 'OFFLINE';
+        const posCount = document.getElementById('d1PosCount');
+        if (posCount) posCount.innerText = d.stocks.positions_count || 0;
+        const bp = document.getElementById('d1BpVal');
+        if (bp) bp.innerText = `BP: $${(Number(d.stocks.buying_power || 0) / 1000).toFixed(1)}k`;
+      }
+
+      if (d.crypto_perp) {
+        const d2Eq = Number(d.crypto_perp.equity || 0);
+        document.getElementById('desk2CapVal').innerText = '$' + d2Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('d2EquityVal').innerText = '$' + d2Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const pidBadge = document.getElementById('d2StatusBadge');
+        if (pidBadge) pidBadge.innerText = d.crypto_perp.status === 'RUNNING' ? `PID ${d.crypto_perp.pid}` : 'OFFLINE';
+      }
+
+      if (d.cme_futures) {
+        const d3Eq = Number(d.cme_futures.equity || 0);
+        document.getElementById('desk3CapVal').innerText = '$' + d3Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('d3EquityVal').innerText = '$' + d3Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const pidBadge = document.getElementById('d3StatusBadge');
+        if (pidBadge) pidBadge.innerText = d.cme_futures.status === 'RUNNING' ? `PID ${d.cme_futures.pid}` : 'OFFLINE';
+      }
+    }
+
+    function refreshAll() {
+      if (!_isUnlocked) return;
+      fetchData();
+      fetchDesks();
+      fetchCompliance();
+    }
+
+    (async function initWidgetSession() {
+      const token = localStorage.getItem('quantdesk_pin_token');
+      if (token) {
+        try {
+          const res = await _rawFetch('/api/auth/status', {
+            headers: { 'X-Dash-PIN-Token': token }
+          });
+          const data = await res.json();
+          if (res.ok && data.authenticated) {
+            _isUnlocked = true;
+            hidePinLock();
+            refreshAll();
+            setInterval(refreshAll, 8000);
+            return;
+          }
+        } catch (e) {}
+      }
+      showPinLock();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+#!/bin/bash
+# ╔════════════════════════════════════════════════════════════════╗
+# ║   QUANT DESK — UNIFIED AUTONOMOUS CONTROL PLANE                ║
+# ║                                                                ║
+# ║   One command to auto-detect funds, scan, execute & manage:    ║
+# ║     ./quant start       Auto-allocates funds & runs desk       ║
+# ║     ./quant stop        Shuts down all background daemons      ║
+# ║     ./quant status      Live status, equity & open positions   ║
+# ║     ./quant sniper      Runs pre-market Quality Sniper scan    ║
+# ║     ./quant logs [c]    Streams live logs (autopilot|webapp)   ║
+# ║     ./quant restart     Clean stop & restart                   ║
+# ╚════════════════════════════════════════════════════════════════╝
+set -u
+cd "$(dirname "$0")"
+
+RUN=".run"; mkdir -p "$RUN" logs
+PY=".venv/bin/python"
+
+# --- Runtime Stability Defaults ---
+export USE_LGBM_RUNTIME=0
+export OMP_NUM_THREADS=1
+export TOKENIZERS_PARALLELISM=false
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+export PYTHONUNBUFFERED=1
+export NEWS_MEMORY=1
+
+# --- Tuned Risk & Exit Geometry (Validated 11-Year Walk-Forward) ---
+export STOP_ATR_MULT="${STOP_ATR_MULT:-2.0}"
+export TP1_ATR_MULT="${TP1_ATR_MULT:-2.0}"
+export TP2_TRIGGER_ATR_MULT="${TP2_TRIGGER_ATR_MULT:-3.5}"
+export TRAIL_ARM_ATR_MULT="${TRAIL_ARM_ATR_MULT:-2.0}"
+export TRAIL_ATR_MULT="${TRAIL_ATR_MULT:-1.5}"
+export TP1_SCALE_OUT_PCT="${TP1_SCALE_OUT_PCT:-0.50}"
+export TP1_AUTOMATION="${TP1_AUTOMATION:-1}"
+export REQUIRE_SMA50_ABOVE_SMA200="${REQUIRE_SMA50_ABOVE_SMA200:-1}"
+export TUNED_RSI_MAX="${TUNED_RSI_MAX:-65}"
+export RISK_PCT="${RISK_PCT:-0.02}"                  # 2% risk per trade
+export MAX_PORTFOLIO_HEAT="${MAX_PORTFOLIO_HEAT:-0.50}" # 50% max portfolio heat for compounding
+export MAX_POSITION_NOTIONAL_PCT="${MAX_POSITION_NOTIONAL_PCT:-0.30}"
+export GAP_SHOCK_PCT="${GAP_SHOCK_PCT:-2.5}"
+export DAILY_LOSS_LIMIT="${DAILY_LOSS_LIMIT:--0.03}"     # -3% daily max loss kill-switch
+export MIN_TRADE_SCORE="${MIN_TRADE_SCORE:-85}"          # Grade A sniper setup threshold
+export MIN_AUTO_SCORE="${MIN_AUTO_SCORE:-85}"            # Quality gate for automated entries
+
+is_up() { [ -f "$RUN/$1.pid" ] && kill -0 "$(cat "$RUN/$1.pid")" 2>/dev/null; }
+
+start_bg() {
+  local name="$1"; shift
+  if is_up "$name"; then
+    echo "• $name already running (pid $(cat "$RUN/$name.pid"))"
+    return 0
+  fi
+  nohup caffeinate -ims "$@" >>"logs/$name.log" 2>&1 &
+  echo $! >"$RUN/$name.pid"
+  sleep 1
+  if is_up "$name"; then
+    echo "✅ $name started (pid $(cat "$RUN/$name.pid")) -> logs/$name.log"
+  else
+    echo "❌ $name failed to start -> see logs/$name.log"
+    return 1
+  fi
+}
+
+start_crypto() {
+  echo "⚡ Launching Crypto Perpetual Futures Daemon (24/7/365 Demo)..."
+  start_bg crypto_futures "$PY" -m execution.crypto_futures_autopilot --interval 60 --capital 50000.0 || true
+}
+
+start_futures() {
+  echo "📈 Launching CME Micro Index Futures Daemon (23h Demo)..."
+  start_bg cme_futures "$PY" -m execution.cme_futures_autopilot --interval 60 --capital 25000.0 || true
+}
+
+start_forex() {
+  echo "💱 Launching Forex 24/5 Macro Currency Daemon..."
+  start_bg forex "$PY" -m execution.forex_autopilot --interval 60 --capital 50000.0 || true
+}
+
+stop_desk() {
+  local target="${1:-all}"
+  case "$target" in
+    crypto|crypto_futures)
+      if is_up crypto_futures; then
+        kill "$(cat "$RUN/crypto_futures.pid")" 2>/dev/null && echo "• crypto_futures stopped"
+      fi
+      rm -f "$RUN/crypto_futures.pid"
+      pkill -f 'execution.crypto_futures_autopilot' 2>/dev/null
+      ;;
+    futures|cme_futures|cme)
+      if is_up cme_futures; then
+        kill "$(cat "$RUN/cme_futures.pid")" 2>/dev/null && echo "• cme_futures stopped"
+      fi
+      rm -f "$RUN/cme_futures.pid"
+      pkill -f 'execution.cme_futures_autopilot' 2>/dev/null
+      ;;
+    forex)
+      if is_up forex; then
+        kill "$(cat "$RUN/forex.pid")" 2>/dev/null && echo "• forex stopped"
+      fi
+      rm -f "$RUN/forex.pid"
+      pkill -f 'execution.forex_autopilot' 2>/dev/null
+      ;;
+    stocks|autopilot)
+      if is_up autopilot; then
+        kill "$(cat "$RUN/autopilot.pid")" 2>/dev/null && echo "• autopilot stopped"
+      fi
+      rm -f "$RUN/autopilot.pid"
+      pkill -f 'execution.autopilot' 2>/dev/null
+      ;;
+    webapp)
+      if is_up webapp; then
+        kill "$(cat "$RUN/webapp.pid")" 2>/dev/null && echo "• webapp stopped"
+      fi
+      rm -f "$RUN/webapp.pid"
+      pkill -f 'uvicorn webapp.app' 2>/dev/null
+      ;;
+    all|*)
+      echo "=== 🛑 STOPPING QUANT DESK (ALL 4 DESKS & SERVICES) ==="
+      for n in autopilot crypto_futures cme_futures forex webapp routine night; do
+        if is_up "$n"; then
+          kill "$(cat "$RUN/$n.pid")" 2>/dev/null && echo "• $n stopped"
+        fi
+        rm -f "$RUN/$n.pid"
+      done
+      pkill -f 'execution.autopilot'               2>/dev/null
+      pkill -f 'execution.crypto_futures_autopilot' 2>/dev/null
+      pkill -f 'execution.cme_futures_autopilot'    2>/dev/null
+      pkill -f 'execution.forex_autopilot'          2>/dev/null
+      pkill -f 'uvicorn webapp.app'                2>/dev/null
+      pkill -f 'backtest.daily_routine'            2>/dev/null
+      pkill -f 'QuantDeskWidget'                   2>/dev/null
+      rm -f logs/autopilot.pid
+      echo "All desks and components down."
+      touch "$HOME/.quantdesk_disabled"
+      ;;
+  esac
+}
+
+show_status() {
+  echo "==========================================================================="
+  echo "   📊 QUANT DESK STATUS — 4 CONCURRENT ASSET DESKS (ISOLATED PIDS)"
+  echo "==========================================================================="
+  echo "  [Daemons & Services]"
+  for n in autopilot crypto_futures cme_futures forex webapp; do
+    if is_up "$n"; then echo "  ● $n : RUNNING (pid $(cat "$RUN/$n.pid"))"
+    else echo "  ○ $n : stopped"; fi
+  done
+
+  code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/ 2>/dev/null)
+  if [ "$code" = "200" ]; then
+    echo "  ● Web UI          : http://localhost:8080 (Active) [Forwarded: 8081]"
+  else
+    echo "  ○ Web UI          : Unreachable (Run ./quant start to launch)"
+  fi
+
+  echo ""
+  echo "--- 🏛️ DESK 1: US EQUITIES (ALPACA LIVE PAPER) ---"
+  "$PY" -c '
+from execution import client
+try:
+    acc = client.get_account()
+    print(f"  Equity      : ${float(acc.equity):,.2f}")
+    print(f"  Cash        : ${float(acc.cash):,.2f}")
+    print(f"  Buying Power: ${float(acc.buying_power):,.2f}")
+    pos = client.get_all_positions()
+    if pos:
+        print("\n  Active Positions:")
+        for p in pos:
+            pl = float(p.unrealized_pl)
+            side_tag = "LONG" if float(p.qty) > 0 else "SHORT"
+            print(f"    • {p.symbol:<6} {side_tag} {abs(float(p.qty)):>6.1f} shs @ ${float(p.avg_entry_price):>7.2f} (curr: ${float(p.current_price):>7.2f}, PnL: ${pl:+,.2f})")
+    else:
+        print("  Active Positions: None (100% Cash)")
+except Exception as e:
+    print(f"  Offline or error: {e}")
+'
+
+  echo ""
+  echo "--- ⚡ DESK 2: CRYPTO PERPETUAL FUTURES (24/7 CCXT DEMO) ---"
+  "$PY" -c '
+import json
+from pathlib import Path
+p = Path("execution/crypto_futures_state.json")
+if p.exists():
+    d = json.loads(p.read_text())
+    eq = d.get("equity", 0.0)
+    cash = d.get("cash", 0.0)
+    pnl = d.get("total_realized_pnl", 0.0)
+    traps = d.get("traps_avoided", 0)
+    print(f"  Equity       : ${eq:,.2f}")
+    print(f"  Cash         : ${cash:,.2f}")
+    print(f"  Realized PnL : ${pnl:+,.2f}")
+    print(f"  Traps Avoided: {traps}")
+    pos = d.get("positions", {})
+    if pos:
+        print("  Active Contracts:")
+        for sym, pdata in pos.items():
+            side = pdata.get("side")
+            ctrs = pdata.get("contracts")
+            ep = pdata.get("entry_price", 0.0)
+            upnl = pdata.get("unrealized_pnl", 0.0)
+            print(f"    • {sym:<10} {side} {ctrs}x @ ${ep:,.2f} (PnL: ${upnl:+,.2f})")
+    else:
+        print("  Active Contracts: None (Monitoring 24/7 liquidation cascades)")
+else:
+    print("  State file not initialized yet.")
+'
+
+  echo ""
+  echo "--- 📈 DESK 3: CME MICRO INDEX FUTURES (23h DEMO) ---"
+  "$PY" -c '
+import json
+from pathlib import Path
+p = Path("execution/cme_futures_state.json")
+if p.exists():
+    d = json.loads(p.read_text())
+    eq = d.get("equity", 0.0)
+    cash = d.get("cash", 0.0)
+    pnl = d.get("total_realized_pnl", 0.0)
+    print(f"  Equity       : ${eq:,.2f}")
+    print(f"  Cash         : ${cash:,.2f}")
+    print(f"  Realized PnL : ${pnl:+,.2f}")
+    pos = d.get("positions", {})
+    if pos:
+        print("  Active Contracts:")
+        for sym, pdata in pos.items():
+            side = pdata.get("side")
+            ctrs = pdata.get("contracts")
+            ep = pdata.get("entry_price", 0.0)
+            upnl = pdata.get("unrealized_pnl", 0.0)
+            print(f"    • {sym:<8} {side} {ctrs} ctrs @ {ep:,.2f} (PnL: ${upnl:+,.2f})")
+    else:
+        print("  Active Contracts: None (Monitoring VWAP / Breakout brackets)")
+else:
+    print("  State file not initialized yet.")
+'
+
+  echo ""
+  echo "--- 💱 DESK 4: FOREX 24/5 MACRO (CURRENCIES DEMO) ---"
+  "$PY" -c '
+import json
+from pathlib import Path
+p = Path("execution/forex_state.json")
+if p.exists():
+    d = json.loads(p.read_text())
+    eq = d.get("equity", 0.0)
+    cash = d.get("cash", 0.0)
+    pnl = d.get("total_realized_pnl", 0.0)
+    pips = d.get("total_pips_won", 0.0)
+    print(f"  Equity       : ${eq:,.2f}")
+    print(f"  Cash         : ${cash:,.2f}")
+    print(f"  Realized PnL : ${pnl:+,.2f} ({pips:+.1f} pips)")
+    pos = d.get("positions", {})
+    if pos:
+        print("  Active Positions:")
+        for sym, pdata in pos.items():
+            side = pdata.get("side")
+            lots = pdata.get("lots")
+            ep = pdata.get("entry_price", 0.0)
+            upnl = pdata.get("unrealized_pnl", 0.0)
+            upips = pdata.get("unrealized_pips", 0.0)
+            print(f"    • {sym:<8} {side} {lots} lots @ {ep} (PnL: ${upnl:+,.2f}, {upips:+.1f} pips)")
+    else:
+        print("  Active Positions: None (Monitoring London/NY overlap & Asian ranges)")
+else:
+    print("  State file not initialized yet.")
+'
+  echo "==========================================================================="
+  return 0
+}
+
+case "${1:-start}" in
+  start)
+    TARGET="${2:-all}"
+    case "$TARGET" in
+      crypto|crypto_futures)
+        start_crypto
+        ;;
+      futures|cme_futures|cme)
+        start_futures
+        ;;
+      forex)
+        start_forex
+        ;;
+      stocks|autopilot)
+        start_bg autopilot "$PY" -m execution.autopilot --interval 900 \
+                            --auto-select --min-auto-score "${MIN_AUTO_SCORE:-85}" \
+                            --min-trade-score "${MIN_TRADE_SCORE:-85}" \
+                            --heat "${MAX_PORTFOLIO_HEAT:-0.50}" \
+                            --risk-pct "${RISK_PCT:-0.02}" || true
+        ;;
+      webapp)
+        echo "🌐 Launching Web App Dashboard on Port 8080..."
+        start_bg webapp "$PY" -m uvicorn webapp.app:app --host 0.0.0.0 --port 8080 || true
+        ;;
+      all|*)
+        echo "==========================================================================="
+        echo "   🚀 QUANT DESK AUTONOMOUS LAUNCH — 4 CONCURRENT ASSET DESKS"
+        echo "==========================================================================="
+        rm -f "$HOME/.quantdesk_disabled"
+
+        # 1. Detect account funds & auto-allocate
+        echo "🔍 Reading account capital from Alpaca..."
+        DETECTED_CAPITAL=$("$PY" -c '
+from execution import client
+try:
+    acc = client.get_account()
+    print(round(float(acc.equity), 2))
+except Exception:
+    print(10000.0)
+')
+        CAPITAL="${CAPITAL:-$DETECTED_CAPITAL}"
+        echo "💰 Total Account Equity: \$${CAPITAL}"
+
+        # Auto-configure fractional sizing & gates based on account tier
+        export SMALL_ACCOUNT_FRACTIONAL=1
+        export MIN_TRADE_SCORE="${MIN_TRADE_SCORE:-85}"
+        export MIN_AUTO_SCORE="${MIN_AUTO_SCORE:-85}"
+        export MAX_PORTFOLIO_HEAT="${MAX_PORTFOLIO_HEAT:-0.50}"
+        export DAILY_LOSS_LIMIT="${DAILY_LOSS_LIMIT:--0.03}"
+        export RISK_PCT="${RISK_PCT:-0.02}"
+        export SMALL_ACCOUNT_CAPITAL="${CAPITAL}"
+        echo "⚙️  Discipline Guardrails: Grade A Gate (Score ≥ 85), Max Heat 50%, Daily Loss Cut -3%, 2% Kelly Risk"
+
+        # 2. Run Quality Sniper Pre-Market Scan
+        echo ""
+        echo "🎯 Running Pre-Market Quality Sniper Scan across 27 core mega-caps..."
+        "$PY" backtest/daily_sniper.py --capital "${CAPITAL}" --risk-pct "${RISK_PCT}"
+
+        # 3. Launch Desk 1: US Equities Autopilot (9:30-16:00 ET + Extended)
+        echo ""
+        echo "🎯 Launching Desk 1: US Equities & Macro Autopilot..."
+        start_bg autopilot "$PY" -m execution.autopilot --interval 900 \
+                            --auto-select --min-auto-score "${MIN_AUTO_SCORE:-85}" \
+                            --min-trade-score "${MIN_TRADE_SCORE:-85}" \
+                            --heat "${MAX_PORTFOLIO_HEAT:-0.50}" \
+                            --risk-pct "${RISK_PCT:-0.02}" || true
+
+        # 4. Launch Desk 2: Crypto Perpetual Futures (24/7/365 CCXT Demo)
+        echo ""
+        start_crypto
+
+        # 5. Launch Desk 3: CME Micro Index Futures (23h Demo)
+        echo ""
+        start_futures
+
+        # 6. Launch Desk 4: Forex 24/5 Macro (Currencies Demo)
+        echo ""
+        start_forex
+
+        # 7. Launch Web App Dashboard
+        echo ""
+        start_bg webapp "$PY" -m uvicorn webapp.app:app \
+                        --host 0.0.0.0 --port 8080 || true
+
+        # 8. Launch macOS Menu Bar Widget
+        echo "🍎 Launching macOS Menu Bar Widget..."
+        ./mac_widget/launch.sh || true
+
+        sleep 2
+        if [ -x /usr/bin/open ] && [ "${NO_BROWSER:-0}" != "1" ]; then
+          ( sleep 3; /usr/bin/open "http://localhost:8080" ) >/dev/null 2>&1 &
+        fi
+
+        echo ""
+        echo "==========================================================================="
+        echo "   ✅ QUANT DESK RUNNING 4 CONCURRENT DESKS (ISOLATED PIDS)"
+        echo "==========================================================================="
+        echo "   🏛️  Desk 1 (Stocks)  : PID $(cat "$RUN/autopilot.pid" 2>/dev/null || echo "N/A") (Alpaca Live Paper)"
+        echo "   ⚡ Desk 2 (Crypto)  : PID $(cat "$RUN/crypto_futures.pid" 2>/dev/null || echo "N/A") (24/7 Perps Demo)"
+        echo "   📈 Desk 3 (Futures) : PID $(cat "$RUN/cme_futures.pid" 2>/dev/null || echo "N/A") (CME Micro Demo)"
+        echo "   💱 Desk 4 (Forex)   : PID $(cat "$RUN/forex.pid" 2>/dev/null || echo "N/A") (24/5 Macro Demo)"
+        echo "   🌐 Web Dashboard   : http://localhost:8080 (Primary Cockpit)"
+        echo "   🍎 Mac Widget       : Look at top-right macOS menu bar 📈"
+        echo "   📊 Live Status      : ./quant status"
+        echo "   📋 Tail Logs        : ./quant logs [stocks|crypto|futures|forex|webapp]"
+        echo "   🛑 Stop Desk        : ./quant stop [all|stocks|crypto|futures|forex]"
+        echo "==========================================================================="
+        ;;
+    esac
+    ;;
+
+  stop|quit|q)
+    stop_desk "${2:-all}" ;;
+
+  status)
+    show_status ;;
+
+  restart)
+    target="${2:-all}"
+    case "$target" in
+      all)
+        "$0" stop; sleep 2; "$0" start ;;
+      tunnel|cloudflared)
+        echo "🔄 Restarting Cloudflare Remote Tunnel (Middle Server)..."
+        "$PY" -c "from webapp.tunnel_manager import restart_tunnel; r = restart_tunnel(); print('✅ Fresh Tunnel URL: ' + str(r.get('tunnel_url')))"
+        ;;
+      webapp)
+        echo "🔄 Restarting Web App Server & Cockpit..."
+        "$0" stop webapp; sleep 1; "$0" start webapp ;;
+      *)
+        "$0" stop "$target"; sleep 1; "$0" start "$target" ;;
+    esac
+    ;;
+
+  tunnel)
+    sub="${2:-status}"
+    case "$sub" in
+      restart)
+        echo "🔄 Restarting Cloudflare Remote Tunnel (Middle Server)..."
+        "$PY" -c "from webapp.tunnel_manager import restart_tunnel; r = restart_tunnel(); print('✅ Fresh Tunnel URL: ' + str(r.get('tunnel_url')))"
+        ;;
+      stop)
+        "$PY" -c "from webapp.tunnel_manager import stop_tunnel; stop_tunnel(); print('🛑 Cloudflare Tunnel Stopped')"
+        ;;
+      start)
+        "$PY" -c "from webapp.tunnel_manager import start_tunnel; r = start_tunnel(); print('🌐 Tunnel URL: ' + str(r.get('tunnel_url')))"
+        ;;
+      status|*)
+        "$PY" -c "from webapp.tunnel_manager import get_remote_status; import json; print(json.dumps(get_remote_status(), indent=2))"
+        ;;
+    esac
+    ;;
+
+  exits|journal)
+    shift
+    "$PY" -m execution.trade_journal --exits "$@" ;;
+
+  dips|opportunities)
+    shift
+    "$PY" backtest/market_scanner.py --dips "$@" ;;
+
+  ross)
+    shift
+    "$PY" market/low_float_scanner.py "$@" ;;
+
+  mock-ross)
+    shift
+    "$PY" backtest/ross_momentum_sim.py "$@" ;;
+
+  scan)
+    shift
+    "$PY" backtest/market_scanner.py "$@" ;;
+
+  sniper)
+    shift
+    "$PY" backtest/daily_sniper.py "$@" ;;
+
+  graphify)
+    shift
+    subcmd="${1:-status}"
+    case "$subcmd" in
+      update|extract)
+        echo "🌐 Updating Graphify Knowledge Graph (AST-only, 0 tokens)..."
+        graphify extract . --code-only
+        graphify cluster-only .
+        ;;
+      query|q)
+        shift
+        graphify query "$*" ;;
+      path)
+        shift
+        graphify path "$1" "$2" --undirected ;;
+      explain)
+        shift
+        graphify explain "$*" ;;
+      tree)
+        graphify tree --output graphify-out/GRAPH_TREE.html
+        echo "🌳 D3 tree generated at graphify-out/GRAPH_TREE.html"
+        ;;
+      status)
+        if [ -f "graphify-out/graph.json" ]; then
+          "$PY" -c "
+import json
+g = json.load(open('graphify-out/graph.json'))
+nodes = len(g.get('nodes', []))
+edges = len(g.get('links', g.get('edges', [])))
+print(f'✅ Knowledge Graph: {nodes} nodes, {edges} edges')
+print('   Web Visualization : http://localhost:8080/graph')
+print('   Tree View HTML    : graphify-out/GRAPH_TREE.html')
+print('   Architecture Doc  : graphify-out/GRAPH_REPORT.md')
+"
+        else
+          echo "⚠️ No graph found. Run './quant graphify update' first."
+        fi
+        ;;
+      *)
+        graphify "$subcmd" "$@" ;;
+    esac
+    ;;
+
+  logs)
+    target="${2:-autopilot}"
+    case "$target" in
+      crypto|crypto_futures) target="crypto_futures" ;;
+      futures|cme_futures|cme) target="cme_futures" ;;
+      forex) target="forex" ;;
+      webapp) target="webapp" ;;
+      autopilot|stocks) target="autopilot" ;;
+    esac
+    tail -n 60 -f "logs/${target}.log" ;;
+
+  night)
+    shift
+    start_bg night "$PY" pipeline.py --phase night --top 1 --min-scan 70 \
+                   --execute "$@" || true
+    echo "Bracket queued pre-open — review reports/night_*.json"
+    ;;
+
+  heal)
+    shift
+    echo "🚑 Watchdog Healing requested: $*"
+    for comp in "$@"; do
+      case "$comp" in
+        autopilot|stocks)
+          start_bg autopilot "$PY" -m execution.autopilot --interval 900 \
+                              --auto-select --min-auto-score "${MIN_AUTO_SCORE:-85}" \
+                              --min-trade-score "${MIN_TRADE_SCORE:-85}" \
+                              --heat "${MAX_PORTFOLIO_HEAT:-0.50}" \
+                              --risk-pct "${RISK_PCT:-0.02}" || true
+          ;;
+        crypto|crypto_futures)
+          start_crypto
+          ;;
+        futures|cme_futures)
+          start_futures
+          ;;
+        forex)
+          start_forex
+          ;;
+        webapp)
+          start_bg webapp "$PY" -m uvicorn webapp.app:app \
+                          --host 0.0.0.0 --port 8080 || true
+          ;;
+      esac
+    done
+    ;;
+
+  widget|hud)
+    shift
+    exec ./mac_widget/launch.sh "$@" ;;
+
+  help|--help|-h|*)
+    echo "╔════════════════════════════════════════════════════════════════╗"
+    echo "║   QUANT DESK — 3-ASSET CONCURRENT AUTONOMOUS CONTROL PLANE     ║"
+    echo "╚════════════════════════════════════════════════════════════════╝"
+    echo "  Usage:"
+    echo "    ./quant start [desk]  Starts all 3 desks or a specific desk (stocks|crypto|futures)"
+    echo "    ./quant stop [desk]   Stops all desks or a specific desk cleanly"
+    echo "    ./quant status        Shows running state, PIDs, equity & open positions"
+    echo "    ./quant logs [desk]   Streams live logs (stocks|crypto|futures|webapp)"
+    echo "    ./quant exits         Shows database ledger of all partial & full exits"
+    echo "    ./quant dips          Scans market for High-Volume Dip opportunities"
+    echo "    ./quant ross          Scans small-caps using Ross Cameron's 5 Pillars"
+    echo "    ./quant mock-ross     Simulates Ross Cameron 1st pullback momentum execution"
+    echo "    ./quant scan          Ranks entire market universe (breakouts & dips)"
+    echo "    ./quant sniper        Shows today's #1 single best setup card"
+    echo "    ./quant widget        Launches native macOS menu bar status widget"
+    echo "    ./quant restart       Restarts the entire desk"
+    echo ""
+    echo "  Desks:"
+    echo "    Desk 1 (Stocks)  : US Equities & Macro Autopilot (Alpaca Paper / Live)"
+    echo "    Desk 2 (Crypto)  : 24/7/365 CCXT Perpetual Futures Demo (Binance/OKX)"
+    echo "    Desk 3 (Futures) : CME Micro Index Futures Demo 23h (MES, MNQ, MCL, MGC)"
+    echo ""
+    echo "  Optional Overrides:"
+    echo "    RISK_PCT=0.01 ./quant start    Risk 1% per trade (default 0.02 = 2%)"
+    echo "    CAPITAL=10000 ./quant start    Force a specific capital allocation"
+    echo "    NO_BROWSER=1  ./quant start    Don't auto-open browser"
+    echo "================================================================="
+    ;;
+esac

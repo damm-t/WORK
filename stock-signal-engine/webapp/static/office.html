@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#070b14">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <title>AI Agent Virtual Trading Floor | Quant Desk Live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070b14;
+      --card: rgba(14, 21, 37, 0.82);
+      --card-border: rgba(99, 102, 241, 0.18);
+      --accent: #6366f1;
+      --trend: #38bdf8;
+      --breakout: #c084fc;
+      --sentiment: #f59e0b;
+      --whale: #10b981;
+      --risk: #f43f5e;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --grid: rgba(99, 102, 241, 0.07);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ambient Floor Lighting */
+    .ambient-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Top HUD Bar */
+    header {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: rgba(11, 18, 32, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(99,102,241,0.5);
+    }
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #fff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand .tag {
+      font-size: 11px;
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    /* Live Big Screen Leaderboard Summary */
+    .top-stats {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .stat-pill {
+      display: flex;
+      flex-direction: column;
+      font-size: 11px;
+      color: var(--muted);
+      border-left: 2px solid rgba(255,255,255,0.1);
+      padding-left: 10px;
+    }
+    .stat-pill b {
+      font-size: 14px;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-pill b.good { color: #34d399; }
+    .stat-pill b.warn { color: #fbbf24; }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+    }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-ghost:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Main Floor Grid Layout */
+    .floor-wrapper {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      min-height: calc(100vh - 70px);
+    }
+    @media (max-width: 1024px) {
+      .floor-wrapper { grid-template-columns: 1fr; }
+    }
+
+    /* Virtual Floor Center Stage */
+    .stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    /* Giant Leaderboard Wall Screen (As seen in the Video) */
+    .wall-screen {
+      background: rgba(10, 16, 28, 0.85);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 16px;
+      padding: 16px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(99, 102, 241, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      backdrop-filter: blur(12px);
+    }
+    .wall-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #818cf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    .leaderboard-board {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .board-metric {
+      display: flex;
+      flex-direction: column;
+    }
+    .board-metric .lbl {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .board-metric .val {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* 2.5D Isometric Floor Canvas & Desks Container */
+    .iso-floor {
+      position: relative;
+      flex: 1;
+      min-height: 540px;
+      background: radial-gradient(circle at 50% 50%, rgba(17, 24, 39, 0.8) 0%, rgba(7, 11, 20, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 80px rgba(0,0,0,0.8);
+    }
+
+    /* Floor Grid Pattern */
+    .floor-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, var(--grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+      background-size: 40px 40px;
+      transform: perspective(600px) rotateX(40deg);
+      transform-origin: center 40%;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    /* Floor Circuit Connectors */
+    .circuit-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    /* Desks Container (Positioned absolutely or with 2.5D layout) */
+    .desks-arena {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 540px;
+    }
+
+    /* Specialist Desk Card */
+    .desk-station {
+      position: absolute;
+      width: 170px;
+      background: rgba(14, 21, 37, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      z-index: 5;
+    }
+    .desk-station:hover {
+      transform: translateY(-6px) scale(1.03);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.8), 0 0 25px var(--station-color, #6366f1);
+      z-index: 15;
+    }
+    .desk-station.active-speaker {
+      border-color: #fff;
+      box-shadow: 0 0 35px var(--station-color, #6366f1);
+      animation: speaking-pulse 1.2s infinite alternate;
+    }
+    @keyframes speaking-pulse {
+      0% { transform: translateY(-4px) scale(1.02); }
+      100% { transform: translateY(-8px) scale(1.06); }
+    }
+
+    /* Desk Coordinates */
+    #station-trend { top: 35px; left: 6%; --station-color: var(--trend); }
+    #station-breakout { top: 35px; left: 40%; --station-color: var(--breakout); }
+    #station-sentiment { top: 35px; right: 6%; --station-color: var(--sentiment); }
+    #station-whale { bottom: 50px; left: 16%; --station-color: var(--whale); }
+    #station-risk { bottom: 50px; right: 16%; --station-color: var(--risk); }
+
+    /* Center Council Conference Table */
+    .council-table-zone {
+      position: absolute;
+      top: 52%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 230px;
+      height: 140px;
+      border-radius: 100px;
+      background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.25) 0%, rgba(14, 21, 37, 0.9) 70%);
+      border: 2px solid rgba(99, 102, 241, 0.4);
+      box-shadow: 0 0 50px rgba(99, 102, 241, 0.3), inset 0 0 30px rgba(99, 102, 241, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 8;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .council-table-zone:hover {
+      box-shadow: 0 0 70px rgba(99, 102, 241, 0.5), inset 0 0 40px rgba(99, 102, 241, 0.4);
+      transform: translate(-50%, -50%) scale(1.03);
+    }
+    .table-hologram {
+      font-size: 11px;
+      font-weight: 700;
+      color: #a5b4fc;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 10px #6366f1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .table-hologram-symbol {
+      font-size: 18px;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      animation: float 2.5s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    /* Agent Avatar Icons */
+    .avatar-wrap {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      margin-bottom: 8px;
+    }
+    .avatar-circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid var(--station-color, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 15px var(--station-color, #6366f1);
+    }
+    .desk-status-led {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 2px solid #0b1220;
+    }
+
+    .station-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .station-role {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .station-badge {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--station-color, #6366f1);
+      color: var(--station-color, #6366f1);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Floating Speech Bubble */
+    .speech-bubble {
+      position: absolute;
+      bottom: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--station-color, #6366f1);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 11.5px;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 30;
+      max-width: 220px;
+      white-space: normal;
+      text-align: left;
+    }
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--station-color, #6366f1);
+    }
+    .speech-bubble.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+
+    /* Right Sidebar: Council Control & Floor Chatter Feed */
+    .sidebar {
+      background: rgba(11, 18, 32, 0.7);
+      backdrop-filter: blur(16px);
+      border-left: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .panel-box {
+      background: rgba(14, 21, 37, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #818cf8;
+    }
+
+    /* Meeting Trigger Controls */
+    .meeting-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .input-row input {
+      flex: 1;
+      background: rgba(7, 11, 20, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .quick-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .chip:hover {
+      background: rgba(99, 102, 241, 0.2);
+      color: #fff;
+      border-color: #6366f1;
+    }
+
+    /* 7-Tier Architecture Pipeline Tracker */
+    .pipeline-tracker {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .tier-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.03);
+      border-left: 2px solid #475569;
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+    .tier-step.active {
+      background: rgba(99, 102, 241, 0.15);
+      border-left-color: #818cf8;
+      color: #fff;
+    }
+    .tier-step.done {
+      border-left-color: #10b981;
+      color: #cbd5e1;
+    }
+
+    /* Live Floor Chatter Feed */
+    .chatter-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .chatter-item {
+      background: rgba(255,255,255,0.02);
+      border-left: 2px solid var(--c-color, #6366f1);
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      line-height: 1.4;
+    }
+    .chatter-item .time {
+      font-size: 10px;
+      color: var(--muted);
+      margin-right: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .chatter-item .speaker {
+      font-weight: 700;
+      color: var(--c-color, #fff);
+      margin-right: 4px;
+    }
+
+    /* Human-in-the-Loop Decision Modal */
+    .decision-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .decision-card {
+      background: rgba(14, 21, 37, 0.95);
+      border: 1px solid rgba(99, 102, 241, 0.5);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(99, 102, 241, 0.3);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 560px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .decision-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 12px;
+    }
+    .decision-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .consensus-badge {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #34d399;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .consensus-badge.reject {
+      background: rgba(244, 63, 94, 0.2);
+      border-color: #f43f5e;
+      color: #fb7185;
+    }
+
+    .debate-transcript {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+    .transcript-turn {
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      padding: 10px;
+      border-left: 3px solid var(--t-color, #6366f1);
+      font-size: 12px;
+    }
+    .transcript-turn .author {
+      font-weight: 700;
+      color: var(--t-color, #fff);
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .transcript-turn .stance-badge {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .risk-gate-alert {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fda4af;
+    }
+
+    .decision-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .btn-approve {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-approve:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
+    }
+    .btn-reject {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: #fb7185;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-reject:hover {
+      background: rgba(244, 63, 94, 0.3);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <!-- Header HUD -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🏢</div>
+      <div>
+        <h1>Quant Desk AI Trading Floor</h1>
+      </div>
+      <span class="tag">5 AI DESKS • 300 SUB-BOTS</span>
+    </div>
+
+    <!-- Wall Summary Stats -->
+    <div class="top-stats">
+      <div class="stat-pill">
+        <span>FUND BALANCE</span>
+        <b id="hud-equity">$124,801.44</b>
+      </div>
+      <div class="stat-pill">
+        <span>DRAWDOWN LIMIT</span>
+        <b class="warn">0.20% Max Floor</b>
+      </div>
+      <div class="stat-pill">
+        <span>HUMAN COACHES</span>
+        <b class="good">+1.43%</b>
+      </div>
+      <div class="stat-pill">
+        <span>AI DESKS</span>
+        <b class="good">+2.84%</b>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="sfx-toggle" onclick="toggleAudioFx()">🔊 SFX: ON</button>
+      <a href="/graph" target="_blank" class="btn btn-ghost" title="Interactive Knowledge Graph (Graphify)">🌐 Knowledge Graph</a>
+      <a href="/graph/tree" target="_blank" class="btn btn-ghost" title="D3 Architecture Hierarchy">🌳 Tree Map</a>
+      <a href="/" class="btn btn-ghost">📊 Cockpit View</a>
+      <a href="/widget" class="btn btn-ghost">📱 Mobile HUD</a>
+      <button class="btn btn-primary" onclick="openConveneModal()">🎙️ Convene Council</button>
+    </div>
+  </header>
+
+  <!-- Floor Layout -->
+  <div class="floor-wrapper">
+    <!-- Center Stage -->
+    <div class="stage">
+      <!-- Big Screen Wall Display (from the video!) -->
+      <div class="wall-screen">
+        <div class="wall-title">
+          <span class="live-dot"></span>
+          <span>HUMAN vs AI • LIVE LEADERBOARD • HEDGE FUND DESK</span>
+        </div>
+        <div class="leaderboard-board">
+          <div class="board-metric">
+            <span class="lbl">Human Coaches</span>
+            <span class="val" style="color:#34d399">+1.43% ($94,361.64)</span>
+          </div>
+          <div class="board-metric">
+            <span class="lbl">AI Autonomous Desk</span>
+            <span class="val" style="color:#60a5fa">+2.84% ($30,889.71)</span>
+          </div>
+          <div class="board-metric">
+            <span class="lbl">Combined Fund</span>
+            <span class="val" style="color:#a78bfa" id="wall-fund-total">$125,251.35</span>
+          </div>
+          <div class="board-metric">
+            <span class="lbl">Status</span>
+            <span class="val" style="color:#34d399;font-size:14px">300 BOTS ONLINE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2.5D Isometric Floor -->
+      <div class="iso-floor" id="floor-container">
+        <div class="floor-grid-bg"></div>
+
+        <div class="desks-arena">
+          <!-- 1. Trend Desk -->
+          <div class="desk-station" id="station-trend" onclick="inspectDesk('trend')">
+            <div class="speech-bubble" id="bubble-trend">Macro scan: 50/200 DMA slope bullish.</div>
+            <div class="avatar-wrap">
+              <div class="avatar-circle">🌐</div>
+              <div class="desk-status-led"></div>
+            </div>
+            <div class="station-name">Alex Vance</div>
+            <div class="station-role">Trend Desk Lead</div>
+            <div class="station-badge">MACRO REGIMES</div>
+          </div>
+
+          <!-- 2. Breakout Desk -->
+          <div class="desk-station" id="station-breakout" onclick="inspectDesk('breakout')">
+            <div class="speech-bubble" id="bubble-breakout">Bollinger squeeze detecting momentum impulse.</div>
+            <div class="avatar-wrap">
+              <div class="avatar-circle">⚡</div>
+              <div class="desk-status-led"></div>
+            </div>
+            <div class="station-name">Chloe Chen</div>
+            <div class="station-role">Breakout Desk Lead</div>
+            <div class="station-badge">VOLATILITY & RSI</div>
+          </div>
+
+          <!-- 3. News / Sentiment Desk -->
+          <div class="desk-station" id="station-sentiment" onclick="inspectDesk('sentiment')">
+            <div class="speech-bubble" id="bubble-sentiment">FinBERT sentiment scoring +0.72 Bullish.</div>
+            <div class="avatar-wrap">
+              <div class="avatar-circle">📰</div>
+              <div class="desk-status-led"></div>
+            </div>
+            <div class="station-name">Dr. M. Vance</div>
+            <div class="station-role">Sentiment Lead</div>
+            <div class="station-badge">FinBERT NLP</div>
+          </div>
+
+          <!-- Central Conference Table Zone -->
+          <div class="council-table-zone" onclick="openConveneModal()">
+            <div class="table-hologram">
+              <span class="table-hologram-symbol" id="table-ticker-display">NVDA</span>
+              <span>STRATEGY COUNCIL</span>
+              <span style="font-size:9.5px;color:#818cf8">[Click to Convene]</span>
+            </div>
+          </div>
+
+          <!-- 4. Whale / Order Flow Desk -->
+          <div class="desk-station" id="station-whale" onclick="inspectDesk('whale')">
+            <div class="speech-bubble" id="bubble-whale">Dark pool footprint shows 1.35x volume absorption.</div>
+            <div class="avatar-wrap">
+              <div class="avatar-circle">🐋</div>
+              <div class="desk-status-led"></div>
+            </div>
+            <div class="station-name">Viktor Orlov</div>
+            <div class="station-role">Order Flow Lead</div>
+            <div class="station-badge">INSTITUTIONAL TAPE</div>
+          </div>
+
+          <!-- 5. Risk Desk (The Gatekeeper) -->
+          <div class="desk-station" id="station-risk" onclick="inspectDesk('risk')">
+            <div class="speech-bubble" id="bubble-risk">Drawdown floor armed. Max allocation: $2,500.</div>
+            <div class="avatar-wrap">
+              <div class="avatar-circle">🛡️</div>
+              <div class="desk-status-led" style="background:#f43f5e"></div>
+            </div>
+            <div class="station-name">Sarah Connor</div>
+            <div class="station-role">Chief Risk Officer</div>
+            <div class="station-badge">VETO GATEKEEPER</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar">
+      <!-- Convene Meeting Panel -->
+      <div class="panel-box">
+        <div class="panel-header">
+          <span>🎙️ Convene Council</span>
+          <span style="font-size:10px;color:var(--muted)">7-TIER PIPELINE</span>
+        </div>
+        <div class="meeting-form">
+          <div class="input-row">
+            <input type="text" id="meeting-ticker-input" value="NVDA" maxlength="8" placeholder="TICKER">
+            <button class="btn btn-primary" id="btn-convene" onclick="runConveneMeeting()">START</button>
+          </div>
+          <div class="quick-chips">
+            <span class="chip" onclick="setTicker('NVDA')">NVDA</span>
+            <span class="chip" onclick="setTicker('AAPL')">AAPL</span>
+            <span class="chip" onclick="setTicker('TSLA')">TSLA</span>
+            <span class="chip" onclick="setTicker('BTC')">BTC</span>
+            <span class="chip" onclick="setTicker('SPY')">SPY</span>
+          </div>
+
+          <!-- Pipeline Tiers Indicator -->
+          <div class="pipeline-tracker" id="pipeline-tracker">
+            <div class="tier-step done" id="tier-1">1. DATA LAYER (OHLCV & Depth)</div>
+            <div class="tier-step done" id="tier-2">2. ANALYSIS LAYER (RSI & BBands)</div>
+            <div class="tier-step done" id="tier-3">3. NEWS LAYER (FinBERT NLP)</div>
+            <div class="tier-step active" id="tier-4">4. REASONING LAYER (Council Debate)</div>
+            <div class="tier-step" id="tier-5">5. REPORT LAYER (Risk Gate)</div>
+            <div class="tier-step" id="tier-6">6. ALERT LAYER (Synthesis)</div>
+            <div class="tier-step" id="tier-7">7. EXECUTIVE DECISION (Human Gate)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floor Chatter Log -->
+      <div class="panel-box" style="flex:1;display:flex;flex-direction:column">
+        <div class="panel-header">
+          <span>📡 Floor Chatter (24/7)</span>
+          <span style="font-size:10px;color:#10b981">LIVE</span>
+        </div>
+        <div class="chatter-feed" id="chatter-feed">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Human-in-the-Loop Safeguard Decision Modal -->
+  <div class="decision-modal-overlay" id="decision-modal">
+    <div class="decision-card">
+      <div class="decision-header">
+        <div class="decision-title">
+          <span>🤖</span>
+          <span>Council Decision: <b id="modal-ticker" style="color:#818cf8">NVDA</b></span>
+        </div>
+        <span class="consensus-badge" id="modal-consensus-badge">84% STRONG BUY</span>
+      </div>
+
+      <div style="font-size:12px;color:var(--muted)">
+        The 5 specialized agent desks debated this setup across the 7-tier pipeline. Human-in-the-loop authorization is required before order routing.
+      </div>
+
+      <!-- Live Debate Transcript -->
+      <div class="debate-transcript" id="modal-transcript">
+        <!-- Dynamically injected turns -->
+      </div>
+
+      <!-- Sarah Connor's Risk Gate Alert -->
+      <div class="risk-gate-alert" id="modal-risk-alert">
+        <span style="font-size:20px">🛡️</span>
+        <div>
+          <b style="color:#fff">Sarah Connor (Risk Gatekeeper):</b>
+          <div id="modal-risk-text">Drawdown floor (0.2%) respected. Max position: $2,500.00. Hard stop-loss locked at 2.15%.</div>
+        </div>
+      </div>
+
+      <!-- Human Action Buttons -->
+      <div class="decision-actions">
+        <button class="btn-approve" onclick="submitDecision('APPROVE')">✓ YES - EXECUTE ORDER</button>
+        <button class="btn-reject" onclick="submitDecision('REJECT')">✗ NO - REJECT & PRESERVE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let audioFxEnabled = true;
+    let activeMeetingId = null;
+    let sfxAudioCtx = null;
+
+    function playBeep(freq = 440, type = 'sine', duration = 0.1) {
+      if (!audioFxEnabled) return;
+      try {
+        if (!sfxAudioCtx) sfxAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = sfxAudioCtx.createOscillator();
+        const gain = sfxAudioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, sfxAudioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, sfxAudioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, sfxAudioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(sfxAudioCtx.destination);
+        osc.start();
+        osc.stop(sfxAudioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function toggleAudioFx() {
+      audioFxEnabled = !audioFxEnabled;
+      document.getElementById('sfx-toggle').innerText = audioFxEnabled ? '🔊 SFX: ON' : '🔇 SFX: OFF';
+    }
+
+    function setTicker(t) {
+      document.getElementById('meeting-ticker-input').value = t;
+      document.getElementById('table-ticker-display').innerText = t;
+      playBeep(520, 'triangle', 0.08);
+    }
+
+    function openConveneModal() {
+      const t = document.getElementById('meeting-ticker-input').value || 'NVDA';
+      runConveneMeeting(t);
+    }
+
+    async function loadFloorStatus() {
+      try {
+        const res = await fetch('/api/council/status');
+        const data = await res.json();
+        if (data.status === 'success') {
+          if (data.fund_equity) {
+            document.getElementById('hud-equity').innerText = '$' + Number(data.fund_equity).toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('wall-fund-total').innerText = '$' + Number(data.fund_equity + 450).toLocaleString('en-US', {minimumFractionDigits: 2});
+          }
+
+          // Render chatter feed
+          const feed = document.getElementById('chatter-feed');
+          if (data.floor_chatter) {
+            feed.innerHTML = data.floor_chatter.map(c => `
+              <div class="chatter-item" style="--c-color: ${c.color}">
+                <span class="time">${c.timestamp}</span>
+                <span class="speaker">${c.agent_name.split(' ')[0]}:</span>
+                <span>${c.message}</span>
+              </div>
+            `).join('');
+          }
+
+          // If there is an active meeting pending human approval, show modal
+          if (data.active_meeting && (!activeMeetingId || activeMeetingId === data.active_meeting.meeting_id)) {
+            renderMeetingModal(data.active_meeting);
+          }
+        }
+      } catch (e) {
+        console.error('Error loading floor status:', e);
+      }
+    }
+
+    async function runConveneMeeting(ticker) {
+      const t = (ticker || document.getElementById('meeting-ticker-input').value || 'NVDA').toUpperCase().trim();
+      document.getElementById('table-ticker-display').innerText = t;
+      const btn = document.getElementById('btn-convene');
+      btn.innerText = 'CONVENING...';
+      btn.disabled = true;
+
+      playBeep(660, 'sine', 0.2);
+
+      // Animate pipeline tiers
+      for (let i = 1; i <= 6; i++) {
+        const el = document.getElementById(`tier-${i}`);
+        if (el) {
+          el.className = 'tier-step active';
+          await new Promise(r => setTimeout(r, 120));
+          playBeep(400 + (i * 60), 'triangle', 0.06);
+          el.className = 'tier-step done';
+        }
+      }
+
+      try {
+        const res = await fetch('/api/council/convene', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ticker: t})
+        });
+        const meeting = await res.json();
+        renderMeetingModal(meeting);
+        loadFloorStatus();
+      } catch (e) {
+        alert('Council connection error: ' + e);
+      } finally {
+        btn.innerText = 'START';
+        btn.disabled = false;
+      }
+    }
+
+    function renderMeetingModal(m) {
+      activeMeetingId = m.meeting_id;
+      document.getElementById('modal-ticker').innerText = m.ticker;
+      
+      const badge = document.getElementById('modal-consensus-badge');
+      badge.innerText = `${m.consensus_score}% ${m.recommendation.replace('_', ' ')}`;
+      badge.className = m.recommendation === 'REJECT' ? 'consensus-badge reject' : 'consensus-badge';
+
+      const transcriptEl = document.getElementById('modal-transcript');
+      transcriptEl.innerHTML = (m.turns || []).map(turn => `
+        <div class="transcript-turn" style="--t-color: ${turn.avatar_color}">
+          <div class="author">
+            <span>${turn.name} (${turn.role})</span>
+            <span class="stance-badge" style="color:${turn.avatar_color}">${turn.stance}</span>
+          </div>
+          <div>${turn.message}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('modal-risk-text').innerText = 
+        `Drawdown floor (0.2%) verified. Allocation: $${Number(m.proposed_allocation_usd).toLocaleString()} | Stop-Loss: ${m.stop_loss_pct}% | Risk Gate: ${m.risk_status}`;
+
+      document.getElementById('decision-modal').style.display = 'flex';
+      playBeep(880, 'sine', 0.25);
+    }
+
+    async function submitDecision(decision) {
+      if (!activeMeetingId) return;
+      playBeep(decision === 'APPROVE' ? 950 : 320, 'square', 0.18);
+      try {
+        const res = await fetch('/api/council/decision', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({meeting_id: activeMeetingId, decision: decision})
+        });
+        const data = await res.json();
+        document.getElementById('decision-modal').style.display = 'none';
+        activeMeetingId = null;
+        loadFloorStatus();
+        alert(decision === 'APPROVE' ? '✓ Trade successfully authorized & executed!' : 'Trade proposal rejected. Capital preserved.');
+      } catch (e) {
+        alert('Decision error: ' + e);
+      }
+    }
+
+    function inspectDesk(deskId) {
+      const bubble = document.getElementById(`bubble-${deskId}`);
+      if (bubble) {
+        bubble.classList.add('show');
+        playBeep(580, 'sine', 0.1);
+        setTimeout(() => bubble.classList.remove('show'), 3500);
+      }
+    }
+
+    // Auto-refresh floor telemetry every 5 seconds
+    loadFloorStatus();
+    setInterval(loadFloorStatus, 5000);
+  </script>
+</body>
+</html>

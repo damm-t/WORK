@@ -7,3 +7,9 @@ venv/
 .vscode
 ingestion/cache/
 market/cache/
+logs/
+*.log
+*.pid
+.run/
+*.db
+*.db-journal
