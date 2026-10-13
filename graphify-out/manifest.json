@@ -510,15 +510,15 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/cme_futures_state.json": {
-    "mtime": 1791858735.4034815,
-    "seen": 1791864065.510068,
+    "mtime": 1791871344.368066,
+    "seen": 1791871360.719645,
     "ast_hash": "06fb5608bed535141e9656589bf2ae07",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_archive.json": {
     "mtime": 1791770301.0684316,
     "seen": 1791864065.510069,
-    "ast_hash": "837f26afd2f2df76b2a3af7d923a9917",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_autopilot.py": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_state.json": {
-    "mtime": 1791864077.4718902,
-    "seen": 1791864085.605115,
-    "ast_hash": "b4bea97115c9fe9cd9917edbe2cfba65",
+    "mtime": 1791871308.126656,
+    "seen": 1791871360.719666,
+    "ast_hash": "675b0482203bd66b1d500af8c0500854",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/deadmans_switch.py": {
@@ -546,9 +546,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/forex_state.json": {
-    "mtime": 1791864020.6532521,
-    "seen": 1791864065.510072,
-    "ast_hash": "13710422a4ccf9fb278c41d7d4f93b03",
+    "mtime": 1791871345.6791108,
+    "seen": 1791871360.719703,
+    "ast_hash": "b6b3f1a60ce47b9c5104114ef182c49c",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/jev_execution.py": {
