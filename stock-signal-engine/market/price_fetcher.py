@@ -1,16 +1,24 @@
+import logging
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 import requests
 
+logging.getLogger("yfinance").setLevel(logging.CRITICAL)
+
 try:
     import yfinance as yf
-except Exception as e:
+except Exception:
     yf = None
-    print(f"[price_fetcher] Error: {e}")
 
 YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
-YAHOO_HEADERS = {"User-Agent": "Mozilla/5.0"}
+YAHOO_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Accept": "*/*",
+}
+SESSION = requests.Session()
+SESSION.headers.update(YAHOO_HEADERS)
 CACHE_DIR = Path("market/cache")
 
 
@@ -28,12 +36,10 @@ def fetch_prices(ticker: str, period: str = "6mo", interval: str = "1d") -> pd.D
 
         df = _load_cache(ticker, period, interval)
         if df.empty:
-            print(f"[fetch_prices] No data returned for {ticker}")
             return pd.DataFrame()
 
         return df
     except Exception as e:
-        print(f"[fetch_prices] Error for {ticker}: {e}")
         return pd.DataFrame()
 
 
@@ -45,21 +51,38 @@ def _fetch_with_yfinance(ticker: str, period: str, interval: str) -> pd.DataFram
         stock = yf.Ticker(ticker)
         df = stock.history(period=period, interval=interval)
         return df if not df.empty else pd.DataFrame()
-    except Exception as e:
-        print(f"[price_fetcher] Error: {e}")
+    except Exception:
         return pd.DataFrame()
 
 
 def _fetch_with_yahoo_chart(ticker: str, period: str, interval: str) -> pd.DataFrame:
     try:
         url = YAHOO_CHART_URL.format(ticker=ticker)
-        response = requests.get(
+        import re, time
+        now_ts = int(time.time())
+        query_params = {"interval": interval}
+        m = re.match(r"^(\d+)(y|mo|d)$", str(period).strip().lower())
+        if m:
+            val, unit = int(m.group(1)), m.group(2)
+            if unit == "y":
+                delta_sec = int(val * 365.25 * 86400)
+            elif unit == "mo":
+                delta_sec = int(val * 30.5 * 86400)
+            else:
+                delta_sec = int(val * 86400)
+            query_params["period1"] = now_ts - delta_sec
+            query_params["period2"] = now_ts
+        else:
+            query_params["range"] = period
+
+        response = SESSION.get(
             url,
-            params={"range": period, "interval": interval},
-            headers=YAHOO_HEADERS,
-            timeout=20
+            params=query_params,
+            timeout=15
         )
-        response.raise_for_status()
+        if response.status_code != 200:
+            return pd.DataFrame()
+
         data = response.json()
         result = (data.get("chart", {}).get("result") or [{}])[0]
         timestamps = result.get("timestamp", [])
@@ -120,3 +143,18 @@ def _get_cache_path(ticker: str, period: str, interval: str) -> Path:
     except Exception as e:
         print(f"[price_fetcher] Error: {e}")
         return Path("market/cache/invalid.csv")
+
+
+def fetch_latest_price(ticker: str) -> Optional[float]:
+    """Retrieves the latest available traded price or close for a ticker."""
+    try:
+        df = fetch_prices(ticker, period="1d", interval="1m")
+        if df is not None and not df.empty and "Close" in df.columns:
+            return float(df["Close"].iloc[-1])
+        df_daily = fetch_prices(ticker, period="5d", interval="1d")
+        if df_daily is not None and not df_daily.empty and "Close" in df_daily.columns:
+            return float(df_daily["Close"].iloc[-1])
+    except Exception as e:
+        pass
+    return None
+
