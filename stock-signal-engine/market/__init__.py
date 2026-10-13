@@ -8,7 +8,7 @@ def get_market_features(ticker: str) -> dict:
     This is the single function Layer 4 will call.
     """
     try:
-        df = fetch_prices(ticker)
+        df = fetch_prices(ticker, period="1y")
 
         if df.empty:                  # ✅ Pythonic — no == True needed
             print(f"[get_market_features] No price data for {ticker}")
