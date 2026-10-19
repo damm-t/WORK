@@ -13,3 +13,4 @@ logs/
 .run/
 *.db
 *.db-journal
+.remote_config

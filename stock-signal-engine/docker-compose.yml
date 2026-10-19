@@ -1,11 +1,16 @@
 services:
-  stock-signal-engine:
+  quant-desk:
     build: .
+    container_name: quant-desk-247
+    restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8080:8080"
+      - "8095:8095"
     env_file:
       - .env
     volumes:
-      - .:/app
-    working_dir: /app
-    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+      - ./.run:/app/.run
+    environment:
+      - NO_BROWSER=1
