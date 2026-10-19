@@ -73,8 +73,17 @@ def is_caffeinate_running() -> bool:
 
 
 def get_active_tunnel_url() -> Optional[str]:
-    """Check running cloudflared process or inspect log file for active URL."""
     global _CACHED_TUNNEL_URL
+
+    # Verify if cloudflared process is actually alive
+    proc_alive = bool(_CURRENT_TUNNEL_PROC and _CURRENT_TUNNEL_PROC.poll() is None)
+    if not proc_alive:
+        res = subprocess.run(["pgrep", "cloudflared"], capture_output=True, text=True)
+        proc_alive = (res.returncode == 0)
+
+    if not proc_alive:
+        _CACHED_TUNNEL_URL = None
+        return None
 
     if is_tunnel_evicted():
         logger.warning("[tunnel] Session evicted or expired by Cloudflare. Auto-clearing dead URL.")
@@ -82,17 +91,13 @@ def get_active_tunnel_url() -> Optional[str]:
         return None
 
     if _CACHED_TUNNEL_URL:
-        # Check if process is still running
-        if _CURRENT_TUNNEL_PROC and _CURRENT_TUNNEL_PROC.poll() is None:
-            return _CACHED_TUNNEL_URL
+        return _CACHED_TUNNEL_URL
 
     if STATE_FILE.exists():
         try:
             data = json.loads(STATE_FILE.read_text())
             tunnel_url = data.get("tunnel_url")
-            # Verify if cloudflared is actually running
-            res = subprocess.run(["pgrep", "cloudflared"], capture_output=True, text=True)
-            if res.returncode == 0 and tunnel_url and not is_tunnel_evicted():
+            if tunnel_url and not is_tunnel_evicted():
                 _CACHED_TUNNEL_URL = tunnel_url
                 return tunnel_url
         except Exception:

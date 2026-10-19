@@ -71,6 +71,18 @@ select,input{background:#0d1526;color:var(--txt);border:1px solid var(--line);
 .scenario-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:10px}
 .scenario-card{background:#0d1526;border:1px solid #1e2c47;border-radius:8px;padding:10px;text-align:center}
 
+/* ==================== INTERACTIVE TRADE LEDGER & EQUITY STYLES ==================== */
+.eq-filter-btn{background:transparent;border:1px solid #1f3050;color:var(--mut);font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .15s ease}
+.eq-filter-btn:hover{border-color:#388bfd;color:#fff}
+.eq-filter-btn.active{background:#1f6feb;border-color:#58a6ff;color:#fff;box-shadow:0 0 10px rgba(31,111,235,0.35)}
+.eq-trade-row{cursor:pointer;transition:all .12s ease;border-bottom:1px solid rgba(255,255,255,0.04)}
+.eq-trade-row:hover{background:rgba(88,166,255,0.09) !important}
+.eq-trade-row.active-trade-row{background:rgba(88,166,255,0.18) !important;border-left:3px solid #58a6ff !important}
+#eq-ledger-scroll::-webkit-scrollbar{width:6px;height:6px}
+#eq-ledger-scroll::-webkit-scrollbar-track{background:#090e1a}
+#eq-ledger-scroll::-webkit-scrollbar-thumb{background:#1c2b44;border-radius:3px}
+#eq-ledger-scroll::-webkit-scrollbar-thumb:hover{background:#2e446d}
+
 /* ==================== BOUGHT STOCKS LIVE DIAGRAM STYLES ==================== */
 .diagram-container{background:linear-gradient(180deg,#0d1526 0%,#090e1a 100%);
                    border:1px solid #1e2c47;border-radius:14px;padding:16px;margin:14px 0 20px;
@@ -586,7 +598,7 @@ select,input{background:#0d1526;color:var(--txt);border:1px solid var(--line);
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;margin-bottom:6px">
   <h2 style="margin:0" id="eq-title">📈 Equity Curve (realised P&L)</h2>
-  <span id="eq-badge" class="mut" style="font-size:12px;font-family:monospace;background:#101a2e;padding:3px 8px;border-radius:6px;border:1px solid #1c283f">Hover across curve to inspect trades</span>
+  <span id="eq-badge" class="mut" style="font-size:12px;font-family:monospace;background:#101a2e;padding:3px 8px;border-radius:6px;border:1px solid #1c283f">Hover across curve or table rows to inspect trades</span>
 </div>
 <div id="eqwrap"><span class="mut">no closed trades yet…</span></div>
 
@@ -2469,8 +2481,15 @@ function renderPositionsTableForDesk() {
       ? `${pnl >= 0 ? "+" : ""}${money(pnl)} <span class="mut" style="font-size:11px">(${p.unrealized_pips >= 0 ? "+" : ""}${p.unrealized_pips} pips)</span>`
       : `${pnl >= 0 ? "+" : ""}${money(pnl)}`;
 
+    let statusPill = "";
+    if (p.reconnect_hold) {
+      statusPill = '<span class="pill" style="font-size:9.5px;padding:1px 6px;margin-left:4px;background:rgba(245,158,11,0.15);color:#fbbf24;border-color:rgba(245,158,11,0.35);font-weight:600" title="Holding for mean-reversion rebound after feed gap">🔌 Hold (Rebound Scan)</span>';
+    } else if (p.loss_curbed) {
+      statusPill = '<span class="pill" style="font-size:9.5px;padding:1px 6px;margin-left:4px;background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35);font-weight:600" title="50% lots closed to curb loss; tight cushion stop active">🛡️ 50% Curbed</span>';
+    }
+
     tr.innerHTML = `
-      <td><b>${esc(symbol)}</b></td>
+      <td><b>${esc(symbol)}</b>${statusPill}</td>
       <td>${deskBadge}</td>
       <td>${sizeStr}</td>
       <td>$${formatAssetPrice(entry, symbol)}</td>
@@ -3034,6 +3053,21 @@ function renderTrades(all) {
       reasonText = '';
     } else if (rLower.includes('tp1') || rLower.includes('partial')) {
       reasonBadge = '<span class="pill good" style="font-size:10px;padding:1px 6px;margin-right:4px">🎯 TP1 Scale-Out</span>';
+      reasonText = '';
+    } else if (rLower.includes('curb') || rLower.includes('de-risk') || rLower.includes('loss curb')) {
+      const pMatch = t.reason.match(/([+-]?\d+\.?\d*\s*p(?:ips)?)/i);
+      const pTag = pMatch ? ` (${pMatch[1]})` : '';
+      reasonBadge = `<span class="pill" style="font-size:10px;padding:1px 6px;margin-right:4px;background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.4);font-weight:600" title="${esc(t.reason)}">🛡️ Loss Curb (50% De-Risk)${pTag}</span>`;
+      reasonText = '';
+    } else if (rLower.includes('disconnect') || rLower.includes('gap cut')) {
+      const pMatch = t.reason.match(/([+-]?\d+\.?\d*\s*p(?:ips)?)/i);
+      const pTag = pMatch ? ` (${pMatch[1]})` : '';
+      reasonBadge = `<span class="pill" style="font-size:10px;padding:1px 6px;margin-right:4px;background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.4);font-weight:600" title="${esc(t.reason)}">🔌 Disconnect Gap Cut${pTag}</span>`;
+      reasonText = '';
+    } else if (rLower.includes('cushion')) {
+      const pMatch = t.reason.match(/([+-]?\d+\.?\d*\s*p(?:ips)?)/i);
+      const pTag = pMatch ? ` (${pMatch[1]})` : '';
+      reasonBadge = `<span class="pill" style="font-size:10px;padding:1px 6px;margin-right:4px;background:rgba(245,158,11,0.15);color:#f59e0b;border-color:rgba(245,158,11,0.35);font-weight:600" title="${esc(t.reason)}">🛡️ Cushion Floor Cut${pTag}</span>`;
       reasonText = '';
     } else if (rLower.includes('shock_exit') || rLower.includes('shock exit') || rLower.includes('shock')) {
       reasonBadge = '<span class="pill" style="font-size:10px;padding:1px 6px;margin-right:4px;background:rgba(245,158,11,0.15);color:#f59e0b;border-color:rgba(245,158,11,0.35)">⚡ Intraday Shock Cut</span>';
@@ -3993,13 +4027,16 @@ async function runAdvisor() {
 }
 
 /* ----------------------------- polling loop ------------------------------ */
-function renderEquity(points) {
+let _currentEqFilter = 'all';
+let _currentEqSort = 'asc';
+
+function renderEquity(points, meta = {}) {
   const wrap = $('eqwrap');
   if (!points || points.length < 2) {
     wrap.innerHTML = '<span class="mut">no closed trades yet…</span>';
     return;
   }
-  const W = 900, H = 160, PAD = 20;
+  const W = 900, H = 175, PAD = 22;
   const vals = points.map(p => p.cum_pnl);
   const mn = Math.min(0, ...vals), mx = Math.max(...vals, 0.01);
   const x = i => PAD + (W - 2 * PAD) * (i / (points.length - 1));
@@ -4008,74 +4045,183 @@ function renderEquity(points) {
   const last = vals[vals.length - 1];
   const col = last >= 0 ? '#3fb950' : '#f85149';
 
-  // ---------------- Partition into 4 Chronological Segments ----------------
-  const numSegments = Math.min(4, points.length);
-  const segments = [];
-  const segSize = Math.ceil(points.length / numSegments);
-  for (let s = 0; s < numSegments; s++) {
-    const startIdx = s * segSize;
-    const endIdx = Math.min(points.length, (s + 1) * segSize);
-    if (startIdx < points.length) {
-      const segPoints = points.slice(startIdx, endIdx);
-      const segPnl = segPoints.reduce((acc, p) => acc + (Number(p.pnl) || 0), 0);
-      const wins = segPoints.filter(p => (Number(p.pnl) || 0) > 0).length;
-      const wr = segPoints.length > 0 ? ((wins / segPoints.length) * 100).toFixed(0) : '0';
-      segments.push({
-        segIndex: s + 1,
-        startIdx,
-        endIdx: endIdx - 1,
-        points: segPoints,
-        totalPnl: segPnl,
-        winRate: wr,
-        winCount: wins,
-        totalTrades: segPoints.length,
-      });
+  // Strategy Upgrade Baseline Anchor (15/10 15:31:00)
+  const upgradeTs = (meta && meta.strategy_upgrade_ts) ? Number(meta.strategy_upgrade_ts) : 1792049500.0;
+  const newTrades = points.filter(p => p.is_new_strategy || (p.ts && Number(p.ts) >= upgradeTs));
+  const legacyTrades = points.filter(p => !p.is_new_strategy && !(p.ts && Number(p.ts) >= upgradeTs));
+  const newTradesCount = newTrades.length;
+  const legacyTradesCount = legacyTrades.length;
+  const newPnl = newTrades.reduce((acc, p) => acc + (Number(p.pnl) || 0), 0);
+  const legacyPnl = legacyTrades.reduce((acc, p) => acc + (Number(p.pnl) || 0), 0);
+  const newWins = newTrades.filter(p => (Number(p.pnl) || 0) > 0).length;
+  const newLosses = newTrades.filter(p => (Number(p.pnl) || 0) < 0).length;
+  const newWr = newTradesCount > 0 ? ((newWins / newTradesCount) * 100).toFixed(1) : '0.0';
+
+  // Find exact demarcation marker index on curve
+  let upgradeIdx = points.findIndex(p => p.is_new_strategy || (p.ts && Number(p.ts) >= upgradeTs));
+  const isPostDeploy = (upgradeIdx !== -1);
+  const markIdx = isPostDeploy ? upgradeIdx : (points.length - 1);
+  const markX = x(markIdx);
+  const markY = y(points[markIdx].cum_pnl);
+
+  // Overall Statistics
+  const totalTrades = points.length;
+  const wins = points.filter(p => (Number(p.pnl) || 0) > 0).length;
+  const losses = points.filter(p => (Number(p.pnl) || 0) < 0).length;
+  const winRate = totalTrades > 0 ? ((wins / totalTrades) * 100).toFixed(1) : '0.0';
+  const totalRealised = points.reduce((acc, p) => acc + (Number(p.pnl) || 0), 0);
+  const totalSign = totalRealised >= 0 ? '+' : '-';
+  const totalCol = totalRealised >= 0 ? 'pos' : 'neg';
+
+  // Date labels along bottom axis
+  const firstDate = points[0] ? esc(points[0].t) : '';
+  const midIdx = Math.floor(points.length / 2);
+  const midDate = points[midIdx] ? esc(points[midIdx].t) : '';
+  const lastDate = points[points.length - 1] ? esc(points[points.length - 1].t) : '';
+
+  // Generate Trade Ledger Rows with Demarcation Banner
+  let renderedDemarcationBanner = false;
+  const rowsHtml = points.map((p, i) => {
+    const isNewStrat = Boolean(p.is_new_strategy || (p.ts && Number(p.ts) >= upgradeTs));
+    const pnlVal = Number(p.pnl) || 0;
+    const isWin = pnlVal > 0;
+    const isLoss = pnlVal < 0;
+    const pnlCol = isWin ? '#3fb950' : (isLoss ? '#f85149' : '#8b949e');
+    const pnlSign = pnlVal >= 0 ? '+' : '-';
+
+    const cumVal = Number(p.cum_pnl) || 0;
+    const cumCol = cumVal >= 0 ? '#3fb950' : '#f85149';
+    const cumSign = cumVal >= 0 ? '+' : '-';
+
+    const rLower = String(p.reason || '').toLowerCase();
+    let reasonBadge = `<span class="pill" style="font-size:10.5px;padding:2px 7px;background:#131d2e;color:#8b949e;border-color:#1e2d44">Exit</span>`;
+    if (rLower.includes('tp1') || rLower.includes('partial') || rLower.includes('take profit')) {
+      reasonBadge = `<span class="pill open" style="font-size:10.5px;padding:2px 7px;font-weight:600">🎯 TP1 Clip</span>`;
+    } else if (rLower.includes('stop')) {
+      reasonBadge = `<span class="pill closed" style="font-size:10.5px;padding:2px 7px;font-weight:600">🛑 Stop Loss</span>`;
+    } else if (rLower.includes('shock')) {
+      reasonBadge = `<span class="pill" style="font-size:10.5px;padding:2px 7px;color:#f59e0b;border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.1);font-weight:600">⚡ Shock Exit</span>`;
+    } else if (p.reason) {
+      reasonBadge = `<span class="pill" style="font-size:10.5px;padding:2px 7px;color:#79c0ff;border-color:#2e446d;background:#101a2e">${esc(p.reason).slice(0, 24)}</span>`;
     }
-  }
 
-  // Segment SVG Dividers & Top Milestone Badges
-  const dividerLinesSvg = segments.slice(0, segments.length - 1).map((seg, s) => {
-    const nextSeg = segments[s + 1];
-    const divX = (x(seg.endIdx) + x(nextSeg.startIdx)) / 2;
-    return `
-      <line x1="${divX}" y1="${PAD - 4}" x2="${divX}" y2="${H - PAD + 4}"
-            stroke="#1d2c47" stroke-dasharray="3 3" stroke-width="1.2"/>
-    `;
-  }).join('');
+    const entryExitDisp = (p.entry && p.exit)
+      ? `<span style="font-family:monospace;font-size:11.5px;color:#94a3b8">$${p.entry.toFixed(2)} <span style="color:#58a6ff">➔</span> $${p.exit.toFixed(2)}</span>`
+      : `<span class="mut" style="font-family:monospace;font-size:11px">—</span>`;
 
-  const segLabelsSvg = segments.map(seg => {
-    const midX = (x(seg.startIdx) + x(seg.endIdx)) / 2;
-    const pnlCol = seg.totalPnl >= 0 ? '#3fb950' : '#f85149';
-    const pnlSign = seg.totalPnl >= 0 ? '+' : '-';
-    return `
-      <g style="pointer-events:none">
-        <rect x="${midX - 38}" y="3" width="76" height="15" rx="3" fill="#0d1526" stroke="#1c283f" stroke-width="0.8" opacity="0.9"/>
-        <text x="${midX}" y="14" fill="${pnlCol}" font-size="8.5" font-family="monospace" font-weight="700" text-anchor="middle">
-          SEG ${seg.segIndex}: ${pnlSign}$${Math.abs(seg.totalPnl).toFixed(0)}
-        </text>
-      </g>
+    const qtyDisp = p.qty ? `<span style="font-family:monospace;font-size:11.5px;color:#cbd5e1">${p.qty}</span>` : `<span class="mut">—</span>`;
+    const gradeDisp = p.grade ? `<span class="pill" style="font-size:10px;padding:1px 6px;color:#a5d6ff;border-color:#1e355b;background:#0d1829">${esc(p.grade)}</span>` : `<span class="mut">—</span>`;
+
+    const stratBadge = isNewStrat
+      ? `<span class="pill" style="margin-left:6px;font-size:9.5px;padding:1px 5px;background:#0369a1;color:#7dd3fc;border-color:#38bdf8;font-weight:800">ASTRAQUANT V2</span>`
+      : `<span style="font-size:9px;color:#64748b;margin-left:4px">[Legacy]</span>`;
+
+    let bannerRow = '';
+    if (isNewStrat && !renderedDemarcationBanner) {
+      renderedDemarcationBanner = true;
+      bannerRow = `
+        <tr style="background:linear-gradient(90deg, rgba(2,132,199,0.35), rgba(16,185,129,0.25));border-top:2px solid #38bdf8;border-bottom:2px solid #38bdf8">
+          <td colspan="9" style="padding:10px 14px;text-align:center">
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+              <span style="font-size:14px">🚀</span>
+              <b style="color:#f0f9ff;font-size:12px;letter-spacing:0.5px">ASTRAQUANT STRATEGY V2.0 DEPLOYED (15/10 15:31) — OBSERVING FROM THIS TRADE FORWARD</b>
+              <span class="pill" style="font-size:10px;background:#0369a1;color:#fff;border-color:#38bdf8">1.8:1 R:R FLOOR · $85 HARD LOSS CAP · +1.5R SCALE-OUT</span>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    return bannerRow + `
+      <tr id="eq-trade-row-${i}" class="eq-trade-row"
+          data-ticker="${esc(p.ticker || '').toUpperCase()}"
+          data-type="${isWin ? 'win' : (isLoss ? 'loss' : 'scratch')}"
+          data-phase="${isNewStrat ? 'new' : 'legacy'}"
+          data-idx="${i}"
+          onmouseenter="highlightTradePoint(${i})"
+          onmouseleave="unhighlightTradePoint()"
+          onclick="selectTradePoint(${i})"
+          style="background:${isNewStrat ? 'rgba(3,105,161,0.08)' : '#090e1a'}">
+        <td style="padding:9px 12px;font-family:monospace;font-size:11px;color:#64748b;font-weight:700">#${i + 1}</td>
+        <td style="padding:9px 12px;font-family:monospace;font-size:11.5px;color:#cbd5e1;white-space:nowrap">${esc(p.t)}</td>
+        <td style="padding:9px 12px;white-space:nowrap">
+          <b style="color:#f0f6fc;font-size:13px;letter-spacing:0.3px">${esc(p.ticker)}</b>${stratBadge}
+        </td>
+        <td style="padding:9px 12px;white-space:nowrap">${gradeDisp}</td>
+        <td style="padding:9px 12px;white-space:nowrap">${reasonBadge}</td>
+        <td style="padding:9px 12px;text-align:right;white-space:nowrap">${qtyDisp}</td>
+        <td style="padding:9px 12px;text-align:right;white-space:nowrap">${entryExitDisp}</td>
+        <td style="padding:9px 12px;text-align:right;white-space:nowrap">
+          <b style="color:${pnlCol};font-family:monospace;font-size:13px">${pnlSign}$${Math.abs(pnlVal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b>
+        </td>
+        <td style="padding:9px 14px;text-align:right;white-space:nowrap">
+          <b style="color:${cumCol};font-family:monospace;font-size:13px">${cumSign}$${Math.abs(cumVal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b>
+        </td>
+      </tr>
     `;
   }).join('');
 
   wrap.style.position = 'relative';
   wrap.innerHTML = `
+    <!-- High-Impact Strategy Observation Cockpit HUD -->
+    <div id="strategy-observation-hud" style="background:linear-gradient(135deg, rgba(14,24,42,0.95), rgba(7,14,26,0.98));border:1px solid #0284c7;box-shadow:0 0 25px rgba(2,132,199,0.22);border-radius:12px;padding:12px 16px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:rgba(56,189,248,0.18);border:1px solid #38bdf8;color:#38bdf8;font-size:15px">📍</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#f0f6fc;letter-spacing:0.2px;display:flex;align-items:center;gap:8px">
+              NEW QUANT STRATEGY OBSERVATION BASELINE
+              <span class="pill" style="font-size:10px;font-weight:800;background:rgba(34,197,94,0.18);color:#4ade80;border-color:rgba(34,197,94,0.4)">OBSERVING LIVE</span>
+            </div>
+            <div style="font-size:11.5px;color:#94a3b8">
+              AstraQuant Fail-Closed Pipeline Deployed: Non-bypassable 1.8:1 R:R floor, $85 hard stop cap, +1.5R scale-outs, Wada Chaos veto.
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="background:#09101d;border:1px solid #1e293b;border-radius:8px;padding:5px 12px;text-align:center">
+            <div style="font-size:9.5px;color:#64748b;text-transform:uppercase;font-weight:700">Baseline Set</div>
+            <div style="font-size:12px;font-weight:800;color:#38bdf8;font-family:monospace">15/10 15:31</div>
+          </div>
+          <div style="background:#09101d;border:1px solid #1e293b;border-radius:8px;padding:5px 12px;text-align:center">
+            <div style="font-size:9.5px;color:#64748b;text-transform:uppercase;font-weight:700">Observed Trades</div>
+            <div style="font-size:12px;font-weight:800;color:#f0f6fc;font-family:monospace">${newTradesCount} trades</div>
+          </div>
+          <div style="background:#09101d;border:1px solid #1e293b;border-radius:8px;padding:5px 12px;text-align:center">
+            <div style="font-size:9.5px;color:#64748b;text-transform:uppercase;font-weight:700">Observed P&L</div>
+            <div style="font-size:12px;font-weight:800;color:${newPnl >= 0 ? '#4ade80' : '#f87171'};font-family:monospace">${newPnl >= 0 ? '+' : '-'}$${Math.abs(newPnl).toFixed(2)}</div>
+          </div>
+          <div style="background:#09101d;border:1px solid #1e293b;border-radius:8px;padding:5px 12px;text-align:center">
+            <div style="font-size:9.5px;color:#64748b;text-transform:uppercase;font-weight:700">R:R Floor</div>
+            <div style="font-size:12px;font-weight:800;color:#fbbf24;font-family:monospace">≥ 1.80 : 1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="eq-chart-container" style="position:relative;width:100%">
-      <svg id="eq-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:170px;background:var(--panel);
+      <svg id="eq-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:185px;background:var(--panel);
            border:1px solid var(--line);border-radius:10px;cursor:crosshair;display:block">
         <defs>
           <linearGradient id="eqGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="${col}" stop-opacity="0.22"/>
             <stop offset="100%" stop-color="${col}" stop-opacity="0.0"/>
           </linearGradient>
+          <linearGradient id="projGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="rgba(56,189,248,0.25)"/>
+            <stop offset="100%" stop-color="rgba(52,211,153,0.15)"/>
+          </linearGradient>
         </defs>
-
-        <!-- 4-Segment Vertical Guidelines -->
-        ${dividerLinesSvg}
 
         <!-- Zero baseline -->
         <line x1="${PAD}" y1="${y(0)}" x2="${W - PAD}" y2="${y(0)}"
               stroke="#22304a" stroke-dasharray="4 4" stroke-width="1.5"/>
         <text x="${PAD + 4}" y="${y(0) - 6}" fill="#546681" font-size="10" font-family="monospace">$0.00 Base</text>
+
+        <!-- Timeline axis milestone dates -->
+        <text x="${PAD}" y="${H - 5}" fill="#3d5170" font-size="9" font-family="monospace">${firstDate}</text>
+        <text x="${W / 2}" y="${H - 5}" fill="#3d5170" font-size="9" font-family="monospace" text-anchor="middle">${midDate}</text>
+        <text x="${W - PAD}" y="${H - 5}" fill="#3d5170" font-size="9" font-family="monospace" text-anchor="end">${lastDate}</text>
 
         <!-- Area fill under line -->
         <polygon fill="url(#eqGrad)" points="${x(0)},${y(0)} ${line} ${x(points.length - 1)},${y(0)}"/>
@@ -4085,15 +4231,52 @@ function renderEquity(points) {
 
         <!-- Individual trade dots -->
         ${points.map((p, i) => {
-          if (points.length > 80 && i % Math.ceil(points.length / 60) !== 0 && i !== points.length - 1) return '';
+          if (points.length > 80 && i % Math.ceil(points.length / 60) !== 0 && i !== points.length - 1 && i !== markIdx) return '';
+          const isNew = p.is_new_strategy || (p.ts && Number(p.ts) >= upgradeTs);
+          const dotCol = isNew ? '#38bdf8' : (p.pnl >= 0 ? '#3fb950' : '#f85149');
           return `
-            <circle id="eq-dot-${i}" cx="${x(i)}" cy="${y(p.cum_pnl)}" r="${points.length > 80 ? '2.5' : '3.5'}" fill="${p.pnl >= 0 ? '#3fb950' : '#f85149'}"
-                    stroke="var(--panel)" stroke-width="1.2" opacity="0.85"/>
+            <circle id="eq-dot-${i}" cx="${x(i)}" cy="${y(p.cum_pnl)}" r="${isNew ? '4.5' : (points.length > 80 ? '2.5' : '3.5')}"
+                    fill="${dotCol}" stroke="${isNew ? '#ffffff' : 'var(--panel)'}" stroke-width="${isNew ? '1.8' : '1.2'}" opacity="0.9"/>
           `;
         }).join('')}
 
-        <!-- 4 Segment Earnings Markers at top of chart -->
-        ${segLabelsSvg}
+        <!-- 🚀 STRATEGY UPGRADE DEMARCATION MARKER & TRAJECTORY -->
+        <g id="eq-strategy-demarcation" style="cursor:help">
+          <!-- Shaded Observation Zone Area -->
+          <rect x="${markX}" y="${PAD}" width="${Math.max(10, W - PAD - markX)}" height="${H - 2 * PAD}"
+                fill="url(#projGrad)" opacity="0.45"/>
+
+          <!-- Glowing vertical demarcation line -->
+          <line x1="${markX}" y1="10" x2="${markX}" y2="${H - PAD}"
+                stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="5 3"/>
+          <line x1="${markX}" y1="10" x2="${markX}" y2="${H - PAD}"
+                stroke="#38bdf8" stroke-width="7" opacity="0.2"/>
+
+          <!-- Demarcation Flag Pin Tag at Top -->
+          <rect x="${Math.max(PAD, Math.min(W - 205, markX - 100))}" y="5" width="200" height="22" rx="5"
+                fill="#082f49" stroke="#38bdf8" stroke-width="1.3" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.6))"/>
+          <circle cx="${Math.max(PAD, Math.min(W - 205, markX - 100)) + 12}" cy="16" r="4.5" fill="#38bdf8"/>
+          <text x="${Math.max(PAD, Math.min(W - 205, markX - 100)) + 24}" y="19.5" fill="#f0f9ff" font-size="9.5" font-weight="800" font-family="monospace">
+            🚀 NEW STRATEGY V2.0 START
+          </text>
+
+          <!-- Expected Compounding Trajectory (How much it can go) -->
+          <path d="M ${markX} ${markY} L ${Math.min(W - PAD, markX + 160)} ${Math.max(PAD + 15, markY - 40)}"
+                stroke="#34d399" stroke-width="2" stroke-dasharray="4 3" opacity="0.9"/>
+          <polygon points="${markX},${markY} ${Math.min(W - PAD, markX + 160)},${Math.max(PAD + 5, markY - 50)} ${Math.min(W - PAD, markX + 160)},${Math.max(PAD + 25, markY - 30)}"
+                   fill="rgba(52, 211, 153, 0.16)"/>
+          <text x="${Math.min(W - PAD - 8, markX + 160)}" y="${Math.max(PAD + 12, markY - 42)}" fill="#34d399" font-size="8.5" font-weight="bold" font-family="monospace" text-anchor="end">
+            +2.0:1 R:R Target Trajectory ↗
+          </text>
+
+          <!-- Phase Label Subtitles -->
+          <text x="${Math.max(PAD + 10, markX - 10)}" y="${H - PAD - 8}" fill="#64748b" font-size="9" font-family="monospace" text-anchor="end">
+            ◀ Legacy Engine (0.38:1 R:R)
+          </text>
+          <text x="${Math.min(W - PAD - 10, markX + 12)}" y="${H - PAD - 8}" fill="#38bdf8" font-size="9" font-weight="bold" font-family="monospace">
+            AstraQuant Observation Phase ▶
+          </text>
+        </g>
 
         <!-- Interactive hover elements -->
         <line id="eq-crosshair" x1="0" y1="${PAD}" x2="0" y2="${H - PAD}"
@@ -4111,60 +4294,66 @@ function renderEquity(points) {
       <div id="eq-tooltip" style="display:none;position:absolute;top:10px;left:10px;pointer-events:none;
            background:rgba(13, 21, 38, 0.95);backdrop-filter:blur(8px);border:1px solid #2e4368;
            box-shadow:0 8px 24px rgba(0,0,0,0.6);border-radius:8px;padding:8px 12px;font-size:12px;z-index:99;
-           min-width:190px;transform:translate(-50%, -115%);transition:opacity 0.08s ease">
+           min-width:210px;transform:translate(-50%, -115%);transition:opacity 0.08s ease">
       </div>
     </div>
 
-    <!-- 4-Segment Historical Trade Earnings Logs (Alinged to Graph Positions) -->
-    <div id="eq-segments-container" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:10px;margin-top:12px">
-      ${segments.map(seg => {
-        const pnlCol = seg.totalPnl >= 0 ? 'pos' : 'neg';
-        const pnlSign = seg.totalPnl >= 0 ? '+' : '-';
-        return `
-          <div class="card" style="padding:10px 12px;background:#0b1322;border:1px solid #1a2a46;border-radius:8px;display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1a2842;padding-bottom:6px">
-              <div style="display:flex;align-items:center;gap:6px">
-                <span class="pill" style="font-size:10px;font-weight:700;padding:1px 6px;background:#182844;color:#79c0ff;border-color:#2e446d">SEG ${seg.segIndex}</span>
-                <span class="mut" style="font-size:11px">Trades #${seg.startIdx + 1}–#${seg.endIdx + 1}</span>
-              </div>
-              <b class="${pnlCol}" style="font-size:12.5px">${pnlSign}$${Math.abs(seg.totalPnl).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b>
-            </div>
-
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--mut)">
-              <span>Win Rate: <b style="color:${Number(seg.winRate) >= 50 ? 'var(--good)' : 'var(--bad)'}">${seg.winRate}%</b> (${seg.winCount}W/${seg.totalTrades - seg.winCount}L)</span>
-              <span>${seg.totalTrades} trades</span>
-            </div>
-
-            <div style="display:flex;flex-direction:column;gap:4px;max-height:165px;overflow-y:auto;padding-right:2px">
-              ${seg.points.map((p, pIdx) => {
-                const gIdx = seg.startIdx + pIdx;
-                const pCol = p.pnl > 0 ? '#3fb950' : (p.pnl < 0 ? '#f85149' : '#8b949e');
-                const rType = String(p.reason || '').toLowerCase().includes('tp1') ? 'TP1'
-                            : (String(p.reason || '').toLowerCase().includes('stop') ? 'STOP'
-                            : (String(p.reason || '').toLowerCase().includes('shock') ? 'SHOCK' : 'EXIT'));
-                return `
-                  <div id="eq-trade-row-${gIdx}" class="eq-trade-row"
-                       style="display:flex;justify-content:space-between;align-items:center;padding:4px 6px;border-radius:4px;background:#101a2e;font-size:11px;cursor:pointer;border:1px solid #16243d;transition:all 0.12s ease"
-                       onmouseenter="highlightTradePoint(${gIdx})"
-                       onmouseleave="unhighlightTradePoint()"
-                       onclick="selectTradePoint(${gIdx})">
-                    <div style="display:flex;align-items:center;gap:5px">
-                      <span class="mut" style="font-family:monospace;font-size:9.5px">#${gIdx + 1}</span>
-                      <b style="color:#e6edf3">${esc(p.ticker)}</b>
-                      <span class="pill" style="font-size:8.5px;padding:0 3px">${rType}</span>
-                      <span class="mut" style="font-size:9.5px">${esc(p.t)}</span>
-                    </div>
-                    <div style="text-align:right">
-                      <b style="color:${pCol}">${p.pnl >= 0 ? '+' : '-'}$${Math.abs(p.pnl).toFixed(2)}</b>
-                      <div class="mut" style="font-size:9px;font-family:monospace">cum ${p.cum_pnl >= 0 ? '+' : '-'}$${Math.abs(p.cum_pnl).toFixed(0)}</div>
-                    </div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
+    <!-- Full-Width Interactive Trade Ledger Table -->
+    <div id="eq-ledger-container" style="margin-top:14px;background:#0b1322;border:1px solid #1a2a46;border-radius:12px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,0.35)">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #1a2842">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="font-size:13.5px;font-weight:700;color:#f0f6fc;letter-spacing:-0.2px;display:flex;align-items:center;gap:6px">
+            <span>📋</span> Closed Trades Ledger
           </div>
-        `;
-      }).join('')}
+          <span class="pill" style="font-size:11px;font-weight:700;padding:2px 8px;background:#182844;color:#79c0ff;border-color:#2e446d">${totalTrades} Trades</span>
+          <span class="pill" style="font-size:11px;font-weight:700;padding:2px 8px;background:#101d2e;color:${Number(winRate) >= 50 ? 'var(--good)' : 'var(--bad)'};border-color:#203554">
+            Win Rate: ${winRate}% (${wins}W / ${losses}L)
+          </span>
+          <span class="pill" style="font-size:11px;font-weight:700;padding:2px 8px;background:#101d2e;border-color:#203554">
+            Total Realised: <b class="${totalCol}">${totalSign}$${Math.abs(totalRealised).toFixed(2)}</b>
+          </span>
+        </div>
+
+        <!-- Filter Buttons & Search -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="display:inline-flex;gap:4px;background:#060a14;padding:3px;border-radius:8px;border:1px solid #1c283f">
+            <button class="eq-filter-btn active" data-filter="all" onclick="setEqFilter('all')">All (${totalTrades})</button>
+            <button class="eq-filter-btn" data-filter="new" onclick="setEqFilter('new')" style="color:#38bdf8">🚀 New Strategy (${newTradesCount})</button>
+            <button class="eq-filter-btn" data-filter="legacy" onclick="setEqFilter('legacy')" style="color:#94a3b8">Legacy Phase (${legacyTradesCount})</button>
+            <button class="eq-filter-btn" data-filter="win" onclick="setEqFilter('win')" style="color:#4ade80">Wins (${wins})</button>
+            <button class="eq-filter-btn" data-filter="loss" onclick="setEqFilter('loss')" style="color:#f87171">Losses (${losses})</button>
+          </div>
+
+          <input id="eq-filter-search" type="text" placeholder="Filter ticker..." oninput="applyEqFilter()"
+                 style="font-size:11.5px;padding:4px 9px;width:115px;background:#080d18;border:1px solid #1c283f;border-radius:6px;color:#e6edf3">
+
+          <button id="eq-sort-btn" onclick="toggleEqSort()" class="ghost" style="font-size:11px;padding:4px 9px;border-radius:6px">
+            Sort: #1 ➔ #${totalTrades} ▾
+          </button>
+        </div>
+      </div>
+
+      <!-- Responsive Table Scroll Container -->
+      <div id="eq-ledger-scroll" style="max-height:340px;overflow-y:auto;overflow-x:auto;border:1px solid #16243d;border-radius:8px;background:#080d18">
+        <table style="width:100%;border-collapse:collapse;margin:0;font-size:12px;background:transparent">
+          <thead>
+            <tr style="position:sticky;top:0;background:#0d1629;z-index:3;border-bottom:1px solid #1c2d49;box-shadow:0 2px 8px rgba(0,0,0,0.4)">
+              <th style="padding:9px 12px;font-size:10.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:0.04em">#</th>
+              <th style="padding:9px 12px;font-size:10.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:0.04em">Closed Time</th>
+              <th style="padding:9px 12px;font-size:10.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:0.04em">Ticker</th>
+              <th style="padding:9px 12px;font-size:10.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:0.04em">Grade</th>
+              <th style="padding:9px 12px;font-size:10.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:0.04em">Exit Reason</th>
+              <th style="padding:9px 12px;font-size:10.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;text-align:right">Qty</th>
+              <th style="padding:9px 12px;font-size:10.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;text-align:right">Entry ➔ Exit</th>
+              <th style="padding:9px 12px;font-size:10.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;text-align:right">Trade P&L</th>
+              <th style="padding:9px 14px;font-size:10.5px;color:#79c0ff;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;text-align:right">Running Portfolio Balance</th>
+            </tr>
+          </thead>
+          <tbody id="eq-ledger-tbody">
+            ${rowsHtml}
+          </tbody>
+        </table>
+      </div>
     </div>
   `;
 
@@ -4213,7 +4402,7 @@ function renderEquity(points) {
         <b style="color:${pnlCls}">${p.pnl >= 0 ? '+' : '-'}$${Math.abs(p.pnl).toFixed(2)}</b>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-        <span style="color:#8b949e">Cum. Equity:</span>
+        <span style="color:#8b949e">Portfolio Cum:</span>
         <b style="color:${p.cum_pnl >= 0 ? '#3fb950' : '#f85149'}">${p.cum_pnl >= 0 ? '+' : '-'}$${Math.abs(p.cum_pnl).toFixed(2)}</b>
       </div>
       <div style="font-size:11px;color:#8b949e;border-top:1px solid #1e2c47;padding-top:4px;margin-top:4px">
@@ -4221,22 +4410,24 @@ function renderEquity(points) {
       </div>
     `;
 
-    // Highlight row in segment card
+    // Highlight row in ledger table
     document.querySelectorAll('.eq-trade-row').forEach(el => {
-      el.style.background = '#101a2e';
-      el.style.borderColor = '#16243d';
+      el.classList.remove('active-trade-row');
+      el.style.background = '#090e1a';
+      el.style.borderLeft = '';
     });
     const targetRow = $(`eq-trade-row-${idx}`);
     if (targetRow) {
+      targetRow.classList.add('active-trade-row');
       targetRow.style.background = 'rgba(88, 166, 255, 0.18)';
-      targetRow.style.borderColor = '#58a6ff';
+      targetRow.style.borderLeft = '3px solid #58a6ff';
       targetRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     if (badge) {
       const pSign = p.pnl >= 0 ? '+' : '-';
       const cSign = p.cum_pnl >= 0 ? '+' : '-';
-      badge.innerHTML = `Trade #${idx + 1}: <b style="color:#e6edf3">${esc(p.ticker)}</b> | P&L: <b style="color:${pnlCls}">${pSign}$${Math.abs(p.pnl).toFixed(2)}</b> | Cum: <b style="color:${p.cum_pnl >= 0 ? '#3fb950' : '#f85149'}">${cSign}$${Math.abs(p.cum_pnl).toFixed(2)}</b>`;
+      badge.innerHTML = `Trade #${idx + 1}: <b style="color:#e6edf3">${esc(p.ticker)}</b> | Trade P&L: <b style="color:${pnlCls}">${pSign}$${Math.abs(p.pnl).toFixed(2)}</b> | Running Portfolio Balance: <b style="color:${p.cum_pnl >= 0 ? '#3fb950' : '#f85149'}">${cSign}$${Math.abs(p.cum_pnl).toFixed(2)}</b>`;
     }
   }
 
@@ -4256,11 +4447,12 @@ function renderEquity(points) {
     dot.style.display = 'none';
     tip.style.display = 'none';
     document.querySelectorAll('.eq-trade-row').forEach(el => {
-      el.style.background = '#101a2e';
-      el.style.borderColor = '#16243d';
+      el.classList.remove('active-trade-row');
+      el.style.background = '#090e1a';
+      el.style.borderLeft = '';
     });
     if (badge) {
-      badge.textContent = 'Hover across curve to inspect trades';
+      badge.textContent = 'Hover across curve or table rows to inspect trades';
     }
   }
 
@@ -4281,6 +4473,58 @@ function renderEquity(points) {
   svg.addEventListener('touchmove', onMove);
   svg.addEventListener('touchend', onLeave);
 }
+
+window.setEqFilter = function(f) {
+  _currentEqFilter = f;
+  document.querySelectorAll('.eq-filter-btn').forEach(btn => {
+    const isAct = btn.getAttribute('data-filter') === f;
+    btn.classList.toggle('active', isAct);
+    if (isAct) {
+      btn.style.background = '#1f6feb';
+      btn.style.borderColor = '#58a6ff';
+      btn.style.color = '#fff';
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.borderColor = '#1f3050';
+      btn.style.color = 'var(--mut)';
+    }
+  });
+  window.applyEqFilter();
+};
+
+window.applyEqFilter = function() {
+  const query = (document.getElementById('eq-filter-search')?.value || '').trim().toUpperCase();
+  const filter = _currentEqFilter || 'all';
+  const rows = document.querySelectorAll('.eq-trade-row');
+  rows.forEach(r => {
+    const ticker = r.getAttribute('data-ticker') || '';
+    const type = r.getAttribute('data-type') || '';
+    const phase = r.getAttribute('data-phase') || '';
+    let matchFilter = false;
+    if (filter === 'all') matchFilter = true;
+    else if (filter === 'new') matchFilter = (phase === 'new');
+    else if (filter === 'legacy') matchFilter = (phase === 'legacy');
+    else matchFilter = (type === filter);
+    const matchSearch = !query || ticker.includes(query);
+    r.style.display = (matchFilter && matchSearch) ? '' : 'none';
+  });
+};
+
+window.toggleEqSort = function() {
+  _currentEqSort = _currentEqSort === 'asc' ? 'desc' : 'asc';
+  const tbody = document.getElementById('eq-ledger-tbody');
+  const btn = document.getElementById('eq-sort-btn');
+  if (!tbody || !btn) return;
+  const rows = Array.from(tbody.querySelectorAll('.eq-trade-row'));
+  const total = rows.length;
+  rows.sort((a, b) => {
+    const idxA = parseInt(a.getAttribute('data-idx') || '0', 10);
+    const idxB = parseInt(b.getAttribute('data-idx') || '0', 10);
+    return _currentEqSort === 'asc' ? (idxA - idxB) : (idxB - idxA);
+  });
+  rows.forEach(r => tbody.appendChild(r));
+  btn.textContent = _currentEqSort === 'asc' ? `Sort: #1 ➔ #${total} ▾` : `Sort: #${total} ➔ #1 ▴`;
+};
 
 async function loadPurchases() {
   try {
@@ -4675,7 +4919,7 @@ async function loadEquityCurveForDesk(deskId) {
   try {
     const data = await api(`/api/journal/equity_curve?desk=${dId}`);
     if (data && data.points) {
-      renderEquity(data.points);
+      renderEquity(data.points, data);
     }
     const titleEl = $('eq-title');
     if (titleEl) {
@@ -4786,7 +5030,7 @@ async function loadFast() {
     renderSummary(summ);
     currentTrades = trades.trades || [];
     renderTrades(currentTrades);
-    renderEquity(eq.points);
+    renderEquity(eq.points, eq);
     updateTopMetricsForActiveDesk();
     loadPurchases().catch(console.warn);
   } catch (err) {
@@ -4922,9 +5166,18 @@ function updateTopMetricsForActiveDesk() {
   const cNK = $('c-n-k');
 
   if (posDeskView === 'forex') {
-    if (cEqK) cEqK.textContent = 'Forex Equity (20:1)';
-    if (cNK) cNK.textContent = 'Forex Closed Trades';
     const xd = d.forex || {};
+    const feed = xd.feed_status || {};
+    if (cEqK) {
+      if (feed.status === 'DISCONNECTED') {
+        cEqK.innerHTML = 'Forex Equity <span class="pill bad" style="font-size:9.5px;padding:1px 6px;margin-left:4px">🔌 DISCONNECTED</span>';
+      } else if (feed.gap_seconds > 0) {
+        cEqK.innerHTML = `Forex Equity <span class="pill" style="font-size:9.5px;padding:1px 6px;margin-left:4px;background:rgba(245,158,11,0.15);color:#fbbf24;border-color:rgba(245,158,11,0.35)">🔌 Reconnected (${Math.round(feed.gap_seconds)}s)</span>`;
+      } else {
+        cEqK.textContent = 'Forex Equity (20:1)';
+      }
+    }
+    if (cNK) cNK.textContent = 'Forex Closed Trades';
     if (cEq) cEq.textContent = money(xd.equity || 50000);
     if (cCash) cCash.textContent = money(xd.cash || 20000);
     const totC = xd.total_closed_count ?? (xd.closed_trades || []).length;
