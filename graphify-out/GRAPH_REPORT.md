@@ -1,7 +1,7 @@
 # Graph Report - WORK  (2026-10-19)
 
 ## Corpus Check
-- 230 files · ~613,750 words
+- 230 files · ~614,041 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 33 file(s) not represented in the graph (top: .csv 15, (none) 9, .ipynb 3)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a98dbd4d`
+- Built from commit: `83806723`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -559,17 +559,17 @@ Nodes (6): breakeven_move_pct(), days_to_target(), expected_move_pct(), is_trade
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `TechnicalIndicators` connect `pandas` to `factor_dag.py`, `numpy`, `time`, `logging`, `test_units.py`, `market_scanner.py`, `Series`, `five_year_stats.py`, `TriConfluenceMatrix`, `argparse`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `fetch_prices()` connect `pandas` to `get`, `time`, `app.py`, `Series`, `ForexAutopilot`, `AgentCouncil`, `hedging_engine.py`, `numpy`, `pipeline.py`, `logging`, `daily_routine.py`, `FactorDAG`, `CMEFuturesAutopilot`, `five_year_stats.py`, `mcp_server.py`, `crypto_futures_autopilot.py`, `TwentyYearStrategyEngine`, `council.py`, `market_scanner.py`, `dataset_generator.py`, `argparse`, `factor_dag.py`, `TriConfluenceMatrix`, `sentiment_hedged_vs_unhedged.py`?**
+  _High betweenness centrality (0.047) - this node is a cross-community bridge._
 - **What connects `HF_HUB_OFFLINE`, `OMP_NUM_THREADS`, `PYTHONUNBUFFERED` to the rest of the system?**
   _83 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `get` be split into smaller, more focused modules?**
   _Cohesion score 0.07207207207207207 - nodes in this community are weakly interconnected._
-- **Why does `fetch_prices()` connect `pandas` to `get`, `time`, `app.py`, `Series`, `ForexAutopilot`, `AgentCouncil`, `hedging_engine.py`, `numpy`, `pipeline.py`, `logging`, `daily_routine.py`, `FactorDAG`, `CMEFuturesAutopilot`, `five_year_stats.py`, `mcp_server.py`, `crypto_futures_autopilot.py`, `TwentyYearStrategyEngine`, `council.py`, `market_scanner.py`, `dataset_generator.py`, `argparse`, `factor_dag.py`, `TriConfluenceMatrix`, `sentiment_hedged_vs_unhedged.py`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `calculate_streak_compounding_factor()` connect `risk/__init__.py` to `.test_defensive_scaling_on_losing_streak`?**
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **Should `tunnel_manager.py` be split into smaller, more focused modules?**
   _Cohesion score 0.0967741935483871 - nodes in this community are weakly interconnected._
-- **Why does `TestMultiDeskArchitecture` connect `ForexAutopilot` to `CMEFuturesAutopilot`, `crypto_futures_autopilot.py`, `CryptoFuturesAutopilot`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `atomic_json_read()` connect `atomic_json_read` to `AgentCouncil`, `pandas`, `time`, `council.py`, `deadmans_switch.py`, `app.py`, `CMEFuturesAutopilot`, `os`, `mcp_server.py`, `crypto_futures_autopilot.py`, `json`, `CryptoFuturesAutopilot`, `ForexAutopilot`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Should `quant` be split into smaller, more focused modules?**
   _Cohesion score 0.07017543859649122 - nodes in this community are weakly interconnected._

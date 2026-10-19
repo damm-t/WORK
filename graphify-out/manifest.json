@@ -468,9 +468,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/data/sniper_setup.json": {
-    "mtime": 1792073349.959497,
-    "seen": 1792386075.103242,
-    "ast_hash": "8ed4feb3e43a94c6408e32f0b2b51f88",
+    "mtime": 1792390780.4159508,
+    "seen": 1792391887.0642922,
+    "ast_hash": "022dd664c158ab50de97133a6582903a",
     "semantic_hash": ""
   },
   "stock-signal-engine/early-signal-scanner/scanner.py": {
@@ -510,15 +510,15 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/cme_futures_state.json": {
-    "mtime": 1792080521.6050024,
-    "seen": 1792386075.103246,
-    "ast_hash": "6b11ab30c15eabcab2cf1579489efc72",
+    "mtime": 1792391044.7653222,
+    "seen": 1792391887.064297,
+    "ast_hash": "87f92fb4f14f372f19bcc21e6f5d9424",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_archive.json": {
-    "mtime": 1792078869.8754692,
-    "seen": 1792386720.3596191,
-    "ast_hash": "4f4f6b09314d0ff1dd9e47c62c70a244",
+    "mtime": 1792390984.5643692,
+    "seen": 1792391887.064298,
+    "ast_hash": "199ba169c88fa78858f77c8fdd95ba2d",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_autopilot.py": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_state.json": {
-    "mtime": 1792080538.1747804,
-    "seen": 1792386075.103248,
-    "ast_hash": "920a3268b9903acdd6148149fa9cb182",
+    "mtime": 1792391050.5886462,
+    "seen": 1792391887.064299,
+    "ast_hash": "1061991672c0891701151dd2c2cd89a7",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/deadmans_switch.py": {
@@ -546,9 +546,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/forex_state.json": {
-    "mtime": 1792080568.9713895,
-    "seen": 1792386075.103252,
-    "ast_hash": "0eaac61786433e8e1d7532d62606526d",
+    "mtime": 1792391033.2947214,
+    "seen": 1792391887.0643032,
+    "ast_hash": "d02c2b4e631aff5be727419465c92ea9",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/jev_execution.py": {
@@ -798,9 +798,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/quant": {
-    "mtime": 1792081519.5743592,
-    "seen": 1792386075.103287,
-    "ast_hash": "d60ab9867a91379a96efb6f52b107a0a",
+    "mtime": 1792391658.0086143,
+    "seen": 1792391887.064339,
+    "ast_hash": "6437148658c645f29181c34d4813aa10",
     "semantic_hash": ""
   },
   "stock-signal-engine/reports/__init__.py": {

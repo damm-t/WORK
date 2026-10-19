@@ -1,7 +1,7 @@
 # Graph Report - stock-signal-engine  (2026-10-19)
 
 ## Corpus Check
-- 227 files · ~602,419 words
+- 227 files · ~607,893 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 20 file(s) not represented in the graph (top: .csv 9, (none) 6, .bat 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2ec6d8a5`
+- Built from commit: `37d1b772`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -604,7 +604,7 @@ Nodes (4): api_desks_status(), _find_process_pid(), _is_pid_alive(), _read_pid()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `fetch_prices()` connect `pandas` to `TradeJournal`, `five_year_stats.py`, `TestMultiDeskArchitecture`, `time`, `financial_modeling.py`, `stock_analysis.py`, `factor_dag.py`, `app.py`, `BayesianConfidenceEngine`, `get`, `get_book_allocations`, `council.py`, `atomic_json_read`, `argparse`, `os`, `.filter_series`, `mcp_server.py`, `daily_routine.py`, `InstitutionalBenchmarkEngine`, `pipeline.py`, `hedging_engine.py`, `market_scanner.py`, `analyze_exit`, `external_alpha_bridge.py`, `numpy`, `get_market_features`, `_leaderboard`, `ConvexTailEngine`, `TriConfluenceMatrix`, `banned_ticker`, `run_multi_asset_benchmark`, `Any`, `detect_market_regime`?**
-  _High betweenness centrality (0.067) - this node is a cross-community bridge._
+  _High betweenness centrality (0.068) - this node is a cross-community bridge._
 - **What connects `axios`, `react-dom`, `@tailwindcss/postcss` to the rest of the system?**
   _83 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `TradeJournal` be split into smaller, more focused modules?**
