@@ -78,5 +78,7 @@ class TechnicalIndicators:
     @classmethod
     def volume_ratio(cls, volume: pd.Series, length: int = 20) -> float:
         """Latest volume vs its rolling average (>1 = above-average activity)."""
+        if volume is None or volume.empty:
+            return 1.0
         avg = cls.avg_volume(volume, length).iloc[-1]
         return float(volume.iloc[-1]) / float(avg) if avg else 0.0

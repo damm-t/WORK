@@ -369,9 +369,9 @@ class ForexStrategyEngine:
         side = pos.get("side", "LONG")
         r_pips = float(pos.get("pips_sl") or 16.0)
 
-        # 0. Safety Guard: If trade is already derisked/trailed in healthy profit, DO NOT shock exit!
+        # 0. Safety Guard: If trade is already derisked/trailed in profit, in reconnect hold, or loss curbed, DO NOT shock exit!
         pips_gain = (curr_price - entry_price) / pip_size if side == "LONG" else (entry_price - curr_price) / pip_size
-        if pos.get("trailed_profit") or (pos.get("scaled_out_50") and pips_gain > 5.0):
+        if pos.get("trailed_profit") or (pos.get("scaled_out_50") and pips_gain > 5.0) or pos.get("reconnect_hold") or pos.get("loss_curbed"):
             return {"shocked": False, "reason": "", "type": "NORMAL"}
 
         # 1. Adverse Pip Velocity Check (Emergency Cut if sudden spike against position)

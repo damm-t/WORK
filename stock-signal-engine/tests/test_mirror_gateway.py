@@ -11,6 +11,7 @@ Verifies:
 
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from gateway.broker_client import BrokerClientFactory
@@ -114,7 +115,7 @@ class TestMirrorGateway(unittest.TestCase):
         ))
 
         # Mock broker account with 0 cash (100% heat)
-        with unittest.mock.patch.object(
+        with patch.object(
             BrokerClientFactory, "get_account",
             return_value={"equity": 20000.0, "cash": 0.0, "buying_power": 5000.0}
         ):

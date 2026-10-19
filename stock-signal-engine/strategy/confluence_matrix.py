@@ -189,6 +189,26 @@ class TriConfluenceMatrix:
         if not cert.approved:
             action_recommended = "STANDBY_SKIP"
 
+        # AstraQuant Fail-Closed Physical Risk Pipeline Audit (Reels 1 & 2)
+        if action_recommended != "STANDBY_SKIP" and raw_price > 0:
+            try:
+                from risk.physical_risk_pipeline import physical_risk_pipeline
+                test_sl = round(raw_price * 0.98, 2)
+                test_tp = round(raw_price * 1.04, 2)
+                p_audit = physical_risk_pipeline.audit_order_intent(
+                    symbol=ticker,
+                    side="LONG",
+                    entry_price=raw_price,
+                    stop_loss=test_sl,
+                    take_profit=test_tp,
+                    portfolio_equity=account_equity,
+                )
+                if not p_audit.approved:
+                    action_recommended = "STANDBY_SKIP"
+                    cert.violations.extend(p_audit.rejection_reasons)
+            except Exception as _pr_err:
+                logger.debug(f"[confluence_matrix] Physical risk check error: {_pr_err}")
+
         rationale = (
             f"Composite Score: {raw_composite}/100 [Vol: {volume_score:.1f}, Mom: {momentum_score:.1f}, "
             f"Sent: {sentiment_score_pts:.1f}, Stab: {stability_score:.1f}]. "
