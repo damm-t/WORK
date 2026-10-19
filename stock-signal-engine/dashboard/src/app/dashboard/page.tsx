@@ -29,26 +29,4 @@ export default function DashboardPage() {
     </main>
   )
 }
-                <p className="mt-2 text-sm text-rose-400">Error: {signalError ?? marketError ?? sentimentError}</p>
-              )}
-            </div>
-          </div>
-        </div>
 
-        <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-          <div className="space-y-6">
-            <SignalCard ticker={ticker} signal={signal?.signal} decision={signal?.decision} loading={signalLoading} />
-            <IndicatorPanel market={market} />
-            <PriceChart market={market} ticker={ticker} />
-          </div>
-
-          <div className="space-y-6">
-            <RiskPanel ticker={ticker} signal={signal?.signal} decision={signal?.decision} market={market} loading={loading} />
-            <SentimentHeatmap articles={articles} />
-            <ArticlesFeed articles={articles} loading={sentimentLoading} />
-          </div>
-        </div>
-      </div>
-    </main>
-  );
-}
