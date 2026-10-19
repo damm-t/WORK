@@ -1,0 +1,75 @@
+{
+  "slug": "DeUW_vslUI8",
+  "source_url": "https://www.instagram.com/reel/DeUW_vslUI8/",
+  "processed_at": "2026-10-15T02:41:28Z",
+  "files": {
+    "video_mp4": "/Users/voonfamily/Desktop/WORK/stock-signal-engine/instagram_extractor/output/DeUW_vslUI8.mp4",
+    "audio_mp3": "/Users/voonfamily/Desktop/WORK/stock-signal-engine/instagram_extractor/output/DeUW_vslUI8.mp3",
+    "audio_wav": "/Users/voonfamily/Desktop/WORK/stock-signal-engine/instagram_extractor/output/DeUW_vslUI8.wav",
+    "thumbnail_jpg": "/Users/voonfamily/Desktop/WORK/stock-signal-engine/instagram_extractor/output/DeUW_vslUI8.jpg",
+    "transcript_txt": "/Users/voonfamily/Desktop/WORK/stock-signal-engine/instagram_extractor/output/DeUW_vslUI8_transcript.txt"
+  },
+  "transcript": "I'm going to show you a strategy that hedge funds would literally kill for but there's one contingency this is quite 101 I took 850 Days of Futures data and tested 8500 strategies every entry time every whole time long short every day of the week then I picked the best one by es every Thursday at 10:10 a.m. sell 5 minutes later 104 trades at 164% of the time with a 2. do Sharpe ratio now here's how to find out if it's real check one out of sample I read it on 2024 and 2025 data is never seen it's still worked sharp 1.8 this is where most people stop and go live don't step 2 move it enter 10 minutes earlier the sharp goes negative enter 10 minutes later negative traded on Wednesday negative 96% of the strategies are rounded have no Edge a real what is a hill this is a needle three costs add two ticks of slippage and commission 2.4 becomes 1.6 out of sample 1.8 becomes 1.1 check 4 how many things did you try I scramble the market so there's zero Edge anywhere Randy exact same 8,500 test best one sharp of 2.3 mine sharp of 2.4 my edges exactly what luck looks like when you look for 8500 and the out of sample pass of my top 100 strategies 54 lost money on new data who did as well as mine test 100.8 because one line of code used the days closing price at 10:00 a.m. it looked into the future and it passed out of sample too now here's my take over fittings this isn't a bug in your strategy it's the number of things you tried the more you search the better your best one looks so before you trust any backtests ask yourself for questions does it work on new data does it survive next door does it survive costs does it be a fake market if you can't answer all four you don't have an edge you have a lucky back test",
+  "abstraction": {
+    "title": "Quant 101: Overfitting vs. Genuine Alpha (The 'Needle' Fallacy)",
+    "category": "Backtest Rigor & Statistical Robustness",
+    "speaker_type": "Quantitative Researcher / Algorithmic Trader",
+    "core_thesis": "A high Sharpe ratio (e.g. 2.4 on ES 1-min) discovered across thousands of parameter permutations is almost always an artifact of data mining (p-hacking) rather than genuine alpha, unless it passes neighborhood perturbation, transaction cost friction, and synthetic market testing.",
+    "quantitative_metrics": {
+      "instrument": "ES (E-mini S&P 500 Futures)",
+      "data_scope": "850 days of 1-minute tick/bar data (2022 - 2025)",
+      "search_space": "8,580 strategies (entry time, holding period, direction, day of week)",
+      "nominal_in_sample_sharpe": 2.4,
+      "out_of_sample_sharpe": 1.8,
+      "after_slippage_and_commissions_sharpe": 1.1,
+      "scrambled_market_benchmark_sharpe": 2.3
+    },
+    "four_rigorous_tests": [
+      {
+        "test": "1. Out-of-Sample Validation",
+        "result": "Sharpe dropped from 2.4 to 1.8. Many amateur quants stop here and launch live.",
+        "status": "PASS (Deceptive)"
+      },
+      {
+        "test": "2. Parameter Neighborhood Sensitivity ('Move It')",
+        "result": "Shift entry by +/- 10 minutes -> Sharpe collapses negative. Change day of week -> Negative. 96% of surrounding neighborhood has zero edge. A true edge is a smooth hill; this strategy is an isolated needle.",
+        "status": "FAIL (Needle Overfitting)"
+      },
+      {
+        "test": "3. Friction & Cost Survival",
+        "result": "Adding realistic 2-tick slippage + exchange commission slashed out-of-sample Sharpe from 1.8 to 1.1.",
+        "status": "FAIL (High Sensitivity to Costs)"
+      },
+      {
+        "test": "4. Monte Carlo Scrambled Market Test",
+        "result": "Permuted market prices with zero edge yielded a top strategy with Sharpe 2.3. The 2.4 Sharpe is statistically indistinguishable from random luck in an 8,500-search space.",
+        "status": "FAIL (P-Hacking Proof)"
+      }
+    ],
+    "bonus_warning": "Lookahead Bias: The author demonstrated that an accidental leak of the daily closing price at 10:00 AM artificially inflated Sharpe to 4.8 and passed out-of-sample tests. Point-in-time timestamp alignment is mandatory.",
+    "takeaway_quote": "Overfitting isn't a bug in your strategy\u2014it's the number of things you tried. The more you search, the better your best one looks.",
+    "engine_integration": "Implement parameter neighborhood stability sweeps in stock-signal-engine backtester and enforce Monte Carlo synthetic permutation benchmarking before promoting any alpha factor to production."
+  },
+  "extraction_metadata": {
+    "source_url": "https://www.instagram.com/reel/DeUW_vslUI8/",
+    "media_count": 1,
+    "primary_video": "https://scontent-iad6-1.cdninstagram.com/o1/v/t2/f2/m86/AQOZ6hO-jpBPqIL5JqT5YjkVml59rESHaxP9o3iFLURGLFp05WZZHRYfnlZrHj-rlSKkiTc9MTs7S1gVYyF7GBeH1rlglMVpN7sCrAs.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-iad6-1.cdninstagram.com&_nc_ohc=CHFIPgNsF_8Q7kNvwEjgZy4&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTc5OTgxNzk3MzgwMzM5NDAsImFzc2V0X2FnZV9kYXlzIjo0LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTIwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=69824919da10b04f&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC81MDUzRTgxQTYwRkQ0NDk5ODNCMUE5NzcyREJEMTUwQl92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyL0VGRkQyN0JCNzgxMjQyMUE5MTU3MzM1RTk4QzA4MkRDX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACao_Jze-M_4PxUCKAJDMywXQF4O6XjU_fQYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=q1wIp5Z7hi9pn2iVC7dVpQ&_nc_ss=70689&_nc_zt=28&oh=00_AQMzpN5LAxN8nSW4SNbQPx5l6hSXLI4P3dtn1OrSvMNWcg&oe=6AD209E1",
+    "primary_thumbnail": "https://scontent-iad6-1.cdninstagram.com/v/t51.71878-15/843161656_1431045422508552_7050853818796738770_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=106&ig_cache_key=NDAwNDkyNzEwNjIwMzMzNzI3NjE3OTk4MTgwMjM5MDMzOTQw.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fbmZyYW1lX2NvdmVyX2ZyYW1lLkMzIn0%3D&_nc_ohc=_qkgPAymSVcQ7kNvwG8Qk1n&_nc_oc=AdrRoYz8gwUN2bEMKFbbdyi4a9OICCWTWw3zZA0yF1Ccrb32oGnv8iv441L6fQ3PJYs&_nc_zt=23&_nc_ht=scontent-iad6-1.cdninstagram.com&_nc_gid=q1wIp5Z7hi9pn2iVC7dVpQ&_nc_ss=70689&oh=00_AQMYZxWIU2PbuW47sF1eHGGZKRgDq_hE1Y7cRLWjhejdIA&oe=6AD61BAE",
+    "media_items": [
+      {
+        "video_url": "https://scontent-iad6-1.cdninstagram.com/o1/v/t2/f2/m86/AQOZ6hO-jpBPqIL5JqT5YjkVml59rESHaxP9o3iFLURGLFp05WZZHRYfnlZrHj-rlSKkiTc9MTs7S1gVYyF7GBeH1rlglMVpN7sCrAs.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-iad6-1.cdninstagram.com&_nc_ohc=CHFIPgNsF_8Q7kNvwEjgZy4&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTc5OTgxNzk3MzgwMzM5NDAsImFzc2V0X2FnZV9kYXlzIjo0LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTIwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=69824919da10b04f&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC81MDUzRTgxQTYwRkQ0NDk5ODNCMUE5NzcyREJEMTUwQl92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyL0VGRkQyN0JCNzgxMjQyMUE5MTU3MzM1RTk4QzA4MkRDX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACao_Jze-M_4PxUCKAJDMywXQF4O6XjU_fQYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=q1wIp5Z7hi9pn2iVC7dVpQ&_nc_ss=70689&_nc_zt=28&oh=00_AQMzpN5LAxN8nSW4SNbQPx5l6hSXLI4P3dtn1OrSvMNWcg&oe=6AD209E1",
+        "thumbnail_url": "https://scontent-iad6-1.cdninstagram.com/v/t51.71878-15/843161656_1431045422508552_7050853818796738770_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=106&ig_cache_key=NDAwNDkyNzEwNjIwMzMzNzI3NjE3OTk4MTgwMjM5MDMzOTQw.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fbmZyYW1lX2NvdmVyX2ZyYW1lLkMzIn0%3D&_nc_ohc=_qkgPAymSVcQ7kNvwG8Qk1n&_nc_oc=AdrRoYz8gwUN2bEMKFbbdyi4a9OICCWTWw3zZA0yF1Ccrb32oGnv8iv441L6fQ3PJYs&_nc_zt=23&_nc_ht=scontent-iad6-1.cdninstagram.com&_nc_gid=q1wIp5Z7hi9pn2iVC7dVpQ&_nc_ss=70689&oh=00_AQMYZxWIU2PbuW47sF1eHGGZKRgDq_hE1Y7cRLWjhejdIA&oe=6AD61BAE",
+        "title": ""
+      }
+    ],
+    "raw_response": {
+      "p": true,
+      "video": [
+        {
+          "video": "https://scontent-iad6-1.cdninstagram.com/o1/v/t2/f2/m86/AQOZ6hO-jpBPqIL5JqT5YjkVml59rESHaxP9o3iFLURGLFp05WZZHRYfnlZrHj-rlSKkiTc9MTs7S1gVYyF7GBeH1rlglMVpN7sCrAs.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-iad6-1.cdninstagram.com&_nc_ohc=CHFIPgNsF_8Q7kNvwEjgZy4&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6MTc5OTgxNzk3MzgwMzM5NDAsImFzc2V0X2FnZV9kYXlzIjo0LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTIwLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&vs=69824919da10b04f&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC81MDUzRTgxQTYwRkQ0NDk5ODNCMUE5NzcyREJEMTUwQl92aWRlb19kYXNoaW5pdC5tcDQVAALIARIAFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyL0VGRkQyN0JCNzgxMjQyMUE5MTU3MzM1RTk4QzA4MkRDX2F1ZGlvX2Rhc2hpbml0Lm1wNBUCAsgBEgAoABgAGwKIB3VzZV9vaWwBMRJwcm9ncmVzc2l2ZV9yZWNpcGUBMRUAACao_Jze-M_4PxUCKAJDMywXQF4O6XjU_fQYEmRhc2hfYmFzZWxpbmVfMV92MREAdf4HZeadAQA&_nc_gid=q1wIp5Z7hi9pn2iVC7dVpQ&_nc_ss=70689&_nc_zt=28&oh=00_AQMzpN5LAxN8nSW4SNbQPx5l6hSXLI4P3dtn1OrSvMNWcg&oe=6AD209E1",
+          "thumbnail": "https://scontent-iad6-1.cdninstagram.com/v/t51.71878-15/843161656_1431045422508552_7050853818796738770_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=106&ig_cache_key=NDAwNDkyNzEwNjIwMzMzNzI3NjE3OTk4MTgwMjM5MDMzOTQw.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNMSVBTLnhwaWRzLjY0MC5zZHIudmlkZW9fbmZyYW1lX2NvdmVyX2ZyYW1lLkMzIn0%3D&_nc_ohc=_qkgPAymSVcQ7kNvwG8Qk1n&_nc_oc=AdrRoYz8gwUN2bEMKFbbdyi4a9OICCWTWw3zZA0yF1Ccrb32oGnv8iv441L6fQ3PJYs&_nc_zt=23&_nc_ht=scontent-iad6-1.cdninstagram.com&_nc_gid=q1wIp5Z7hi9pn2iVC7dVpQ&_nc_ss=70689&oh=00_AQMYZxWIU2PbuW47sF1eHGGZKRgDq_hE1Y7cRLWjhejdIA&oe=6AD61BAE"
+        }
+      ]
+    }
+  }
+}

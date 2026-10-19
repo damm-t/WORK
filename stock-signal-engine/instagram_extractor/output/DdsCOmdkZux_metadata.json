@@ -1,0 +1,117 @@
+{
+  "source_url": "https://www.instagram.com/p/DdsCOmdkZux/?img_index=7",
+  "account": "@TrendSpider",
+  "media_type": "carousel",
+  "total_slides": 16,
+  "requested_slide": 7,
+  "extracted_at": "2026-10-16T00:15:00Z",
+  "highlighted_asset": {
+    "symbol": "GME",
+    "name": "GameStop Corp.",
+    "slide_number": 7,
+    "theme": "CEO Insider Buying & Volume Profile Breakout",
+    "details": {
+      "insider": "CEO Ryan Cohen",
+      "recent_purchases": "$26,000,000 (yesterday) + $20,000,000 (<2 weeks prior)",
+      "total_capital_deployed": "$46,000,000",
+      "price_action": "Clearing $22.80 - $23.50 resistance ceiling into thin volume profile vacuum with $28.00 target",
+      "current_price": 23.84
+    }
+  },
+  "carousel_setups": [
+    {
+      "slide": 1,
+      "symbol": "BABA",
+      "name": "Alibaba",
+      "setup": "Insider Accumulation ($5M CEO Buy + $20M Director Buy) at multi-year base ($113.24)"
+    },
+    {
+      "slide": 2,
+      "symbol": "MCD",
+      "name": "McDonalds",
+      "setup": "200-week EMA support retest at $252.53 value menu zone"
+    },
+    {
+      "slide": 3,
+      "symbol": "CAT",
+      "name": "Caterpillar",
+      "setup": "Rare dip below Wall St average price target ($808.99 vs $1,000 avg / $1,225 high PT)"
+    },
+    {
+      "slide": 4,
+      "symbol": "MU",
+      "name": "Micron",
+      "setup": "High-volume breakout above $1,000 to $1,096.16 driven by AI HBM memory revenue"
+    },
+    {
+      "slide": 5,
+      "symbol": "ONDS",
+      "name": "Ondas Holdings",
+      "setup": "Descending wedge breakout + daily MACD bull cross at $7.72"
+    },
+    {
+      "slide": 6,
+      "symbol": "ASTS",
+      "name": "AST SpaceMobile",
+      "setup": "Multi-month ascending trendline support test at $58.52"
+    },
+    {
+      "slide": 7,
+      "symbol": "GME",
+      "name": "GameStop",
+      "setup": "CEO Ryan Cohen $46M insider buy cluster ($26M + $20M) + resistance breakout at $23.84"
+    },
+    {
+      "slide": 8,
+      "symbol": "AVGO",
+      "name": "Broadcom",
+      "setup": "200-day EMA mean reversion bounce + MACD bull cross at $355.50"
+    },
+    {
+      "slide": 9,
+      "symbol": "GRAB",
+      "name": "Grab Holdings",
+      "setup": "CEO $30M insider buy on record all-time volume spike at $3.17 after 80% drawdown"
+    },
+    {
+      "slide": 10,
+      "symbol": "ALAB",
+      "name": "Astera Labs",
+      "setup": "Prior ATH ceiling flipped to new institutional floor ($250-$280 support, now $303.25)"
+    },
+    {
+      "slide": 11,
+      "symbols": [
+        "GS",
+        "MS",
+        "JPM"
+      ],
+      "name": "Major Banks",
+      "setup": "Bearish breakdown from symmetrical triangles with heavy volume dumps"
+    },
+    {
+      "slide": 12,
+      "symbol": "NVDA",
+      "name": "NVIDIA",
+      "setup": "Daily Cup & Handle pattern tightening at $228.43"
+    },
+    {
+      "slide": 13,
+      "symbol": "MSOS",
+      "name": "US Cannabis ETF",
+      "setup": "Multi-year descending wedge terminal apex compression at $5.33"
+    },
+    {
+      "slide": 14,
+      "symbol": "RGTI",
+      "name": "Rigetti Computing",
+      "setup": "Descending triangle breakout with RSI recovery at $16.52"
+    },
+    {
+      "slide": 15,
+      "symbol": "COIN",
+      "name": "Coinbase",
+      "setup": "Highest weekly volume since June 2025 carving double bottom at $140, breaking out at $194.25"
+    }
+  ]
+}
