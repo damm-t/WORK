@@ -31,8 +31,9 @@ from execution.json_state import atomic_json_read, atomic_json_write
 
 logger = logging.getLogger(__name__)
 
-MEETINGS_FILE = Path("data/council_meetings.json")
-CHATTER_FILE = Path("data/floor_chatter.json")
+_BASE_DIR = Path(__file__).resolve().parent.parent
+MEETINGS_FILE = _BASE_DIR / "data" / "council_meetings.json"
+CHATTER_FILE = _BASE_DIR / "data" / "floor_chatter.json"
 
 
 @dataclass
@@ -255,6 +256,7 @@ class AgentCouncil:
             "recommendation": final_recommendation,
             "risk_status": "APPROVED" if risk_approved else "VETOED",
             "proposed_allocation_usd": risk_turn.key_metrics.get("max_allocation_usd", 2500.0),
+            "price": float(market_data.get("price", 100.0)),
             "stop_loss_pct": risk_turn.key_metrics.get("stop_loss_pct", 2.2),
             "take_profit_pct": risk_turn.key_metrics.get("take_profit_pct", 5.5),
             "turns": [asdict(t) for t in turns],
@@ -480,25 +482,84 @@ class AgentCouncil:
     ) -> CouncilTurn:
         agent = self.roster["risk"]
 
-        # Institutional Risk Rules:
+        # Institutional Risk Rules (AstraQuant Reel 1 & 2 Fail-Closed Gate):
         # 1. Strict 0.2% - 4.5% max portfolio risk limit
         # 2. Maximum single trade allocation: $2,500.00
         # 3. Mandatory stop loss between 1.8% and 2.5%
         # 4. Preliminary consensus must be >= 50%
+        # 5. Non-bypassable deterministic Python physical risk pipeline audit
         approved = preliminary_consensus >= 50
         max_alloc = 2500.0 if preliminary_consensus >= 70 else 1250.0
         stop_pct = 2.15
         target_pct = 5.40
 
-        if approved:
+        from risk.physical_risk_pipeline import physical_risk_pipeline
+        price = float(m.get("price", 100.0) or 100.0)
+        sl_price = round(price * (1.0 - stop_pct / 100.0), 2)
+        tp_price = round(price * (1.0 + target_pct / 100.0), 2)
+        units = (max_alloc / price) if price > 0 else 1.0
+
+        p_audit = physical_risk_pipeline.audit_order_intent(
+            symbol=ticker,
+            side="LONG",
+            entry_price=price,
+            stop_loss=sl_price,
+            take_profit=tp_price,
+            portfolio_equity=35000.0,
+            requested_size=units,
+        )
+
+        if not p_audit.approved:
+            approved = False
+            stance = "VETOED"
+            conf = 100
             msg = (
-                f"Attention Council. I have evaluated our portfolio risk budget against current multi-desk heat. "
-                f"Drawdown floor limit (0.2% max intraday) is intact. For ${ticker}, I approve entry under STRICT conditions: "
-                f"Max position allocation capped at ${max_alloc:,.2f}, mandatory hard stop-loss locked at {stop_pct}% "
-                f"below entry, and target profit at {target_pct}%. I will trigger an instant kill-switch if the stop is touched."
+                f"PHYSICAL RISK VETO ACTIVATED on ${ticker} (AstraQuant Rule): "
+                f"{'; '.join(p_audit.rejection_reasons)}. Deterministic code gate rejected trade."
             )
-            stance = "APPROVED"
-            conf = 95
+        elif approved:
+            # Query Episodic Failure Memory to prevent repeat mistakes under similar volatility
+            from execution.failure_memory import failure_memory
+            bb_stat = str(a.get("bb_status", "NORMAL")).upper()
+            adx_val = float(a.get("adx", 25.0) or 25.0)
+            rsi_val = float(a.get("rsi", 50.0) or 50.0)
+            risk_audit = failure_memory.query_failure_risk(
+                strategy="CORE_EQUITY_SWING",
+                side="LONG",
+                desk="stocks",
+                rsi=rsi_val,
+                adx=adx_val,
+                bb_status=bb_stat,
+            )
+
+            if risk_audit.risk_level == "CRITICAL":
+                approved = False
+                stance = "VETOED"
+                conf = 100
+                msg = (
+                    f"EPISODIC MEMORY VETO ACTIVATED on ${ticker}: {risk_audit.primary_vulnerability} "
+                    f"Defense Rule: {risk_audit.defense_rule}. Prevented deploying capital into repeat failure cluster."
+                )
+            elif risk_audit.risk_level == "HIGH":
+                max_alloc = round(min(max_alloc * 0.50, p_audit.allowed_position_size * price * 0.50), 2)
+                stance = "APPROVED"
+                conf = 75
+                msg = (
+                    f"EPISODIC DEFENSE SIZING on ${ticker}: Sizing slashed 50% to ${max_alloc:,.2f} "
+                    f"({risk_audit.primary_vulnerability}). Hard stop locked at {stop_pct}% (${sl_price:.2f})."
+                )
+            else:
+                max_alloc = min(max_alloc, round(p_audit.allowed_position_size * price, 2))
+                msg = (
+                    f"Attention Council. I have evaluated our portfolio risk budget against AstraQuant deterministic code gates "
+                    f"and Episodic Failure Memory (0 critical clusters). Drawdown floor limit is intact. For ${ticker}, I approve entry: "
+                    f"Max position allocation capped at ${max_alloc:,.2f} (Max loss capped at ${p_audit.max_dollar_loss:.2f}), "
+                    f"mandatory hard stop-loss locked at {stop_pct}% below entry (${sl_price:.2f}), and target profit at "
+                    f"{target_pct}% (${tp_price:.2f}, positive asymmetry R:R {p_audit.calculated_rr}:1). "
+                    f"I will trigger an instant kill-switch if the stop is touched."
+                )
+                stance = "APPROVED"
+                conf = 95
         else:
             msg = (
                 f"VETO ACTIVATED. Preliminary council conviction for ${ticker} was only {preliminary_consensus}%. "
@@ -520,6 +581,8 @@ class AgentCouncil:
                 "max_allocation_usd": max_alloc,
                 "stop_loss_pct": stop_pct,
                 "take_profit_pct": target_pct,
+                "calculated_rr": p_audit.calculated_rr,
+                "max_dollar_loss": p_audit.max_dollar_loss,
                 "risk_gate_status": stance,
             },
         )
@@ -622,7 +685,8 @@ class AgentCouncil:
             # Get latest price to calculate shares
             from market.price_fetcher import fetch_prices
             df = fetch_prices(ticker=ticker, period="1d", interval="1m")
-            px = float(df.iloc[-1]["Close"]) if not df.empty else 150.0
+            fallback_px = float(meeting.get("price") or 150.0)
+            px = float(df.iloc[-1]["Close"]) if (df is not None and not df.empty) else fallback_px
             qty = max(1, int(alloc / max(1.0, px)))
 
             # Execute market order on Alpaca Paper
@@ -777,6 +841,12 @@ class AgentCouncil:
         meetings = atomic_json_read(MEETINGS_FILE, default={"meetings": []}).get("meetings", [])
         active_meeting = meetings[0] if meetings and meetings[0].get("status") == "PENDING_HUMAN_APPROVAL" else None
 
+        # 6. Farm & Failure Memory Integrations
+        from execution.failure_memory import failure_memory
+        from execution.strategy_farm import strategy_farm
+        farm_data = strategy_farm.get_fleet_roster()
+        memory_summary = failure_memory.get_summary()
+
         return {
             "status": "success",
             "fund_equity": fund_equity,
@@ -787,6 +857,8 @@ class AgentCouncil:
             "floor_chatter": chatter_data[:20],
             "active_meeting": active_meeting,
             "total_meetings_held": len(meetings),
+            "strategy_farm": farm_data,
+            "failure_memory": memory_summary,
         }
 
     def _get_agent_current_task(self, agent_id: str) -> str:
@@ -795,8 +867,8 @@ class AgentCouncil:
             "breakout": "Hunting Bollinger squeezes, RSI momentum divergences & ATR expansions",
             "sentiment": "Parsing live news wires & scoring FinBERT sentiment polarity",
             "whale": "Tracking on-chain order flow, OBV divergence & dark pool volume prints",
-            "risk": "Enforcing 0.2% intraday loss floor, calculating VaR & capital allocation gates",
-            "cio": "Orchestrating council debates & synchronizing human-in-the-loop approvals",
+            "risk": "Enforcing 0.2% intraday floor & Episodic Failure Memory Vetoes (373 clusters indexed)",
+            "cio": "Orchestrating Safe Fleet execution & The Farm SIM incubation promotions",
         }
         return tasks.get(agent_id, "Monitoring real-time trading telemetry")
 
