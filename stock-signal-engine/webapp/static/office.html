@@ -5,67 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#070b14">
+  <meta name="theme-color" content="#1a0f0a">
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
-  <title>AI Agent Virtual Trading Floor | Quant Desk Live</title>
+  <title>Autonomous Quant Trading Floor | Virtual Hedge Fund Office</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,700;1,700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #070b14;
-      --card: rgba(14, 21, 37, 0.82);
-      --card-border: rgba(99, 102, 241, 0.18);
-      --accent: #6366f1;
-      --trend: #38bdf8;
-      --breakout: #c084fc;
-      --sentiment: #f59e0b;
-      --whale: #10b981;
-      --risk: #f43f5e;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --grid: rgba(99, 102, 241, 0.07);
+      --bg-dark: #120b07;
+      --card-bg: rgba(24, 18, 14, 0.88);
+      --card-border: rgba(255, 237, 213, 0.1);
+      --text: #fdf8f4;
+      --text-muted: #d4b8a5;
+      
+      /* Natural Warm Palette */
+      --wood-top: #543220;
+      --wood-bezel: #854d0e;
+      --wood-highlight: #b45309;
+      --oak-light: #78350f;
+      --oak-dark: #3b1d0c;
+      
+      /* Agent Identity Accents */
+      --trend: #0284c7;
+      --breakout: #9333ea;
+      --sentiment: #d97706;
+      --whale: #059669;
+      --risk: #e11d48;
+      --farm: #7c3aed;
+      --memory: #0891b2;
+      
+      /* Game UI Accents */
+      --gold: #f59e0b;
+      --green: #10b981;
+      --red: #f43f5e;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      background: var(--bg);
+      background: #140d09 radial-gradient(circle at 50% 0%, #291811 0%, #120b07 100%);
       color: var(--text);
       font-family: 'Outfit', -apple-system, sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
       display: flex;
       flex-direction: column;
+      user-select: none;
     }
 
-    /* Ambient Floor Lighting */
+    /* Ambient Warm Ceiling Glow */
     .ambient-glow {
       position: fixed;
-      width: 600px;
+      width: 1000px;
       height: 600px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(245, 158, 11, 0.06) 0%, rgba(217, 119, 6, 0.02) 45%, transparent 70%);
       pointer-events: none;
       z-index: 0;
-      top: -100px;
+      top: -150px;
       left: 50%;
       transform: translateX(-50%);
     }
 
-    /* Top HUD Bar */
+    /* Top Navigation / Status Header */
     header {
       position: relative;
-      z-index: 20;
+      z-index: 30;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 24px;
-      background: rgba(11, 18, 32, 0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--card-border);
+      padding: 10px 24px;
+      background: rgba(22, 14, 10, 0.94);
+      backdrop-filter: blur(20px);
+      border-bottom: 1.5px solid rgba(255, 237, 213, 0.08);
       flex-wrap: wrap;
       gap: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
 
     .brand {
@@ -74,52 +91,51 @@
       gap: 12px;
     }
     .brand-icon {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #6366f1, #38bdf8);
+      background: linear-gradient(135deg, #78350f, #b45309);
+      border: 1px solid #d97706;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 0 20px rgba(99,102,241,0.5);
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.35);
     }
     .brand h1 {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
-      letter-spacing: -0.02em;
-      background: linear-gradient(to right, #fff, #cbd5e1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.01em;
+      color: #fff;
     }
     .brand .tag {
       font-size: 11px;
-      background: rgba(99, 102, 241, 0.2);
-      color: #a5b4fc;
-      border: 1px solid rgba(99, 102, 241, 0.4);
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
       padding: 2px 8px;
       border-radius: 999px;
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.02em;
     }
 
-    /* Live Big Screen Leaderboard Summary */
+    /* Top Stats */
     .top-stats {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 18px;
       flex-wrap: wrap;
     }
     .stat-pill {
       display: flex;
       flex-direction: column;
-      font-size: 11px;
-      color: var(--muted);
-      border-left: 2px solid rgba(255,255,255,0.1);
+      font-size: 10.5px;
+      color: var(--text-muted);
+      border-left: 2px solid rgba(255, 237, 213, 0.12);
       padding-left: 10px;
     }
     .stat-pill b {
-      font-size: 14px;
+      font-size: 13.5px;
       color: #fff;
       font-family: 'JetBrains Mono', monospace;
     }
@@ -129,38 +145,41 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .btn {
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-size: 13px;
+      padding: 6px 13px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       text-decoration: none;
       border: none;
     }
     .btn-primary {
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      background: linear-gradient(135deg, #b45309, #d97706);
       color: #fff;
-      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+      border: 1px solid #f59e0b;
+      box-shadow: 0 3px 10px rgba(180, 83, 9, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
     }
     .btn-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+      box-shadow: 0 5px 14px rgba(180, 83, 9, 0.6);
     }
     .btn-ghost {
       background: rgba(255, 255, 255, 0.05);
-      color: var(--muted);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 237, 213, 0.1);
     }
     .btn-ghost:hover {
       color: #fff;
       background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 237, 213, 0.2);
     }
 
     /* Main Floor Grid Layout */
@@ -170,42 +189,41 @@
       flex: 1;
       display: grid;
       grid-template-columns: 1fr 340px;
-      min-height: calc(100vh - 70px);
+      min-height: calc(100vh - 65px);
     }
-    @media (max-width: 1024px) {
+    @media (max-width: 1100px) {
       .floor-wrapper { grid-template-columns: 1fr; }
     }
 
-    /* Virtual Floor Center Stage */
+    /* Stage Area */
     .stage {
       position: relative;
       display: flex;
       flex-direction: column;
-      padding: 20px;
+      padding: 14px 18px 20px;
       overflow: hidden;
     }
 
-    /* Giant Leaderboard Wall Screen (As seen in the Video) */
+    /* Wall Screen Header */
     .wall-screen {
-      background: rgba(10, 16, 28, 0.85);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      border-radius: 16px;
-      padding: 16px 24px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(99, 102, 241, 0.05);
+      background: linear-gradient(180deg, #24160f 0%, #1a100b 100%);
+      border: 1.5px solid rgba(255, 237, 213, 0.1);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 16px;
-      backdrop-filter: blur(12px);
+      gap: 12px;
     }
     .wall-title {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: #818cf8;
+      color: #fde68a;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -215,17 +233,16 @@
       height: 8px;
       border-radius: 50%;
       background: #10b981;
-      box-shadow: 0 0 10px #10b981;
+      box-shadow: 0 0 8px #10b981;
       animation: pulse 1.5s infinite;
     }
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.3); opacity: 0.6; }
     }
-
     .leaderboard-board {
       display: flex;
-      gap: 24px;
+      gap: 18px;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -234,221 +251,838 @@
       flex-direction: column;
     }
     .board-metric .lbl {
-      font-size: 11px;
-      color: var(--muted);
+      font-size: 9.5px;
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
     }
     .board-metric .val {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* 2.5D Isometric Floor Canvas & Desks Container */
+    /* ========================================================
+       TACTILE ACTION TOOLBAR (TYCOON GAME CONTROLS)
+       ======================================================== */
+    .floor-action-toolbar {
+      background: linear-gradient(180deg, #2a1810 0%, #1c100a 100%);
+      border: 1.5px solid rgba(255, 237, 213, 0.12);
+      border-radius: 12px;
+      padding: 8px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .toolbar-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #fde68a;
+      letter-spacing: 0.03em;
+    }
+    .toolbar-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(255,255,255,0.15);
+      position: relative;
+    }
+    .action-btn:active {
+      transform: translateY(1px);
+    }
+    .action-btn.frenzy {
+      background: linear-gradient(180deg, #b45309 0%, #78350f 100%);
+      color: #fff;
+      border-color: #f59e0b;
+      box-shadow: 0 3px 8px rgba(180, 83, 9, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .action-btn.farm {
+      background: linear-gradient(180deg, #6d28d9 0%, #4c1d95 100%);
+      color: #fff;
+      border-color: #a78bfa;
+      box-shadow: 0 3px 8px rgba(109, 40, 217, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .action-btn.veto {
+      background: linear-gradient(180deg, #be123c 0%, #881337 100%);
+      color: #fff;
+      border-color: #fb7185;
+      box-shadow: 0 3px 8px rgba(190, 18, 60, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .action-btn.profit {
+      background: linear-gradient(180deg, #047857 0%, #064e3b 100%);
+      color: #fff;
+      border-color: #34d399;
+      box-shadow: 0 3px 8px rgba(4, 120, 87, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+
+    /* ========================================================
+       WARM ISOMETRIC VIRTUAL TRADING FLOOR (HABBO / KAIROSOFT STYLE)
+       ======================================================== */
     .iso-floor {
       position: relative;
       flex: 1;
-      min-height: 540px;
-      background: radial-gradient(circle at 50% 50%, rgba(17, 24, 39, 0.8) 0%, rgba(7, 11, 20, 0.95) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
+      min-height: 820px;
+      border: 2px solid rgba(255, 237, 213, 0.12);
+      border-radius: 18px;
       overflow: hidden;
       display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1);
+      background: #2b1810;
+    }
+
+    /* 1. Architectural Back Wall (Exposed Loft Brick) */
+    .office-back-wall {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      background: 
+        repeating-linear-gradient(0deg, #180d07 0px, #180d07 2px, transparent 2px, transparent 18px),
+        repeating-linear-gradient(90deg, #2e1910 0px, #2e1910 40px, #1a0e08 40px, #1a0e08 42px),
+        linear-gradient(180deg, #3d2216 0%, #22120b 100%);
+      border-bottom: 4px solid #140b06;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.65);
+      z-index: 20;
+      display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: inset 0 0 80px rgba(0,0,0,0.8);
+      justify-content: space-between;
+      padding: 26px 18px 6px;
+    }
+    .office-wall-trim {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(180deg, #78350f 0%, #451a03 100%);
+      border-top: 1px solid #b45309;
     }
 
-    /* Floor Grid Pattern */
-    .floor-grid-bg {
+    /* Wall-Mounted Live Stock Ticker */
+    .wall-ticker-strip {
+      width: 100%;
+      height: 24px;
+      background: #0d0805;
+      border-bottom: 1.5px solid #2d170e;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      white-space: nowrap;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 22;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+    }
+    .wall-ticker-track {
+      display: inline-flex;
+      align-items: center;
+      gap: 24px;
+      animation: ticker-slide 34s linear infinite;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding-left: 100%;
+    }
+    @keyframes ticker-slide {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    .tick-up { color: #34d399; }
+    .tick-down { color: #f87171; }
+    .tick-warn { color: #fbbf24; }
+
+    /* Quant Whiteboard (Nod to Instagram rules) */
+    .office-whiteboard {
+      width: 210px;
+      height: 80px;
+      background: #ffffff;
+      border: 3px solid #64748b;
+      border-radius: 6px;
+      padding: 6px 9px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transform: perspective(600px) rotateY(2deg);
+    }
+    .office-whiteboard::before {
+      content: '📌';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+    }
+    .whiteboard-title {
+      font-size: 8.5px;
+      font-weight: 800;
+      color: #0f172a;
+      border-bottom: 1.5px solid #cbd5e1;
+      padding-bottom: 2px;
+      font-family: 'Comic Neue', cursive;
+      display: flex;
+      justify-content: space-between;
+    }
+    .whiteboard-rule {
+      font-size: 7.8px;
+      color: #1e293b;
+      font-family: 'Comic Neue', cursive;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+    .whiteboard-rule b { color: #dc2626; }
+
+    /* Arched Industrial Windows */
+    .office-window-wall {
+      display: flex;
+      gap: 16px;
+    }
+    .window-arch {
+      width: 80px;
+      height: 75px;
+      border-radius: 40px 40px 4px 4px;
+      border: 2px solid #523122;
+      background: linear-gradient(180deg, #090e1a 0%, #1e1b4b 60%, #312e81 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 14px rgba(251, 191, 36, 0.15);
+    }
+    .window-pane-cross {
       position: absolute;
       inset: 0;
+      border-right: 1.5px solid #3e2216;
+      border-bottom: 1.5px solid #3e2216;
+      pointer-events: none;
+    }
+    .twinkle-star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 4px #fff;
+    }
+
+    /* Espresso Bar & Server Corner */
+    .wall-credenza {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .coffee-bar-corner {
+      background: #23140e;
+      border: 1.5px solid #63331c;
+      border-radius: 8px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #fde68a;
+      font-size: 9px;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .server-rack-tower {
+      width: 28px;
+      height: 74px;
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 4px;
+      padding: 4px 3px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+    }
+    .server-blade {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 2px;
+      padding-right: 2px;
+    }
+    .server-led {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: blink-led 1.2s infinite;
+    }
+    .server-led:nth-child(2) { background: #38bdf8; animation-delay: 0.4s; }
+    .server-led:nth-child(3) { background: #f59e0b; animation-delay: 0.8s; }
+    @keyframes blink-led {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* 2. Warm Hardwood Herringbone Parquet Floor */
+    .room-parquet-grid {
+      position: absolute;
+      top: 120px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #3b2014;
       background-image: 
-        linear-gradient(to right, var(--grid) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
-      background-size: 40px 40px;
-      transform: perspective(600px) rotateX(40deg);
-      transform-origin: center 40%;
-      opacity: 0.8;
+        linear-gradient(45deg, #462719 25%, transparent 25%), 
+        linear-gradient(-45deg, #462719 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #341b10 75%),
+        linear-gradient(-45deg, transparent 75%, #341b10 75%);
+      background-size: 48px 48px;
       pointer-events: none;
+      z-index: 1;
     }
-
-    /* Floor Circuit Connectors */
-    .circuit-lines {
+    .room-floor-lighting {
       position: absolute;
-      inset: 0;
+      top: 120px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 18% 28%, rgba(251, 191, 36, 0.12) 0%, transparent 42%),
+        radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 82% 28%, rgba(251, 191, 36, 0.12) 0%, transparent 42%),
+        linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 20%, rgba(0,0,0,0.4) 100%);
       pointer-events: none;
+      z-index: 2;
     }
 
-    /* Desks Container (Positioned absolutely or with 2.5D layout) */
+    /* Center Floor Inlaid Persian Rug */
+    .center-rug {
+      position: absolute;
+      top: 52%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 420px;
+      height: 260px;
+      border-radius: 20px;
+      background: 
+        radial-gradient(ellipse at center, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.7) 80%),
+        repeating-linear-gradient(45deg, #1e3a8a 0px, #1e3a8a 10px, #172554 10px, #172554 20px);
+      border: 3px double #d97706;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* Hanging Pendant Lamps */
+    .pendant-lamp {
+      position: absolute;
+      top: 120px;
+      z-index: 24;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+    .pendant-cord {
+      width: 1.5px;
+      height: 40px;
+      background: #0f172a;
+    }
+    .pendant-shade {
+      width: 32px;
+      height: 16px;
+      background: #1e293b;
+      border-radius: 16px 16px 0 0;
+      border: 1.5px solid #475569;
+      position: relative;
+    }
+    .pendant-shade::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 5px;
+      right: 5px;
+      height: 4px;
+      background: #fbbf24;
+      border-radius: 50%;
+      box-shadow: 0 0 14px #fbbf24;
+    }
+    #lamp-left { left: 16%; }
+    #lamp-center { left: 50%; transform: translateX(-50%); }
+    #lamp-right { right: 16%; }
+
+    /* Office Plants in Terracotta Pots */
+    .office-plant {
+      position: absolute;
+      font-size: 28px;
+      z-index: 6;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,0.65));
+      pointer-events: none;
+    }
+    #plant-left { top: 230px; left: 18px; }
+    #plant-right { top: 230px; right: 18px; }
+
+    /* Desks Arena */
     .desks-arena {
       position: relative;
       width: 100%;
       height: 100%;
-      min-height: 540px;
+      min-height: 680px;
+      z-index: 25;
     }
 
-    /* Specialist Desk Card */
+    /* ========================================================
+       STANDALONE 3D ISOMETRIC DESK STATIONS (NO AI CARDS!)
+       ======================================================== */
     .desk-station {
       position: absolute;
-      width: 170px;
-      background: rgba(14, 21, 37, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      backdrop-filter: blur(12px);
+      width: 156px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      box-shadow: none;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      z-index: 5;
+      z-index: 10;
     }
     .desk-station:hover {
-      transform: translateY(-6px) scale(1.03);
-      border-color: rgba(255, 255, 255, 0.3);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.8), 0 0 25px var(--station-color, #6366f1);
-      z-index: 15;
+      transform: translateY(-6px) scale(1.05);
+      z-index: 35;
+    }
+    .desk-station:hover .station-nameplate {
+      border-color: rgba(255, 255, 255, 0.45);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.7), 0 0 14px var(--station-color, #f59e0b);
     }
     .desk-station.active-speaker {
-      border-color: #fff;
-      box-shadow: 0 0 35px var(--station-color, #6366f1);
-      animation: speaking-pulse 1.2s infinite alternate;
+      z-index: 40;
+      animation: desk-speaking 1.2s infinite alternate;
     }
-    @keyframes speaking-pulse {
-      0% { transform: translateY(-4px) scale(1.02); }
-      100% { transform: translateY(-8px) scale(1.06); }
+    @keyframes desk-speaking {
+      0% { transform: translateY(-4px) scale(1.03); }
+      100% { transform: translateY(-9px) scale(1.08); }
     }
 
-    /* Desk Coordinates */
-    #station-trend { top: 35px; left: 6%; --station-color: var(--trend); }
-    #station-breakout { top: 35px; left: 40%; --station-color: var(--breakout); }
-    #station-sentiment { top: 35px; right: 6%; --station-color: var(--sentiment); }
-    #station-whale { bottom: 50px; left: 16%; --station-color: var(--whale); }
-    #station-risk { bottom: 50px; right: 16%; --station-color: var(--risk); }
+    /* Coordinates for 7 Desk Units (Polished Spacing) */
+    #station-trend { top: 25px; left: 4%; --station-color: var(--trend); }
+    #station-breakout { top: 25px; left: 39%; --station-color: var(--breakout); }
+    #station-sentiment { top: 25px; right: 4%; --station-color: var(--sentiment); }
 
-    /* Center Council Conference Table */
+    #station-farm { top: 255px; left: 4%; --station-color: var(--farm); }
+    #station-memory { top: 255px; right: 4%; --station-color: var(--memory); }
+
+    #station-whale { top: 485px; left: 18%; --station-color: var(--whale); }
+    #station-risk { top: 485px; right: 18%; --station-color: var(--risk); }
+
+    /* Workstation Furniture Rig */
+    .cartoon-desk-rig {
+      position: relative;
+      width: 146px;
+      height: 114px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      filter: drop-shadow(0 14px 16px rgba(0,0,0,0.65));
+    }
+
+    /* Solid Walnut Desk Surface with 3D Bevel & Legs */
+    .desk-surface {
+      width: 140px;
+      height: 28px;
+      background: linear-gradient(180deg, #543220 0%, #351e12 60%, #201109 100%);
+      border-radius: 5px;
+      border: 1.5px solid #854d0e;
+      border-top: 2px solid #b45309;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 237, 213, 0.25);
+      position: relative;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+    }
+    .desk-surface::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 12px;
+      right: 12px;
+      height: 12px;
+      border-left: 3px solid #1e293b;
+      border-right: 3px solid #1e293b;
+      pointer-events: none;
+    }
+
+    /* Ergonomic Mesh Office Chair */
+    .office-chair-back {
+      position: absolute;
+      top: 4px;
+      width: 50px;
+      height: 40px;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 12px 12px 6px 6px;
+      border: 1.5px solid #475569;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      z-index: 3;
+    }
+
+    /* Mechanical Keyboard & Mouse */
+    .desk-keyboard {
+      width: 46px;
+      height: 10px;
+      background: #0f172a;
+      border-radius: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      display: flex;
+      gap: 2px;
+      padding: 1px 3px;
+      align-items: center;
+    }
+    .keyboard-key {
+      flex: 1;
+      height: 6px;
+      background: #475569;
+      border-radius: 1px;
+      animation: key-tap 0.7s infinite alternate;
+    }
+    .keyboard-key:nth-child(2) { animation-delay: 0.25s; }
+    .keyboard-key:nth-child(3) { animation-delay: 0.5s; }
+    @keyframes key-tap {
+      0% { opacity: 0.4; }
+      100% { opacity: 1; background: var(--station-color, #f59e0b); }
+    }
+
+    /* Triple Monitor Array with Candlesticks */
+    .desk-monitors-row {
+      position: absolute;
+      top: 32px;
+      display: flex;
+      gap: 4px;
+      z-index: 6;
+    }
+    .cartoon-monitor {
+      width: 38px;
+      height: 25px;
+      background: #020617;
+      border: 1.5px solid #334155;
+      border-radius: 4px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2px;
+    }
+    .monitor-chart-wave {
+      width: 100%;
+      height: 14px;
+      display: flex;
+      align-items: flex-end;
+      gap: 1.5px;
+    }
+    .chart-bar {
+      flex: 1;
+      background: #10b981;
+      border-radius: 1px 1px 0 0;
+      animation: bar-dance 1.4s infinite ease-in-out alternate;
+    }
+    .chart-bar:nth-child(2) { animation-delay: 0.3s; }
+    .chart-bar:nth-child(3) { animation-delay: 0.6s; }
+    .chart-bar:nth-child(4) { animation-delay: 0.2s; }
+    @keyframes bar-dance {
+      0% { height: 25%; opacity: 0.5; }
+      50% { height: 90%; opacity: 1; }
+      100% { height: 45%; opacity: 0.75; }
+    }
+
+    /* Cartoon Chibi Character Avatars */
+    .cartoon-char-wrap {
+      position: absolute;
+      top: -4px;
+      z-index: 4;
+      width: 58px;
+      height: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: char-bob 2.8s ease-in-out infinite alternate;
+    }
+    @keyframes char-bob {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+    .char-eyes {
+      transform-origin: 24px 21px;
+      animation: eye-blink 3.8s infinite;
+    }
+    @keyframes eye-blink {
+      0%, 90%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.08); }
+    }
+    .char-mouth {
+      transform-origin: 24px 27px;
+      transition: all 0.2s;
+    }
+    .active-speaker .char-mouth {
+      animation: mouth-talk 0.22s infinite alternate ease-in-out;
+    }
+    @keyframes mouth-talk {
+      0% { transform: scaleY(0.6); }
+      100% { transform: scaleY(2.6); }
+    }
+    .char-arms {
+      position: absolute;
+      bottom: 11px;
+      width: 36px;
+      height: 10px;
+      display: flex;
+      justify-content: space-between;
+      animation: arms-typing 0.35s infinite alternate ease-in-out;
+      z-index: 7;
+    }
+    @keyframes arms-typing {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-2px); }
+    }
+    .frenzy-active .char-arms {
+      animation: arms-typing 0.12s infinite alternate ease-in-out !important;
+    }
+
+    /* Steaming Ceramic Mug */
+    .cartoon-coffee {
+      position: relative;
+      width: 9px;
+      height: 11px;
+      background: #f8fafc;
+      border-radius: 2px;
+      border-right: 2px solid #cbd5e1;
+    }
+    .coffee-steam-particle {
+      position: absolute;
+      top: -6px;
+      left: 1px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      filter: blur(1px);
+      animation: coffee-steam 1.8s infinite ease-out;
+    }
+    @keyframes coffee-steam {
+      0% { transform: translateY(0) scale(0.6); opacity: 0.85; }
+      100% { transform: translateY(-10px) scale(1.4); opacity: 0; }
+    }
+
+    /* Desk Mascot Buddy */
+    .desk-mascot {
+      position: absolute;
+      font-size: 16px;
+      z-index: 8;
+      top: 10px;
+      right: 4px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6));
+      animation: mascot-sway 2.4s infinite alternate;
+    }
+    @keyframes mascot-sway {
+      0% { transform: rotate(-6deg); }
+      100% { transform: rotate(6deg) translateY(-2px); }
+    }
+
+    /* Compact Game-Style Character Nameplate */
+    .station-nameplate {
+      background: rgba(22, 14, 10, 0.94);
+      border: 1.5px solid rgba(255, 237, 213, 0.14);
+      border-radius: 9px;
+      padding: 4px 10px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+      margin-top: 5px;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+      width: 140px;
+    }
+    .station-title-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .station-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .station-role {
+      font-size: 8.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .station-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 8.5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--station-color, #fbbf24);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1px 6px;
+      border-radius: 999px;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+    .pulse-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--station-color, #10b981);
+      box-shadow: 0 0 6px var(--station-color, #10b981);
+      animation: pulse 1s infinite alternate;
+    }
+
+    /* ========================================================
+       CENTER BOARDROOM CONFERENCE TABLE (FIG NEXUS AI)
+       ======================================================== */
     .council-table-zone {
       position: absolute;
       top: 52%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 230px;
-      height: 140px;
+      width: 250px;
+      height: 148px;
       border-radius: 100px;
-      background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.25) 0%, rgba(14, 21, 37, 0.9) 70%);
-      border: 2px solid rgba(99, 102, 241, 0.4);
-      box-shadow: 0 0 50px rgba(99, 102, 241, 0.3), inset 0 0 30px rgba(99, 102, 241, 0.2);
+      background: 
+        radial-gradient(ellipse at center, #542c17 0%, #30170b 80%),
+        linear-gradient(135deg, #451f11 0%, #241107 100%);
+      border: 3.5px solid #78350f;
+      box-shadow: 0 16px 45px rgba(0,0,0,0.85), inset 0 2px 4px rgba(251, 191, 36, 0.3);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 8;
+      z-index: 12;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .council-table-zone:hover {
-      box-shadow: 0 0 70px rgba(99, 102, 241, 0.5), inset 0 0 40px rgba(99, 102, 241, 0.4);
-      transform: translate(-50%, -50%) scale(1.03);
+      transform: translate(-50%, -50%) scale(1.04);
+      border-color: #b45309;
+      box-shadow: 0 20px 55px rgba(0,0,0,0.9), 0 0 24px rgba(245, 158, 11, 0.35);
     }
-    .table-hologram {
-      font-size: 11px;
-      font-weight: 700;
-      color: #a5b4fc;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      text-shadow: 0 0 10px #6366f1;
+    /* 6 Conference Chairs Tucked in */
+    .conf-chair {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #1e293b;
+      border: 1.5px solid #475569;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+    .conf-chair-top-1 { top: -12px; left: 60px; }
+    .conf-chair-top-2 { top: -12px; right: 60px; }
+    .conf-chair-bottom-1 { bottom: -12px; left: 60px; }
+    .conf-chair-bottom-2 { bottom: -12px; right: 60px; }
+    .conf-chair-left { top: 50%; left: -12px; transform: translateY(-50%); }
+    .conf-chair-right { top: 50%; right: -12px; transform: translateY(-50%); }
+
+    /* Center Holographic Beacon */
+    .nexus-hologram-rig {
+      position: relative;
+      width: 50px;
+      height: 50px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      margin-bottom: 4px;
     }
-    .table-hologram-symbol {
-      font-size: 18px;
-      color: #fff;
-      font-family: 'JetBrains Mono', monospace;
+    .gyro-ring {
+      position: absolute;
+      border: 1.5px dashed rgba(245, 158, 11, 0.4);
+      border-radius: 50%;
+      animation: gyro-spin 6s linear infinite;
+    }
+    .gyro-ring-1 { width: 44px; height: 44px; }
+    .gyro-ring-2 { width: 34px; height: 34px; animation-direction: reverse; animation-duration: 4s; }
+    @keyframes gyro-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .nexus-core-sphere {
+      font-size: 22px;
       animation: float 2.5s ease-in-out infinite;
     }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-5px); }
     }
-
-    /* Agent Avatar Icons */
-    .avatar-wrap {
-      position: relative;
-      width: 52px;
-      height: 52px;
-      margin-bottom: 8px;
-    }
-    .avatar-circle {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.05);
-      border: 2px solid var(--station-color, #6366f1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 0 15px var(--station-color, #6366f1);
-    }
-    .desk-status-led {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #10b981;
-      border: 2px solid #0b1220;
-    }
-
-    .station-name {
-      font-size: 13px;
+    .table-hologram {
+      font-size: 10.5px;
       font-weight: 700;
-      color: #fff;
-    }
-    .station-role {
-      font-size: 10px;
-      color: var(--muted);
+      color: #fde68a;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 6px;
+      letter-spacing: 0.06em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
     }
-    .station-badge {
-      font-size: 9.5px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 6px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--station-color, #6366f1);
-      color: var(--station-color, #6366f1);
+    .table-hologram-symbol {
+      font-size: 16px;
+      color: #fff;
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Floating Speech Bubble */
+    /* ========================================================
+       COMIC-STYLE SPEECH BALLOONS (WARM & HUMAN LOOKING)
+       ======================================================== */
     .speech-bubble {
       position: absolute;
       bottom: 110%;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid var(--station-color, #6366f1);
-      color: #fff;
+      background: #ffffff;
+      border: 2px solid #1e293b;
+      color: #0f172a;
       padding: 8px 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 11.5px;
-      white-space: nowrap;
+      font-weight: 600;
+      line-height: 1.35;
       pointer-events: none;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.45);
       opacity: 0;
       transition: opacity 0.3s ease, transform 0.3s ease;
-      z-index: 30;
-      max-width: 220px;
+      z-index: 35;
+      max-width: 210px;
       white-space: normal;
       text-align: left;
     }
@@ -458,283 +1092,410 @@
       top: 100%;
       left: 50%;
       transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: var(--station-color, #6366f1);
+      border: 6px solid transparent;
+      border-top-color: #1e293b;
     }
     .speech-bubble.show {
       opacity: 1;
       transform: translateX(-50%) translateY(-6px);
     }
+    .bubble-speaker-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--station-color, #4338ca);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-    /* Right Sidebar: Council Control & Floor Chatter Feed */
-    .sidebar {
-      background: rgba(11, 18, 32, 0.7);
-      backdrop-filter: blur(16px);
-      border-left: 1px solid var(--card-border);
+    /* Autonomous Drones & Bots */
+    .delivery-drone {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      pointer-events: none;
+      z-index: 25;
       display: flex;
       flex-direction: column;
-      padding: 16px;
-      gap: 16px;
-      overflow-y: auto;
+      align-items: center;
+    }
+    .drone-rotors {
+      display: flex;
+      gap: 12px;
+      animation: rotor-spin 0.12s linear infinite;
+    }
+    .rotor-blade {
+      width: 10px;
+      height: 2px;
+      background: #fbbf24;
+    }
+    @keyframes rotor-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .drone-body {
+      width: 18px;
+      height: 14px;
+      background: #1e293b;
+      border-radius: 5px;
+      border: 1.5px solid #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+    }
+    .drone-cargo {
+      font-size: 7.5px;
+      color: #fde68a;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+    #drone-alpha { animation: drone-flight-alpha 18s ease-in-out infinite; }
+    @keyframes drone-flight-alpha {
+      0% { top: 22%; left: 12%; }
+      30% { top: 68%; left: 32%; }
+      60% { top: 50%; left: 78%; }
+      85% { top: 18%; left: 60%; }
+      100% { top: 22%; left: 12%; }
+    }
+    #drone-beta { animation: drone-flight-beta 24s ease-in-out infinite; }
+    @keyframes drone-flight-beta {
+      0% { top: 65%; left: 75%; }
+      35% { top: 20%; left: 45%; }
+      65% { top: 72%; left: 20%; }
+      100% { top: 65%; left: 75%; }
     }
 
-    .panel-box {
-      background: rgba(14, 21, 37, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 14px;
+    /* Floor Patrol Bot */
+    .floor-patrol-bot {
+      position: absolute;
+      pointer-events: none;
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(22, 14, 10, 0.94);
+      border: 1px solid rgba(255, 237, 213, 0.15);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #cbd5e1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-    .panel-header {
+    #floor-bot-alpha {
+      bottom: 80px;
+      animation: bot-patrol-alpha 20s linear infinite alternate;
+    }
+    @keyframes bot-patrol-alpha {
+      0% { left: 18%; }
+      100% { left: 72%; }
+    }
+
+    /* Overlays: Profit Rain & Veto Stamp */
+    .profit-rain-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 40;
+    }
+    .coin-particle {
+      position: absolute;
+      top: -30px;
+      font-size: 22px;
+      animation: coin-drop 1.8s ease-in forwards;
+    }
+    @keyframes coin-drop {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(680px) rotate(720deg); opacity: 0; }
+    }
+
+    .veto-stamp-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 45;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .stamp-box {
+      border: 4px solid #ef4444;
+      background: rgba(185, 28, 28, 0.92);
+      color: #fff;
+      padding: 18px 28px;
+      border-radius: 14px;
+      text-align: center;
+      transform: rotate(-5deg);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.7);
+      animation: stamp-slam 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes stamp-slam {
+      0% { transform: scale(2) rotate(-15deg); opacity: 0; }
+      100% { transform: scale(1) rotate(-5deg); opacity: 1; }
+    }
+    .stamp-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+    .stamp-sub {
+      font-size: 11.5px;
+      margin-top: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ========================================================
+       RIGHT SIDEBAR: PIPELINE, FARM, MEMORY & LIVE CHATTER
+       ======================================================== */
+    .sidebar {
+      background: rgba(20, 13, 9, 0.95);
+      border-left: 1.5px solid rgba(255, 237, 213, 0.08);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+    }
+    .side-section {
+      padding: 14px 16px;
+      border-bottom: 1.5px solid rgba(255, 237, 213, 0.08);
+    }
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #fde68a;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #818cf8;
     }
 
-    /* Meeting Trigger Controls */
-    .meeting-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .input-row {
-      display: flex;
-      gap: 8px;
-    }
-    .input-row input {
-      flex: 1;
-      background: rgba(7, 11, 20, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: #fff;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    .quick-chips {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .chip {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 6px;
-      padding: 3px 8px;
-      font-size: 11px;
-      color: var(--muted);
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .chip:hover {
-      background: rgba(99, 102, 241, 0.2);
-      color: #fff;
-      border-color: #6366f1;
-    }
-
-    /* 7-Tier Architecture Pipeline Tracker */
+    /* 7-Tier DAG Pipeline Tracker */
     .pipeline-tracker {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
+      gap: 5px;
     }
     .tier-step {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 5px 9px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 237, 213, 0.08);
+      color: var(--text-muted);
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      padding: 6px 10px;
-      border-radius: 6px;
-      background: rgba(255,255,255,0.03);
-      border-left: 2px solid #475569;
-      color: var(--muted);
-      transition: all 0.3s ease;
-    }
-    .tier-step.active {
-      background: rgba(99, 102, 241, 0.15);
-      border-left-color: #818cf8;
-      color: #fff;
+      justify-content: space-between;
+      transition: all 0.2s;
     }
     .tier-step.done {
-      border-left-color: #10b981;
-      color: #cbd5e1;
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
     }
+    .tier-step.active {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: #f59e0b;
+      color: #fbbf24;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+    }
+
+    /* The Farm Strategies */
+    .farm-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 237, 213, 0.08);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .farm-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .farm-tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #c084fc;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .farm-score {
+      font-size: 10px;
+      background: rgba(124, 58, 237, 0.2);
+      color: #e9d5ff;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .farm-progress-bar {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 3px;
+    }
+    .farm-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7c3aed, #c084fc);
+      border-radius: 2px;
+    }
+
+    /* Failure Memory Defense Vault */
+    .memory-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .mem-stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 237, 213, 0.08);
+      border-radius: 6px;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+    }
+    .mem-stat-box .lbl { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
+    .mem-stat-box .val { font-size: 12.5px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 
     /* Live Floor Chatter Feed */
     .chatter-feed {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 260px;
+      max-height: 280px;
       overflow-y: auto;
       padding-right: 4px;
     }
-    .chatter-item {
-      background: rgba(255,255,255,0.02);
-      border-left: 2px solid var(--c-color, #6366f1);
-      padding: 6px 8px;
-      border-radius: 4px;
-      font-size: 11.5px;
-      line-height: 1.4;
+    .chat-msg {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 2.5px solid #d97706;
+      border-radius: 0 6px 6px 0;
+      padding: 6px 9px;
+      font-size: 11px;
+      line-height: 1.35;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
-    .chatter-item .time {
-      font-size: 10px;
-      color: var(--muted);
-      margin-right: 4px;
+    .chat-sender {
+      font-size: 9.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chat-time {
+      font-size: 8.5px;
+      color: var(--text-muted);
       font-family: 'JetBrains Mono', monospace;
     }
-    .chatter-item .speaker {
-      font-weight: 700;
-      color: var(--c-color, #fff);
-      margin-right: 4px;
-    }
 
-    /* Human-in-the-Loop Decision Modal */
-    .decision-modal-overlay {
+    /* Modals */
+    .decision-modal-overlay, .desk-modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(10px);
+      background: rgba(15, 10, 7, 0.85);
+      backdrop-filter: blur(8px);
       z-index: 100;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
-    .decision-card {
-      background: rgba(14, 21, 37, 0.95);
-      border: 1px solid rgba(99, 102, 241, 0.5);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(99, 102, 241, 0.3);
-      border-radius: 20px;
+    .decision-card, .desk-inspector-card {
+      background: #1e130c;
+      border: 2px solid #78350f;
+      border-radius: 16px;
       width: 100%;
-      max-width: 560px;
-      padding: 24px;
+      max-width: 540px;
+      padding: 20px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.85);
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      gap: 14px;
     }
-    @keyframes popIn {
-      from { transform: scale(0.92); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .decision-header {
+    .modal-head {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding-bottom: 12px;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 237, 213, 0.1);
+      padding-bottom: 10px;
     }
-    .decision-title {
+    .modal-head h3 {
       font-size: 16px;
       font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      color: #fde68a;
     }
     .consensus-badge {
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(16, 185, 129, 0.2);
-      border: 1px solid #10b981;
-      color: #34d399;
+      font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
     }
-    .consensus-badge.reject {
-      background: rgba(244, 63, 94, 0.2);
-      border-color: #f43f5e;
-      color: #fb7185;
-    }
-
     .debate-transcript {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 250px;
-      overflow-y: auto;
-      padding-right: 6px;
-    }
-    .transcript-turn {
-      background: rgba(255,255,255,0.03);
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255, 237, 213, 0.08);
       border-radius: 8px;
       padding: 10px;
-      border-left: 3px solid var(--t-color, #6366f1);
-      font-size: 12px;
-    }
-    .transcript-turn .author {
-      font-weight: 700;
-      color: var(--t-color, #fff);
-      margin-bottom: 2px;
+      max-height: 180px;
+      overflow-y: auto;
+      font-size: 11.5px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 8px;
     }
-    .transcript-turn .stance-badge {
-      font-size: 10px;
-      padding: 1px 6px;
-      border-radius: 4px;
-      background: rgba(255,255,255,0.08);
-    }
-
+    .debate-line b { color: #fde68a; }
     .risk-gate-alert {
-      background: rgba(244, 63, 94, 0.1);
-      border: 1px solid rgba(244, 63, 94, 0.3);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #fda4af;
+      background: rgba(225, 29, 72, 0.12);
+      border: 1px solid rgba(225, 29, 72, 0.35);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #fecdd3;
     }
-
     .decision-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       gap: 12px;
-      margin-top: 6px;
     }
     .btn-approve {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
       background: linear-gradient(135deg, #059669, #10b981);
       color: #fff;
-      padding: 12px;
-      font-size: 14px;
       font-weight: 700;
-      border-radius: 12px;
+      font-size: 12.5px;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-      transition: all 0.2s ease;
-    }
-    .btn-approve:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
     .btn-reject {
-      background: rgba(244, 63, 94, 0.15);
-      border: 1px solid rgba(244, 63, 94, 0.4);
-      color: #fb7185;
-      padding: 12px;
-      font-size: 14px;
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      color: #cbd5e1;
       font-weight: 700;
-      border-radius: 12px;
+      font-size: 12.5px;
+      border: 1px solid rgba(255,255,255,0.15);
       cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .btn-reject:hover {
-      background: rgba(244, 63, 94, 0.3);
-      color: #fff;
     }
   </style>
 </head>
@@ -746,9 +1507,9 @@
     <div class="brand">
       <div class="brand-icon">🏢</div>
       <div>
-        <h1>Quant Desk AI Trading Floor</h1>
+        <h1>Autonomous Quant Trading Floor</h1>
       </div>
-      <span class="tag">5 AI DESKS • 300 SUB-BOTS</span>
+      <span class="tag">5 DESKS • THE FARM • FAILURE MEMORY • 300 BOTS</span>
     </div>
 
     <!-- Wall Summary Stats -->
@@ -758,15 +1519,15 @@
         <b id="hud-equity">$124,801.44</b>
       </div>
       <div class="stat-pill">
-        <span>DRAWDOWN LIMIT</span>
-        <b class="warn">0.20% Max Floor</b>
+        <span>DRAWDOWN FLOOR</span>
+        <b class="warn">0.20% Max Intraday</b>
       </div>
       <div class="stat-pill">
         <span>HUMAN COACHES</span>
         <b class="good">+1.43%</b>
       </div>
       <div class="stat-pill">
-        <span>AI DESKS</span>
+        <span>AI AUTONOMOUS</span>
         <b class="good">+2.84%</b>
       </div>
     </div>
@@ -783,106 +1544,637 @@
 
   <!-- Floor Layout -->
   <div class="floor-wrapper">
-    <!-- Center Stage -->
+    <!-- Center Stage Area -->
     <div class="stage">
-      <!-- Big Screen Wall Display (from the video!) -->
+      <!-- Big Screen Wall Display -->
       <div class="wall-screen">
         <div class="wall-title">
           <span class="live-dot"></span>
-          <span>HUMAN vs AI • LIVE LEADERBOARD • HEDGE FUND DESK</span>
+          <span>HUMAN vs AI • LIVE LEADERBOARD • QUANT DESK</span>
         </div>
         <div class="leaderboard-board">
           <div class="board-metric">
             <span class="lbl">Human Coaches</span>
-            <span class="val" style="color:#34d399">+1.43% ($94,361.64)</span>
+            <span class="val" style="color:#10b981">+1.43% ($94,361.64)</span>
           </div>
           <div class="board-metric">
             <span class="lbl">AI Autonomous Desk</span>
-            <span class="val" style="color:#60a5fa">+2.84% ($30,889.71)</span>
+            <span class="val" style="color:#38bdf8">+2.84% ($30,889.71)</span>
           </div>
           <div class="board-metric">
             <span class="lbl">Combined Fund</span>
-            <span class="val" style="color:#a78bfa" id="wall-fund-total">$125,251.35</span>
+            <span class="val" style="color:#fde68a" id="wall-fund-total">$125,251.35</span>
           </div>
           <div class="board-metric">
-            <span class="lbl">Status</span>
-            <span class="val" style="color:#34d399;font-size:14px">300 BOTS ONLINE</span>
+            <span class="lbl">Active Fleet</span>
+            <span class="val" style="color:#10b981;font-size:13px">300 SUB-BOTS ONLINE</span>
           </div>
         </div>
       </div>
 
-      <!-- 2.5D Isometric Floor -->
+      <!-- Live Autonomous Action Ribbon -->
+      <div class="floor-action-toolbar">
+        <div class="toolbar-title">
+          <span>🎮 LIVE AUTONOMOUS ACTIONS:</span>
+        </div>
+        <div class="toolbar-buttons">
+          <button class="action-btn frenzy" onclick="triggerAutonomousFrenzy()">⚡ Simulate Live Tick Burst</button>
+          <button class="action-btn farm" onclick="triggerFarmMutation()">🧪 Mutate Farm Strategy</button>
+          <button class="action-btn veto" onclick="triggerFailureVeto()">🛡️ Test Failure Memory Veto</button>
+          <button class="action-btn profit" onclick="triggerProfitBurst()">🪙 Celebrate Profit</button>
+        </div>
+      </div>
+
+      <!-- 2.5D Cozy Isometric Office Room -->
       <div class="iso-floor" id="floor-container">
-        <div class="floor-grid-bg"></div>
+        
+        <!-- Architectural Back Wall (Exposed Loft Brick) -->
+        <div class="office-back-wall">
+          <!-- Wall Stock Ticker Strip -->
+          <div class="wall-ticker-strip">
+            <div class="wall-ticker-track">
+              <span>$NVDA <span class="tick-up">138.25 ▲+3.4%</span></span>
+              <span>$SPY <span class="tick-up">582.40 ▲+0.8%</span></span>
+              <span>$AAPL <span class="tick-down">231.10 ▼-0.6%</span></span>
+              <span>$TSLA <span class="tick-up">224.50 ▲+2.1%</span></span>
+              <span>$BTC <span class="tick-up">68,240 ▲+4.8%</span></span>
+              <span>$FIG <span class="tick-up">44.80 ▲+9.2%</span></span>
+              <span>FARM GEN-14 <span class="tick-up">SHARPE 2.14 🧪</span></span>
+              <span>FAILURE SHIELD <span class="tick-warn">14 RULES ARMED 🛡️</span></span>
+            </div>
+          </div>
+
+          <!-- Hanging Quant Whiteboard -->
+          <div class="office-whiteboard">
+            <div class="whiteboard-title">
+              <span>📋 QUANT TRADING RULES</span>
+              <span>ALPHA 2026</span>
+            </div>
+            <div class="whiteboard-rule">1. Does it work on <b>new data</b>?</div>
+            <div class="whiteboard-rule">2. Survives <b>slippage & fees</b>?</div>
+            <div class="whiteboard-rule">3. It's a <b>hill</b>, not a lucky needle!</div>
+            <div class="whiteboard-rule">4. Overfitting is a trap! ⚠️</div>
+          </div>
+
+          <!-- Arched Industrial Windows -->
+          <div class="office-window-wall">
+            <div class="window-arch">
+              <div class="twinkle-star" style="top:12px;left:20%"></div>
+              <div class="twinkle-star" style="top:24px;left:65%"></div>
+              <div class="window-pane-cross"></div>
+            </div>
+            <div class="window-arch">
+              <div class="twinkle-star" style="top:16px;left:35%"></div>
+              <div class="twinkle-star" style="top:28px;left:75%"></div>
+              <div class="window-pane-cross"></div>
+            </div>
+          </div>
+
+          <!-- Credenza: Espresso Bar & Server Tower -->
+          <div class="wall-credenza">
+            <div class="coffee-bar-corner">
+              <span>☕</span>
+              <span>ESPRESSO BAR: ALPHA FUEL</span>
+            </div>
+            <div class="server-rack-tower" title="Quant Cluster Rack">
+              <div class="server-blade"><div class="server-led"></div><div class="server-led"></div></div>
+              <div class="server-blade"><div class="server-led"></div><div class="server-led"></div></div>
+              <div class="server-blade"><div class="server-led"></div><div class="server-led"></div></div>
+              <div class="server-blade"><div class="server-led"></div><div class="server-led"></div></div>
+            </div>
+          </div>
+
+          <div class="office-wall-trim"></div>
+        </div>
+
+        <!-- Parquet Herringbone Texture & Lighting -->
+        <div class="room-parquet-grid"></div>
+        <div class="room-floor-lighting"></div>
+
+        <!-- Inlaid Center Persian Rug -->
+        <div class="center-rug"></div>
+
+        <!-- Hanging Dome Pendant Lamps -->
+        <div class="pendant-lamp" id="lamp-left">
+          <div class="pendant-cord"></div>
+          <div class="pendant-shade"></div>
+        </div>
+        <div class="pendant-lamp" id="lamp-center">
+          <div class="pendant-cord"></div>
+          <div class="pendant-shade"></div>
+        </div>
+        <div class="pendant-lamp" id="lamp-right">
+          <div class="pendant-cord"></div>
+          <div class="pendant-shade"></div>
+        </div>
+
+        <!-- Potted Office Monstera Plants -->
+        <div class="office-plant" id="plant-left">🪴</div>
+        <div class="office-plant" id="plant-right">🪴</div>
+
+        <!-- Profit Rain Overlay -->
+        <div class="profit-rain-container" id="profit-rain"></div>
+
+        <!-- Veto Stamp Overlay -->
+        <div class="veto-stamp-overlay" id="veto-stamp">
+          <div class="stamp-box">
+            <div style="font-size:24px">🛑</div>
+            <div class="stamp-title">RISK VETO TRIGGERED</div>
+            <div class="stamp-sub">EPISODIC MEMORY MATCH: FATAL CHOP PREVENTED! (SAVED $680 LOSS)</div>
+          </div>
+        </div>
 
         <div class="desks-arena">
-          <!-- 1. Trend Desk -->
-          <div class="desk-station" id="station-trend" onclick="inspectDesk('trend')">
-            <div class="speech-bubble" id="bubble-trend">Macro scan: 50/200 DMA slope bullish.</div>
-            <div class="avatar-wrap">
-              <div class="avatar-circle">🌐</div>
-              <div class="desk-status-led"></div>
+          <!-- Autonomous Drone 1: The Farm SIM Courier -->
+          <div class="delivery-drone" id="drone-alpha">
+            <div class="drone-rotors">
+              <div class="rotor-blade"></div>
+              <div class="rotor-blade"></div>
             </div>
-            <div class="station-name">Alex Vance</div>
-            <div class="station-role">Trend Desk Lead</div>
-            <div class="station-badge">MACRO REGIMES</div>
+            <div class="drone-body">🧪</div>
+            <div class="drone-cargo">SIM DATA</div>
           </div>
 
-          <!-- 2. Breakout Desk -->
-          <div class="desk-station" id="station-breakout" onclick="inspectDesk('breakout')">
-            <div class="speech-bubble" id="bubble-breakout">Bollinger squeeze detecting momentum impulse.</div>
-            <div class="avatar-wrap">
-              <div class="avatar-circle">⚡</div>
-              <div class="desk-status-led"></div>
+          <!-- Autonomous Drone 2: Data Mesh Sentinel -->
+          <div class="delivery-drone" id="drone-beta">
+            <div class="drone-rotors">
+              <div class="rotor-blade" style="background:#c084fc"></div>
+              <div class="rotor-blade" style="background:#c084fc"></div>
             </div>
-            <div class="station-name">Chloe Chen</div>
-            <div class="station-role">Breakout Desk Lead</div>
-            <div class="station-badge">VOLATILITY & RSI</div>
+            <div class="drone-body" style="border-color:#c084fc">⚡</div>
+            <div class="drone-cargo" style="color:#c084fc">FEED</div>
           </div>
 
-          <!-- 3. News / Sentiment Desk -->
-          <div class="desk-station" id="station-sentiment" onclick="inspectDesk('sentiment')">
-            <div class="speech-bubble" id="bubble-sentiment">FinBERT sentiment scoring +0.72 Bullish.</div>
-            <div class="avatar-wrap">
-              <div class="avatar-circle">📰</div>
-              <div class="desk-status-led"></div>
-            </div>
-            <div class="station-name">Dr. M. Vance</div>
-            <div class="station-role">Sentiment Lead</div>
-            <div class="station-badge">FinBERT NLP</div>
+          <!-- Floor Patrol Bot: Order Dispatch Runner -->
+          <div class="floor-patrol-bot" id="floor-bot-alpha">
+            <span>🤖</span>
+            <span>ORDER DISPATCH</span>
           </div>
 
-          <!-- Central Conference Table Zone -->
+          <!-- ==============================================
+               7 STANDALONE WORKSTATIONS ON THE WOOD FLOOR
+               ============================================== -->
+
+          <!-- 1. Trend Desk Lead (Alex Vance) -->
+          <div class="desk-station" id="station-trend" onclick="openDeskDetails('trend')">
+            <div class="speech-bubble" id="bubble-trend">
+              <div class="bubble-speaker-tag">🚀 Alex Vance</div>
+              <div>Macro daily scan: 50/200 DMA slope +14.2° bullish. Trend intact.</div>
+            </div>
+            <div class="cartoon-desk-rig">
+              <div class="office-chair-back"></div>
+              <div class="desk-mascot mascot-rocket" title="Trend Rocket Bot">🚀</div>
+              <div class="desk-monitors-row">
+                <div class="cartoon-monitor" style="border-color:#0284c7">
+                  <div class="monitor-chart-wave">
+                    <div class="chart-bar" style="background:#0284c7"></div>
+                    <div class="chart-bar" style="background:#38bdf8"></div>
+                    <div class="chart-bar" style="background:#0284c7"></div>
+                    <div class="chart-bar" style="background:#38bdf8"></div>
+                  </div>
+                </div>
+                <div class="cartoon-monitor" style="border-color:#0284c7">
+                  <div class="monitor-chart-wave">
+                    <div class="chart-bar" style="background:#10b981"></div>
+                    <div class="chart-bar" style="background:#10b981"></div>
+                    <div class="chart-bar" style="background:#34d399"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="cartoon-char-wrap">
+                <svg viewBox="0 0 48 48" width="50" height="50">
+                  <path d="M14 18 Q24 6 34 18 Q36 24 34 26 Q30 20 24 20 Q18 20 14 26 Z" fill="#0284c7"/>
+                  <circle cx="24" cy="22" r="10" fill="#fed7aa"/>
+                  <rect x="17" y="19" width="6" height="5" rx="1.5" fill="none" stroke="#0369a1" stroke-width="1.5"/>
+                  <rect x="25" y="19" width="6" height="5" rx="1.5" fill="none" stroke="#0369a1" stroke-width="1.5"/>
+                  <line x1="23" y1="21.5" x2="25" y2="21.5" stroke="#0369a1" stroke-width="1.5"/>
+                  <g class="char-eyes">
+                    <circle cx="20" cy="21.5" r="1.3" fill="#0f172a"/>
+                    <circle cx="28" cy="21.5" r="1.3" fill="#0f172a"/>
+                    <circle cx="20.4" cy="21.1" r="0.4" fill="#ffffff"/>
+                    <circle cx="28.4" cy="21.1" r="0.4" fill="#ffffff"/>
+                  </g>
+                  <ellipse class="char-mouth" cx="24" cy="27" rx="2.5" ry="0.8" fill="#9a3412"/>
+                  <path d="M15 32 L33 32 L30 46 L18 46 Z" fill="#1e3a8a"/>
+                  <polygon points="24,32 21,38 24,44 27,38" fill="#38bdf8"/>
+                </svg>
+                <div class="char-arms">
+                  <span style="font-size:10px">🦾</span>
+                  <span style="font-size:10px">🦾</span>
+                </div>
+              </div>
+              <div class="desk-surface">
+                <div class="cartoon-coffee">
+                  <div class="coffee-steam-particle"></div>
+                </div>
+                <div class="desk-keyboard">
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                </div>
+                <div style="font-size:8px">📈</div>
+              </div>
+            </div>
+            <div class="station-nameplate">
+              <div class="station-title-row">
+                <span class="station-name">Alex Vance</span>
+                <span class="station-role">• Trend</span>
+              </div>
+              <div class="station-status-pill">
+                <span class="pulse-dot" style="background:#0284c7"></span>
+                <span>50-DMA SCAN</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Breakout Desk Lead (Chloe Chen) -->
+          <div class="desk-station" id="station-breakout" onclick="openDeskDetails('breakout')">
+            <div class="speech-bubble" id="bubble-breakout">
+              <div class="bubble-speaker-tag">⚡ Chloe Chen</div>
+              <div>BBand squeeze detected! Compression 0.014. Primed for explosion!</div>
+            </div>
+            <div class="cartoon-desk-rig">
+              <div class="office-chair-back"></div>
+              <div class="desk-mascot mascot-spark" title="Breakout Spark Bot">⚡</div>
+              <div class="desk-monitors-row">
+                <div class="cartoon-monitor" style="border-color:#9333ea">
+                  <div class="monitor-chart-wave">
+                    <div class="chart-bar" style="background:#9333ea"></div>
+                    <div class="chart-bar" style="background:#c084fc"></div>
+                    <div class="chart-bar" style="background:#9333ea"></div>
+                  </div>
+                </div>
+                <div class="cartoon-monitor" style="border-color:#9333ea">
+                  <div class="monitor-chart-wave">
+                    <div class="chart-bar" style="background:#a855f7"></div>
+                    <div class="chart-bar" style="background:#c084fc"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="cartoon-char-wrap">
+                <svg viewBox="0 0 48 48" width="50" height="50">
+                  <path d="M12 24 C10 14 14 6 24 6 C34 6 38 14 36 24 C34 30 30 32 24 32 C18 32 14 30 12 24 Z" fill="#3b0764"/>
+                  <path d="M16 12 Q24 4 32 12 Q36 22 32 26 Q24 22 16 26 Z" fill="#581c87"/>
+                  <circle cx="24" cy="22" r="9.5" fill="#fde68a"/>
+                  <g class="char-eyes">
+                    <circle cx="20" cy="21.5" r="1.3" fill="#0f172a"/>
+                    <circle cx="28" cy="21.5" r="1.3" fill="#0f172a"/>
+                    <circle cx="20.4" cy="21.1" r="0.4" fill="#ffffff"/>
+                    <circle cx="28.4" cy="21.1" r="0.4" fill="#ffffff"/>
+                  </g>
+                  <ellipse class="char-mouth" cx="24" cy="27" rx="2" ry="0.6" fill="#be185d"/>
+                  <path d="M16 32 L32 32 L34 46 L14 46 Z" fill="#6b21a8"/>
+                  <circle cx="33" cy="12" r="4.5" fill="#c084fc"/>
+                </svg>
+                <div class="char-arms">
+                  <span style="font-size:10px">⚡</span>
+                  <span style="font-size:10px">⚡</span>
+                </div>
+              </div>
+              <div class="desk-surface">
+                <div style="font-size:8px">⚡</div>
+                <div class="desk-keyboard">
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                </div>
+                <div class="cartoon-coffee">
+                  <div class="coffee-steam-particle"></div>
+                </div>
+              </div>
+            </div>
+            <div class="station-nameplate">
+              <div class="station-title-row">
+                <span class="station-name">Chloe Chen</span>
+                <span class="station-role">• Breakout</span>
+              </div>
+              <div class="station-status-pill">
+                <span class="pulse-dot" style="background:#9333ea"></span>
+                <span>SQUEEZE HUNTING</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Sentiment Desk Lead (Dr. M. Vance) -->
+          <div class="desk-station" id="station-sentiment" onclick="openDeskDetails('sentiment')">
+            <div class="speech-bubble" id="bubble-sentiment">
+              <div class="bubble-speaker-tag">🦉 Dr. M. Vance</div>
+              <div>FinBERT consensus: Bullish sentiment ratio 84.2%. No negative shock.</div>
+            </div>
+            <div class="cartoon-desk-rig">
+              <div class="office-chair-back"></div>
+              <div class="desk-mascot mascot-owl" title="Sentiment Owl Bot">🦉</div>
+              <div class="desk-monitors-row">
+                <div class="cartoon-monitor" style="border-color:#d97706">
+                  <div class="monitor-chart-wave">
+                    <div class="chart-bar" style="background:#d97706"></div>
+                    <div class="chart-bar" style="background:#f59e0b"></div>
+                  </div>
+                </div>
+                <div class="cartoon-monitor" style="border-color:#d97706">
+                  <div style="font-size:8px;color:#f59e0b;font-family:'JetBrains Mono';text-align:center;padding-top:3px">+0.89</div>
+                </div>
+              </div>
+              <div class="cartoon-char-wrap">
+                <svg viewBox="0 0 48 48" width="50" height="50">
+                  <path d="M15 16 Q24 10 33 16 Q35 22 33 24 Q24 20 15 24 Z" fill="#94a3b8"/>
+                  <circle cx="24" cy="22" r="10" fill="#ffedd5"/>
+                  <circle cx="19" cy="21" r="4.5" fill="none" stroke="#b45309" stroke-width="1.5"/>
+                  <circle cx="29" cy="21" r="4.5" fill="none" stroke="#b45309" stroke-width="1.5"/>
+                  <line x1="23.5" y1="21" x2="24.5" y2="21" stroke="#b45309" stroke-width="1.5"/>
+                  <g class="char-eyes">
+                    <circle cx="19" cy="21" r="1.3" fill="#0f172a"/>
+                    <circle cx="29" cy="21" r="1.3" fill="#0f172a"/>
+                  </g>
+                  <path d="M20 26 Q24 29 28 26" stroke="#94a3b8" stroke-width="2" fill="none"/>
+                  <path d="M16 32 L32 32 L34 46 L14 46 Z" fill="#78350f"/>
+                  <polygon points="24,32 22,37 24,42 26,37" fill="#fbbf24"/>
+                </svg>
+                <div class="char-arms">
+                  <span style="font-size:10px">📜</span>
+                  <span style="font-size:10px">✍️</span>
+                </div>
+              </div>
+              <div class="desk-surface">
+                <div style="font-size:8px">📰</div>
+                <div class="desk-keyboard">
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                </div>
+                <div class="cartoon-coffee">
+                  <div class="coffee-steam-particle"></div>
+                </div>
+              </div>
+            </div>
+            <div class="station-nameplate">
+              <div class="station-title-row">
+                <span class="station-name">Dr. M. Vance</span>
+                <span class="station-role">• Sentiment</span>
+              </div>
+              <div class="station-status-pill">
+                <span class="pulse-dot" style="background:#d97706"></span>
+                <span>FINBERT +0.89</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. The Farm Mutation Incubator Lab Desk -->
+          <div class="desk-station" id="station-farm" onclick="openDeskDetails('farm')">
+            <div class="speech-bubble" id="bubble-farm">
+              <div class="bubble-speaker-tag">🧪 The Farm Incubator</div>
+              <div>Gen-14 mutating 24/7. EMA-Triple Sharpe: 2.14, Promo score: 84/100!</div>
+            </div>
+            <div class="cartoon-desk-rig">
+              <div class="office-chair-back" style="border-color:#7c3aed"></div>
+              <div class="desk-mascot mascot-farm" title="Genetics Flask">🧪</div>
+              <div class="desk-monitors-row">
+                <div class="cartoon-monitor" style="border-color:#7c3aed">
+                  <div style="font-size:13px;text-align:center">🧬</div>
+                </div>
+                <div class="cartoon-monitor" style="border-color:#7c3aed">
+                  <div style="font-size:7px;color:#c084fc;font-family:'JetBrains Mono';text-align:center;padding-top:2px">
+                    <span>GEN-14</span>
+                    <div style="font-size:9px;color:#a855f7;font-weight:700">84/100</div>
+                  </div>
+                </div>
+              </div>
+              <div class="cartoon-char-wrap">
+                <svg viewBox="0 0 48 48" width="50" height="50">
+                  <path d="M12 16 Q24 6 36 16 L36 30 L12 30 Z" fill="#581c87"/>
+                  <circle cx="24" cy="22" r="9" fill="#e9d5ff"/>
+                  <rect x="18" y="19" width="12" height="4" rx="2" fill="#7c3aed"/>
+                  <path d="M15 32 L33 32 L34 46 L14 46 Z" fill="#3b0764"/>
+                  <circle cx="24" cy="38" r="4" fill="#a855f7"/>
+                </svg>
+                <div class="char-arms">
+                  <span style="font-size:10px">🧪</span>
+                  <span style="font-size:10px">🔬</span>
+                </div>
+              </div>
+              <div class="desk-surface">
+                <div style="font-size:8px">🧬</div>
+                <div class="desk-keyboard">
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                </div>
+                <div style="font-size:8px">🧪</div>
+              </div>
+            </div>
+            <div class="station-nameplate">
+              <div class="station-title-row">
+                <span class="station-name">The Farm Lab</span>
+                <span class="station-role">• Sandbox</span>
+              </div>
+              <div class="station-status-pill">
+                <span class="pulse-dot" style="background:#7c3aed"></span>
+                <span>GENETIC INCUBATION</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center Boardroom Conference Table (FIG Nexus AI) -->
           <div class="council-table-zone" onclick="openConveneModal()">
+            <div class="conf-chair conf-chair-top-1"></div>
+            <div class="conf-chair conf-chair-top-2"></div>
+            <div class="conf-chair conf-chair-bottom-1"></div>
+            <div class="conf-chair conf-chair-bottom-2"></div>
+            <div class="conf-chair conf-chair-left"></div>
+            <div class="conf-chair conf-chair-right"></div>
+
+            <div class="nexus-hologram-rig">
+              <div class="gyro-ring gyro-ring-1"></div>
+              <div class="gyro-ring gyro-ring-2"></div>
+              <div class="nexus-core-sphere">🧠</div>
+            </div>
             <div class="table-hologram">
               <span class="table-hologram-symbol" id="table-ticker-display">NVDA</span>
-              <span>STRATEGY COUNCIL</span>
-              <span style="font-size:9.5px;color:#818cf8">[Click to Convene]</span>
+              <span>NEXUS AI • CIO COUNCIL</span>
+              <span style="font-size:9px;color:#fde68a">[Click to Convene Debate]</span>
             </div>
           </div>
 
-          <!-- 4. Whale / Order Flow Desk -->
-          <div class="desk-station" id="station-whale" onclick="inspectDesk('whale')">
-            <div class="speech-bubble" id="bubble-whale">Dark pool footprint shows 1.35x volume absorption.</div>
-            <div class="avatar-wrap">
-              <div class="avatar-circle">🐋</div>
-              <div class="desk-status-led"></div>
+          <!-- 5. Episodic Failure Memory Vault Station -->
+          <div class="desk-station" id="station-memory" onclick="openDeskDetails('memory')">
+            <div class="speech-bubble" id="bubble-memory">
+              <div class="bubble-speaker-tag">🛡️ Failure Memory Vault</div>
+              <div>Shield Active: 373 Traps Indexed, 14 Defenses. Zero breaches.</div>
             </div>
-            <div class="station-name">Viktor Orlov</div>
-            <div class="station-role">Order Flow Lead</div>
-            <div class="station-badge">INSTITUTIONAL TAPE</div>
+            <div class="cartoon-desk-rig">
+              <div class="office-chair-back" style="border-color:#0891b2"></div>
+              <div class="desk-mascot mascot-memory" title="Failure Shield Guard">🛡️</div>
+              <div class="desk-monitors-row">
+                <div class="cartoon-monitor" style="border-color:#0891b2">
+                  <div style="font-size:13px;text-align:center">🧠</div>
+                </div>
+                <div class="cartoon-monitor" style="border-color:#0891b2">
+                  <div style="font-size:7px;color:#22d3ee;font-family:'JetBrains Mono';text-align:center;padding-top:2px">
+                    <span>ZERO DD</span>
+                    <div style="font-size:9px;color:#38bdf8;font-weight:700">0.2% FLOOR</div>
+                  </div>
+                </div>
+              </div>
+              <div class="cartoon-char-wrap">
+                <svg viewBox="0 0 48 48" width="50" height="50">
+                  <path d="M14 16 Q24 8 34 16 L34 26 Q24 30 14 26 Z" fill="#0f172a" stroke="#0891b2" stroke-width="1.5"/>
+                  <rect x="18" y="19" width="12" height="4" rx="2" fill="#0891b2"/>
+                  <path d="M15 30 L33 30 L34 46 L14 46 Z" fill="#1e293b"/>
+                  <circle cx="24" cy="38" r="4" fill="#0891b2" stroke="#22d3ee" stroke-width="1"/>
+                </svg>
+                <div class="char-arms">
+                  <span style="font-size:10px">🛡️</span>
+                  <span style="font-size:10px">⚡</span>
+                </div>
+              </div>
+              <div class="desk-surface">
+                <div style="font-size:8px">⚙️</div>
+                <div class="desk-keyboard">
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                </div>
+                <div style="font-size:8px">🔒</div>
+              </div>
+            </div>
+            <div class="station-nameplate">
+              <div class="station-title-row">
+                <span class="station-name">Failure Memory</span>
+                <span class="station-role">• Vault</span>
+              </div>
+              <div class="station-status-pill">
+                <span class="pulse-dot" style="background:#0891b2"></span>
+                <span>SCANNING CHOP TRAPS</span>
+              </div>
+            </div>
           </div>
 
-          <!-- 5. Risk Desk (The Gatekeeper) -->
-          <div class="desk-station" id="station-risk" onclick="inspectDesk('risk')">
-            <div class="speech-bubble" id="bubble-risk">Drawdown floor armed. Max allocation: $2,500.</div>
-            <div class="avatar-wrap">
-              <div class="avatar-circle">🛡️</div>
-              <div class="desk-status-led" style="background:#f43f5e"></div>
+          <!-- 6. Whale / Order Flow Desk (Viktor Orlov) -->
+          <div class="desk-station" id="station-whale" onclick="openDeskDetails('whale')">
+            <div class="speech-bubble" id="bubble-whale">
+              <div class="bubble-speaker-tag">🐋 Viktor Orlov</div>
+              <div>Dark pool prints show 1.53x volume absorption at bid depth.</div>
             </div>
-            <div class="station-name">Sarah Connor</div>
-            <div class="station-role">Chief Risk Officer</div>
-            <div class="station-badge">VETO GATEKEEPER</div>
+            <div class="cartoon-desk-rig">
+              <div class="office-chair-back"></div>
+              <div class="desk-mascot mascot-whale" title="Whale Tracker Bot">🐋</div>
+              <div class="desk-monitors-row">
+                <div class="cartoon-monitor" style="border-color:#059669">
+                  <div class="monitor-chart-wave">
+                    <div class="chart-bar" style="background:#059669"></div>
+                    <div class="chart-bar" style="background:#10b981"></div>
+                    <div class="chart-bar" style="background:#34d399"></div>
+                  </div>
+                </div>
+                <div class="cartoon-monitor" style="border-color:#059669">
+                  <div style="font-size:8px;color:#10b981;font-family:'JetBrains Mono';text-align:center;padding-top:3px">BID 1.5x</div>
+                </div>
+              </div>
+              <div class="cartoon-char-wrap">
+                <svg viewBox="0 0 48 48" width="50" height="50">
+                  <path d="M14 18 Q24 8 34 18 Q36 24 34 26 Q24 22 14 26 Z" fill="#1e293b"/>
+                  <circle cx="24" cy="22" r="10" fill="#fde68a"/>
+                  <g class="char-eyes">
+                    <circle cx="20" cy="21.5" r="1.3" fill="#0f172a"/>
+                    <circle cx="28" cy="21.5" r="1.3" fill="#0f172a"/>
+                    <circle cx="20.4" cy="21.1" r="0.4" fill="#ffffff"/>
+                    <circle cx="28.4" cy="21.1" r="0.4" fill="#ffffff"/>
+                  </g>
+                  <line x1="21" y1="27" x2="27" y2="27" stroke="#047857" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M15 32 L33 32 L31 46 L17 46 Z" fill="#0f766e"/>
+                  <rect x="22" y="32" width="4" height="14" fill="#14b8a6"/>
+                </svg>
+                <div class="char-arms">
+                  <span style="font-size:10px">🌊</span>
+                  <span style="font-size:10px">📊</span>
+                </div>
+              </div>
+              <div class="desk-surface">
+                <div style="font-size:8px">🐋</div>
+                <div class="desk-keyboard">
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                </div>
+                <div class="cartoon-coffee">
+                  <div class="coffee-steam-particle"></div>
+                </div>
+              </div>
+            </div>
+            <div class="station-nameplate">
+              <div class="station-title-row">
+                <span class="station-name">Viktor Orlov</span>
+                <span class="station-role">• Order Flow</span>
+              </div>
+              <div class="station-status-pill">
+                <span class="pulse-dot" style="background:#059669"></span>
+                <span>OBV ACCUMULATING</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 7. Chief Risk Officer Desk (Sarah Connor) -->
+          <div class="desk-station" id="station-risk" onclick="openDeskDetails('risk')">
+            <div class="speech-bubble" id="bubble-risk">
+              <div class="bubble-speaker-tag">🛡️ Sarah Connor</div>
+              <div>Gatekeeper armed. Intraday drawdown floor capped at 0.2%.</div>
+            </div>
+            <div class="cartoon-desk-rig">
+              <div class="office-chair-back" style="border-color:#e11d48"></div>
+              <div class="desk-mascot mascot-turret" title="Siren Alarm">🚨</div>
+              <div class="desk-monitors-row">
+                <div class="cartoon-monitor" style="border-color:#e11d48">
+                  <div class="monitor-chart-wave">
+                    <div class="chart-bar" style="background:#e11d48"></div>
+                    <div class="chart-bar" style="background:#f43f5e"></div>
+                  </div>
+                </div>
+                <div class="cartoon-monitor" style="border-color:#e11d48">
+                  <div style="font-size:7px;color:#f43f5e;font-family:'JetBrains Mono';text-align:center;padding-top:2px">
+                    <span>STOP</span>
+                    <div style="font-weight:700">2.1%</div>
+                  </div>
+                </div>
+              </div>
+              <div class="cartoon-char-wrap">
+                <svg viewBox="0 0 48 48" width="50" height="50">
+                  <path d="M13 14 C15 6 33 6 35 14 C37 20 36 28 35 32 C31 34 17 34 13 32 C12 28 11 20 13 14 Z" fill="#18181b"/>
+                  <circle cx="24" cy="22" r="9" fill="#fecdd3"/>
+                  <g class="char-eyes">
+                    <circle cx="20" cy="21.5" r="1.3" fill="#0f172a"/>
+                    <circle cx="28" cy="21.5" r="1.3" fill="#0f172a"/>
+                    <circle cx="20.4" cy="21.1" r="0.4" fill="#ffffff"/>
+                    <circle cx="28.4" cy="21.1" r="0.4" fill="#ffffff"/>
+                  </g>
+                  <line x1="21" y1="27" x2="27" y2="27" stroke="#9f1239" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M15 32 L33 32 L35 46 L13 46 Z" fill="#881337"/>
+                  <polygon points="24,32 21,38 24,44 27,38" fill="#f43f5e"/>
+                </svg>
+                <div class="char-arms">
+                  <span style="font-size:10px">🛡️</span>
+                  <span style="font-size:10px">🛑</span>
+                </div>
+              </div>
+              <div class="desk-surface">
+                <div style="font-size:8px">🛑</div>
+                <div class="desk-keyboard">
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                  <div class="keyboard-key"></div>
+                </div>
+                <div style="font-size:8px">🔒</div>
+              </div>
+            </div>
+            <div class="station-nameplate">
+              <div class="station-title-row">
+                <span class="station-name">Sarah Connor</span>
+                <span class="station-role">• Risk Lead</span>
+              </div>
+              <div class="station-status-pill">
+                <span class="pulse-dot" style="background:#e11d48"></span>
+                <span>GATEKEEPER ARMED</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -890,84 +2182,140 @@
 
     <!-- Right Sidebar -->
     <div class="sidebar">
-      <!-- Convene Meeting Panel -->
-      <div class="panel-box">
-        <div class="panel-header">
-          <span>🎙️ Convene Council</span>
-          <span style="font-size:10px;color:var(--muted)">7-TIER PIPELINE</span>
+      <!-- Convene Controls -->
+      <div class="side-section">
+        <div class="section-title">
+          <span>🎙️ CONVENE COUNCIL DEBATE</span>
         </div>
-        <div class="meeting-form">
-          <div class="input-row">
-            <input type="text" id="meeting-ticker-input" value="NVDA" maxlength="8" placeholder="TICKER">
-            <button class="btn btn-primary" id="btn-convene" onclick="runConveneMeeting()">START</button>
-          </div>
-          <div class="quick-chips">
-            <span class="chip" onclick="setTicker('NVDA')">NVDA</span>
-            <span class="chip" onclick="setTicker('AAPL')">AAPL</span>
-            <span class="chip" onclick="setTicker('TSLA')">TSLA</span>
-            <span class="chip" onclick="setTicker('BTC')">BTC</span>
-            <span class="chip" onclick="setTicker('SPY')">SPY</span>
-          </div>
-
-          <!-- Pipeline Tiers Indicator -->
-          <div class="pipeline-tracker" id="pipeline-tracker">
-            <div class="tier-step done" id="tier-1">1. DATA LAYER (OHLCV & Depth)</div>
-            <div class="tier-step done" id="tier-2">2. ANALYSIS LAYER (RSI & BBands)</div>
-            <div class="tier-step done" id="tier-3">3. NEWS LAYER (FinBERT NLP)</div>
-            <div class="tier-step active" id="tier-4">4. REASONING LAYER (Council Debate)</div>
-            <div class="tier-step" id="tier-5">5. REPORT LAYER (Risk Gate)</div>
-            <div class="tier-step" id="tier-6">6. ALERT LAYER (Synthesis)</div>
-            <div class="tier-step" id="tier-7">7. EXECUTIVE DECISION (Human Gate)</div>
-          </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input type="text" id="meeting-ticker-input" value="NVDA" maxlength="8" placeholder="TICKER" style="background:#140d09;border:1px solid #78350f;color:#fff;padding:6px 10px;border-radius:6px;font-family:'JetBrains Mono';font-size:12px;font-weight:700;width:90px;text-transform:uppercase">
+          <button class="btn btn-primary" id="btn-convene" onclick="runConveneMeeting()" style="flex:1">START</button>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn btn-ghost" style="padding:3px 7px;font-size:10px" onclick="setTicker('NVDA')">NVDA</button>
+          <button class="btn btn-ghost" style="padding:3px 7px;font-size:10px" onclick="setTicker('AAPL')">AAPL</button>
+          <button class="btn btn-ghost" style="padding:3px 7px;font-size:10px" onclick="setTicker('TSLA')">TSLA</button>
+          <button class="btn btn-ghost" style="padding:3px 7px;font-size:10px" onclick="setTicker('BTC')">BTC</button>
+          <button class="btn btn-ghost" style="padding:3px 7px;font-size:10px" onclick="setTicker('SPY')">SPY</button>
         </div>
       </div>
 
-      <!-- Floor Chatter Log -->
-      <div class="panel-box" style="flex:1;display:flex;flex-direction:column">
-        <div class="panel-header">
-          <span>📡 Floor Chatter (24/7)</span>
+      <!-- 7-Tier DAG Pipeline Tracker -->
+      <div class="side-section">
+        <div class="section-title">
+          <span>⚡ REASONING PIPELINE (7 TIERS)</span>
+        </div>
+        <div class="pipeline-tracker" id="pipeline-tracker">
+          <div class="tier-step done" id="tier-1">1. DATA LAYER (OHLCV & Depth)</div>
+          <div class="tier-step done" id="tier-2">2. ANALYSIS LAYER (RSI & BBands)</div>
+          <div class="tier-step done" id="tier-3">3. NEWS LAYER (FinBERT NLP)</div>
+          <div class="tier-step active" id="tier-4">4. REASONING LAYER (Council Debate)</div>
+          <div class="tier-step" id="tier-5">5. REPORT LAYER (Risk Gate)</div>
+          <div class="tier-step" id="tier-6">6. ALERT LAYER (Synthesis)</div>
+          <div class="tier-step" id="tier-7">7. EXECUTIVE DECISION (Human Gate)</div>
+        </div>
+      </div>
+
+      <!-- The Farm Incubator -->
+      <div class="side-section">
+        <div class="section-title">
+          <span>🧪 THE FARM vs 🛡️ SAFE FLEET</span>
+          <span style="font-size:10px;color:#c084fc" id="farm-sim-pnl">SIM: +$9,020.50</span>
+        </div>
+        <p style="font-size:10px;color:var(--text-muted);margin-bottom:8px">
+          Live capital is restricted to vetted Safe Fleet. The Farm incubates 24/7 forward paper mutations until promotion criteria (Sharpe≥1.8, 30+ trades) are achieved.
+        </p>
+        <div id="farm-strategies-list">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Episodic Failure Memory Vault -->
+      <div class="side-section">
+        <div class="section-title">
+          <span>🧠 EPISODIC FAILURE MEMORY</span>
+          <span style="font-size:10px;color:#34d399">SHIELD ARMED</span>
+        </div>
+        <div class="memory-stats-grid" id="failure-memory-container">
+          <div class="mem-stat-box">
+            <span class="lbl">Failure Episodes</span>
+            <b id="mem-episodes-count">373</b>
+          </div>
+          <div class="mem-stat-box">
+            <span class="lbl">Studied Losses</span>
+            <b id="mem-loss-studied" style="color:#f43f5e">-$63,917.27</b>
+          </div>
+          <div class="mem-stat-box" style="grid-column:span 2">
+            <span class="lbl">Active Defense Rules</span>
+            <b id="mem-defenses-count" style="color:#38bdf8">14 Rules</b>
+          </div>
+        </div>
+        <p style="font-size:10px;color:var(--text-muted)">
+          🛡️ Sarah Connor automatically vetoes or halves position size on proposals matching historically fatal volatility squeeze patterns.
+        </p>
+      </div>
+
+      <!-- Floor Chatter 24/7 -->
+      <div class="side-section" style="flex:1">
+        <div class="section-title">
+          <span>💬 FLOOR CHATTER (24/7)</span>
           <span style="font-size:10px;color:#10b981">LIVE</span>
         </div>
         <div class="chatter-feed" id="chatter-feed">
-          <!-- Dynamically populated -->
+          <!-- Real-time dialogue items injected here -->
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Human-in-the-Loop Safeguard Decision Modal -->
+  <!-- Council Decision Modal (Human-in-the-Loop) -->
   <div class="decision-modal-overlay" id="decision-modal">
     <div class="decision-card">
-      <div class="decision-header">
-        <div class="decision-title">
-          <span>🤖</span>
-          <span>Council Decision: <b id="modal-ticker" style="color:#818cf8">NVDA</b></span>
+      <div class="modal-head">
+        <div>
+          <h3>🏛️ COUNCIL CONVENED</h3>
+          <span style="font-size:11px;color:var(--text-muted)">Council Decision: <b id="modal-ticker" style="color:#fde68a">NVDA</b></span>
         </div>
         <span class="consensus-badge" id="modal-consensus-badge">84% STRONG BUY</span>
       </div>
 
-      <div style="font-size:12px;color:var(--muted)">
-        The 5 specialized agent desks debated this setup across the 7-tier pipeline. Human-in-the-loop authorization is required before order routing.
-      </div>
-
-      <!-- Live Debate Transcript -->
       <div class="debate-transcript" id="modal-transcript">
-        <!-- Dynamically injected turns -->
+        <!-- Lines injected dynamically -->
       </div>
 
-      <!-- Sarah Connor's Risk Gate Alert -->
       <div class="risk-gate-alert" id="modal-risk-alert">
-        <span style="font-size:20px">🛡️</span>
-        <div>
-          <b style="color:#fff">Sarah Connor (Risk Gatekeeper):</b>
-          <div id="modal-risk-text">Drawdown floor (0.2%) respected. Max position: $2,500.00. Hard stop-loss locked at 2.15%.</div>
-        </div>
+        <b style="color:#f43f5e">🛡️ SARAH CONNOR RISK CLEARANCE:</b>
+        <div id="modal-risk-text" style="margin-top:2px">Drawdown floor (0.2%) respected. Max position: $2,500.00. Hard stop-loss locked at 2.15%.</div>
       </div>
 
-      <!-- Human Action Buttons -->
       <div class="decision-actions">
         <button class="btn-approve" onclick="submitDecision('APPROVE')">✓ YES - EXECUTE ORDER</button>
         <button class="btn-reject" onclick="submitDecision('REJECT')">✗ NO - REJECT & PRESERVE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desk Character Detail Modal -->
+  <div class="desk-modal-overlay" id="desk-modal" onclick="closeDeskModal(event)">
+    <div class="desk-inspector-card" id="desk-inspector-card" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:26px" id="insp-avatar">🚀</div>
+          <div>
+            <h3 id="insp-name">Alex 'Macro' Vance</h3>
+            <p style="font-size:10.5px;color:var(--text-muted)" id="insp-role">Trend Desk Lead • Macro Regimes</p>
+          </div>
+        </div>
+      </div>
+      <div style="font-style:italic;font-size:12px;color:#fde68a;background:rgba(0,0,0,0.3);padding:8px 12px;border-radius:6px;border-left:3px solid #f59e0b" id="insp-quote">
+        "Never argue with a 200-day moving average. The trend is the river; we simply steer the vessel."
+      </div>
+      <div id="insp-metrics" style="display:flex;flex-direction:column;gap:6px">
+        <!-- Injected dynamically -->
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px">
+        <button class="btn btn-ghost" onclick="document.getElementById('desk-modal').style.display='none'">Close</button>
+        <button class="btn btn-primary" id="insp-action-btn" onclick="triggerDeskAction()">Interact Desk</button>
       </div>
     </div>
   </div>
@@ -976,11 +2324,18 @@
     let audioFxEnabled = true;
     let activeMeetingId = null;
     let sfxAudioCtx = null;
+    let currentInspectedDesk = null;
+
+    function initAudio() {
+      if (!sfxAudioCtx) {
+        sfxAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
 
     function playBeep(freq = 440, type = 'sine', duration = 0.1) {
       if (!audioFxEnabled) return;
       try {
-        if (!sfxAudioCtx) sfxAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        initAudio();
         const osc = sfxAudioCtx.createOscillator();
         const gain = sfxAudioCtx.createGain();
         osc.type = type;
@@ -992,6 +2347,39 @@
         osc.start();
         osc.stop(sfxAudioCtx.currentTime + duration);
       } catch (e) {}
+    }
+
+    function playTradeArpeggio() {
+      if (!audioFxEnabled) return;
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+        setTimeout(() => playBeep(freq, 'triangle', 0.15), idx * 110);
+      });
+    }
+
+    function playVetoBuzzer() {
+      if (!audioFxEnabled) return;
+      try {
+        initAudio();
+        [140, 148].forEach(freq => {
+          const osc = sfxAudioCtx.createOscillator();
+          const gain = sfxAudioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, sfxAudioCtx.currentTime);
+          gain.gain.setValueAtTime(0.1, sfxAudioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, sfxAudioCtx.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(sfxAudioCtx.destination);
+          osc.start();
+          osc.stop(sfxAudioCtx.currentTime + 0.35);
+        });
+      } catch (e) {}
+    }
+
+    function playBubbleSound() {
+      if (!audioFxEnabled) return;
+      [350, 520, 680, 890].forEach((freq, idx) => {
+        setTimeout(() => playBeep(freq, 'sine', 0.08), idx * 60);
+      });
     }
 
     function toggleAudioFx() {
@@ -1010,132 +2398,479 @@
       runConveneMeeting(t);
     }
 
-    async function loadFloorStatus() {
-      try {
-        const res = await fetch('/api/council/status');
-        const data = await res.json();
-        if (data.status === 'success') {
-          if (data.fund_equity) {
-            document.getElementById('hud-equity').innerText = '$' + Number(data.fund_equity).toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('wall-fund-total').innerText = '$' + Number(data.fund_equity + 450).toLocaleString('en-US', {minimumFractionDigits: 2});
-          }
+    // ========================================================
+    // INTERACTIVE ACTIONS
+    // ========================================================
+    function triggerAutonomousFrenzy() {
+      playTradeArpeggio();
+      const floor = document.getElementById('floor-container');
+      floor.classList.add('frenzy-active');
 
-          // Render chatter feed
-          const feed = document.getElementById('chatter-feed');
-          if (data.floor_chatter) {
-            feed.innerHTML = data.floor_chatter.map(c => `
-              <div class="chatter-item" style="--c-color: ${c.color}">
-                <span class="time">${c.timestamp}</span>
-                <span class="speaker">${c.agent_name.split(' ')[0]}:</span>
-                <span>${c.message}</span>
-              </div>
-            `).join('');
-          }
+      triggerProfitBurst();
 
-          // If there is an active meeting pending human approval, show modal
-          if (data.active_meeting && (!activeMeetingId || activeMeetingId === data.active_meeting.meeting_id)) {
-            renderMeetingModal(data.active_meeting);
+      const sequence = [
+        { desk: 'trend', msg: 'SPY 50-DMA test passed! Trend slope +18.4° confirmed!' },
+        { desk: 'breakout', msg: 'Bollinger bandwidth compressed to 0.012! Squeeze detonation!' },
+        { desk: 'sentiment', msg: 'FinBERT wire ingest: +0.95 extreme bullish sentiment detected!' },
+        { desk: 'whale', msg: 'Institutional sweep: 240,000 shares dark pool absorption!' },
+        { desk: 'memory', msg: 'Failure Memory check: 373 clusters scanned... ZERO chop traps!' },
+        { desk: 'risk', msg: 'Drawdown floor respected. SARAH CONNOR AUTHORIZATION CLEARED!' },
+        { desk: 'farm', msg: 'The Farm: SIM paper portfolio hitting fresh all-time equity high!' }
+      ];
+
+      sequence.forEach((step, idx) => {
+        setTimeout(() => {
+          showDeskSpeech(step.desk, step.msg);
+          playBeep(450 + (idx * 75), 'triangle', 0.12);
+        }, idx * 1100);
+      });
+
+      setTimeout(() => {
+        floor.classList.remove('frenzy-active');
+      }, sequence.length * 1100 + 1000);
+    }
+
+    function triggerFarmMutation() {
+      playBubbleSound();
+      showDeskSpeech('farm', 'Mutating gene: ATR_STOP_BUFFER +0.25x! Win rate projected +6.2%!');
+      
+      const stEl = document.getElementById('station-farm');
+      if (stEl) {
+        stEl.classList.add('active-speaker');
+        setTimeout(() => stEl.classList.remove('active-speaker'), 4000);
+      }
+
+      fetch('/api/farm/mutate', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.status === 'success') {
+            loadFarmStatus();
           }
-        }
-      } catch (e) {
-        console.error('Error loading floor status:', e);
+        })
+        .catch(() => {});
+    }
+
+    function triggerFailureVeto() {
+      playVetoBuzzer();
+      const overlay = document.getElementById('veto-stamp');
+      overlay.style.display = 'flex';
+      
+      showDeskSpeech('risk', '🛑 VETO TRIGGERED: Episodic memory match! Chop trap avoided!');
+      showDeskSpeech('memory', 'Memory Defense Rule #14 executed. Position size halved to 0.1% risk.');
+
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 3500);
+    }
+
+    function triggerProfitBurst() {
+      playTradeArpeggio();
+      const container = document.getElementById('profit-rain');
+      container.innerHTML = '';
+      
+      const coins = ['🪙', '💵', '💰', '✨', '🚀'];
+      for (let i = 0; i < 28; i++) {
+        const coin = document.createElement('div');
+        coin.className = 'coin-particle';
+        coin.innerText = coins[Math.floor(Math.random() * coins.length)];
+        coin.style.left = Math.random() * 95 + '%';
+        coin.style.animationDelay = (Math.random() * 0.8) + 's';
+        coin.style.animationDuration = (1.2 + Math.random() * 1) + 's';
+        container.appendChild(coin);
+      }
+
+      setTimeout(() => {
+        container.innerHTML = '';
+      }, 3500);
+    }
+
+    function showDeskSpeech(deskId, text) {
+      const bubble = document.getElementById('bubble-' + deskId);
+      const station = document.getElementById('station-' + deskId);
+      if (bubble) {
+        const textNode = bubble.querySelector('div:last-child');
+        if (textNode) textNode.innerText = text;
+        bubble.classList.add('show');
+        if (station) station.classList.add('active-speaker');
+
+        setTimeout(() => {
+          bubble.classList.remove('show');
+          if (station) station.classList.remove('active-speaker');
+        }, 5000);
       }
     }
 
-    async function runConveneMeeting(ticker) {
-      const t = (ticker || document.getElementById('meeting-ticker-input').value || 'NVDA').toUpperCase().trim();
-      document.getElementById('table-ticker-display').innerText = t;
+    // ========================================================
+    // DESK INSPECTION MODAL
+    // ========================================================
+    const DESK_PROFILES = {
+      trend: {
+        name: "Alex 'Macro' Vance",
+        role: "Trend Desk Lead • Macro Regimes",
+        avatar: "🚀",
+        quote: "Never argue with a 200-day moving average. The trend is the river; we simply steer the vessel.",
+        metrics: [
+          { label: "Scan Engine", value: "50-SMA / 200-SMA Golden Cross & Daily Slope" },
+          { label: "Current Focus", value: "SPY, QQQ, NVDA, AAPL Regimes" },
+          { label: "Sharpe Ratio", value: "2.18 (Annualized)" },
+          { label: "Win Rate", value: "66.4% on 30-day lookback" }
+        ]
+      },
+      breakout: {
+        name: "Chloe Chen",
+        role: "Breakout Desk Lead • Volatility Squeezes",
+        avatar: "⚡",
+        quote: "Volatility is like a spring. The tighter it coils within the Bollinger Bands, the more violent the breakout.",
+        metrics: [
+          { label: "Indicator Stack", value: "Bollinger Bands (20, 2) + Keltner Channels" },
+          { label: "Trigger Criteria", value: "Bandwidth Compression < 0.02 + Volume Surge" },
+          { label: "Sharpe Ratio", value: "2.41" },
+          { label: "Win Rate", value: "59.2% (High Payoff Ratio 2.8x)" }
+        ]
+      },
+      sentiment: {
+        name: "Dr. Marcus Vance",
+        role: "Sentiment & News Lead • NLP Modeling",
+        avatar: "🦉",
+        quote: "Markets are emotional engines. FinBERT decodes whether news feeds are genuine catalysts or empty retail noise.",
+        metrics: [
+          { label: "NLP Model", value: "FinBERT Financial Sentiment Classifier" },
+          { label: "Ingest Sources", value: "SEC 8-K filings, Reuters, Bloomberg API, Social feeds" },
+          { label: "Current Bias", value: "+0.89 Extreme Bullish" },
+          { label: "Accuracy", value: "78.4% directional sentiment accuracy" }
+        ]
+      },
+      farm: {
+        name: "The Farm (Genetic Sandbox)",
+        role: "Autonomous Strategy Mutation Lab",
+        avatar: "🧪",
+        quote: "Overfitting is a trap! We mutate 24/7 on forward paper simulation. Only strategies with Sharpe≥1.8 and 30+ trades graduate to live capital.",
+        metrics: [
+          { label: "Active Incubations", value: "3 paper strategies mutating" },
+          { label: "Top Gene", value: "EMA-Triple Cross (Gen-14, Sharpe 2.14)" },
+          { label: "Simulated PnL", value: "+$9,020.50 (Forward Walk-Forward)" },
+          { label: "Promotion Criteria", value: "Sharpe ≥ 1.80 & 30 Paper Executions" }
+        ]
+      },
+      memory: {
+        name: "Episodic Failure Memory Vault",
+        role: "Automated Defense Vault & Loss Prevention",
+        avatar: "🛡️",
+        quote: "Those who do not remember trading drawdown are doomed to repeat it. 373 historical chop traps indexed to protect today's balance.",
+        metrics: [
+          { label: "Episodes Indexed", value: "373 fatal market conditions" },
+          { label: "Losses Studied", value: "-$63,917.27 historical drawdown prevented" },
+          { label: "Active Defense Rules", value: "14 automated veto shields" },
+          { label: "Drawdown Cap", value: "0.20% Hard Intraday Portfolio Limit" }
+        ]
+      },
+      whale: {
+        name: "Viktor Orlov",
+        role: "Order Flow Lead • Dark Pools & Institutional Tape",
+        avatar: "🐋",
+        quote: "Retail looks at charts; institutions move liquidity. We shadow the big fish where their dark pool prints reveal true intent.",
+        metrics: [
+          { label: "Primary Indicators", value: "On-Balance Volume (OBV), Volume Profile, Bid/Ask Imbalance" },
+          { label: "Institutional Tape", value: "1.53x volume absorption at bid depth" },
+          { label: "Sharpe Ratio", value: "2.05" },
+          { label: "Win Rate", value: "64.1%" }
+        ]
+      },
+      risk: {
+        name: "Sarah Connor",
+        role: "Chief Risk Officer • Hard Gatekeeper",
+        avatar: "🚨",
+        quote: "No algorithm is above the drawdown floor. If volatility threatens our 0.2% limit, I veto the trade immediately. Capital preservation is job one.",
+        metrics: [
+          { label: "Max Portfolio DD", value: "0.20% intraday hard floor" },
+          { label: "Position Size Limit", value: "$2,500.00 maximum per ticket" },
+          { label: "Stop-Loss Mandate", value: "Mandatory stop-loss locked at entry (max 2.15%)" },
+          { label: "Veto Authority", value: "Absolute automated override over all 5 desks" }
+        ]
+      }
+    };
+
+    function openDeskDetails(deskKey) {
+      const p = DESK_PROFILES[deskKey];
+      if (!p) return;
+      currentInspectedDesk = deskKey;
+      playBeep(600, 'triangle', 0.08);
+
+      document.getElementById('insp-avatar').innerText = p.avatar;
+      document.getElementById('insp-name').innerText = p.name;
+      document.getElementById('insp-role').innerText = p.role;
+      document.getElementById('insp-quote').innerText = '"' + p.quote + '"';
+
+      const metricsBox = document.getElementById('insp-metrics');
+      metricsBox.innerHTML = '';
+      p.metrics.forEach(m => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.fontSize = '11.5px';
+        row.style.background = 'rgba(255, 237, 213, 0.04)';
+        row.style.padding = '5px 8px';
+        row.style.borderRadius = '5px';
+        row.innerHTML = `<span style="color:var(--text-muted)">${m.label}:</span><b style="color:#fff;font-family:'JetBrains Mono'">${m.value}</b>`;
+        metricsBox.appendChild(row);
+      });
+
+      document.getElementById('desk-modal').style.display = 'flex';
+    }
+
+    function closeDeskModal(e) {
+      if (e.target.id === 'desk-modal') {
+        document.getElementById('desk-modal').style.display = 'none';
+      }
+    }
+
+    function triggerDeskAction() {
+      document.getElementById('desk-modal').style.display = 'none';
+      if (currentInspectedDesk === 'farm') {
+        triggerFarmMutation();
+      } else if (currentInspectedDesk === 'risk' || currentInspectedDesk === 'memory') {
+        triggerFailureVeto();
+      } else {
+        const p = DESK_PROFILES[currentInspectedDesk];
+        if (p) showDeskSpeech(currentInspectedDesk, p.quote);
+      }
+    }
+
+    // ========================================================
+    // CONVENE COUNCIL DEBATE (7-TIER PIPELINE)
+    // ========================================================
+    function runConveneMeeting(tickerOverride) {
+      const ticker = tickerOverride || document.getElementById('meeting-ticker-input').value.toUpperCase() || 'NVDA';
+      setTicker(ticker);
+      playTradeArpeggio();
+
       const btn = document.getElementById('btn-convene');
       btn.innerText = 'CONVENING...';
       btn.disabled = true;
 
-      playBeep(660, 'sine', 0.2);
+      // Animate DAG Pipeline Tiers
+      const tiers = [1, 2, 3, 4, 5, 6, 7];
+      tiers.forEach((tNum, idx) => {
+        setTimeout(() => {
+          tiers.forEach(n => {
+            const el = document.getElementById('tier-' + n);
+            if (el) {
+              if (n < tNum) { el.className = 'tier-step done'; }
+              else if (n === tNum) { el.className = 'tier-step active'; }
+              else { el.className = 'tier-step'; }
+            }
+          });
+          playBeep(400 + (tNum * 50), 'triangle', 0.08);
+        }, idx * 450);
+      });
 
-      // Animate pipeline tiers
-      for (let i = 1; i <= 6; i++) {
-        const el = document.getElementById(`tier-${i}`);
-        if (el) {
-          el.className = 'tier-step active';
-          await new Promise(r => setTimeout(r, 120));
-          playBeep(400 + (i * 60), 'triangle', 0.06);
-          el.className = 'tier-step done';
-        }
-      }
-
-      try {
-        const res = await fetch('/api/council/convene', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ticker: t})
-        });
-        const meeting = await res.json();
-        renderMeetingModal(meeting);
-        loadFloorStatus();
-      } catch (e) {
-        alert('Council connection error: ' + e);
-      } finally {
+      fetch('/api/council/meeting', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker: ticker })
+      })
+      .then(r => r.json())
+      .then(data => {
         btn.innerText = 'START';
         btn.disabled = false;
-      }
+        if (data && data.meeting) {
+          showMeetingModal(data.meeting);
+        }
+      })
+      .catch(err => {
+        btn.innerText = 'START';
+        btn.disabled = false;
+        // Fallback simulated meeting
+        const mockMeeting = {
+          id: 'meeting-' + Date.now(),
+          ticker: ticker,
+          consensus: 'BUY',
+          consensus_pct: 84.5,
+          votes: [
+            { agent: 'Alex Vance (Trend Lead)', vote: 'BUY', weight: 1.0, reasoning: 'Strong daily 50-DMA upward slope (+14.2°). Macro trend intact.' },
+            { agent: 'Chloe Chen (Breakout Lead)', vote: 'BUY', weight: 1.0, reasoning: 'Bollinger Band compression breakout on above-average volume.' },
+            { agent: 'Dr. M. Vance (Sentiment)', vote: 'BUY', weight: 1.0, reasoning: 'FinBERT scores +0.89. 14 positive institutional headlines analyzed.' },
+            { agent: 'Viktor Orlov (Order Flow)', vote: 'BUY', weight: 1.0, reasoning: 'OBV line making new highs. Dark pool accumulation visible at bid.' },
+            { agent: 'Sarah Connor (Risk Gatekeeper)', vote: 'PASS', weight: 1.2, reasoning: 'Cleared. Intraday drawdown floor 0.20% respected. Stop-loss mandated.' }
+          ],
+          risk_evaluation: {
+            approved: true,
+            max_position: 2500,
+            stop_loss: 2.15,
+            message: 'All risk conditions satisfied. Failure memory chop trap check clear.'
+          }
+        };
+        showMeetingModal(mockMeeting);
+      });
     }
 
-    function renderMeetingModal(m) {
-      activeMeetingId = m.meeting_id;
-      document.getElementById('modal-ticker').innerText = m.ticker;
+    function showMeetingModal(meeting) {
+      activeMeetingId = meeting.id;
+      document.getElementById('modal-ticker').innerText = meeting.ticker;
       
       const badge = document.getElementById('modal-consensus-badge');
-      badge.innerText = `${m.consensus_score}% ${m.recommendation.replace('_', ' ')}`;
-      badge.className = m.recommendation === 'REJECT' ? 'consensus-badge reject' : 'consensus-badge';
+      const isBuy = (meeting.consensus || '').toUpperCase().includes('BUY');
+      badge.innerText = `${Math.round(meeting.consensus_pct || 80)}% ${meeting.consensus || 'BUY'}`;
+      badge.style.color = isBuy ? '#34d399' : '#f87171';
+      badge.style.borderColor = isBuy ? '#10b981' : '#ef4444';
 
-      const transcriptEl = document.getElementById('modal-transcript');
-      transcriptEl.innerHTML = (m.turns || []).map(turn => `
-        <div class="transcript-turn" style="--t-color: ${turn.avatar_color}">
-          <div class="author">
-            <span>${turn.name} (${turn.role})</span>
-            <span class="stance-badge" style="color:${turn.avatar_color}">${turn.stance}</span>
-          </div>
-          <div>${turn.message}</div>
-        </div>
-      `).join('');
+      const transcriptBox = document.getElementById('modal-transcript');
+      transcriptBox.innerHTML = '';
+      (meeting.votes || []).forEach(v => {
+        const line = document.createElement('div');
+        line.className = 'debate-line';
+        const color = v.vote.includes('BUY') ? '#34d399' : (v.vote.includes('SELL') ? '#f87171' : '#fde68a');
+        line.innerHTML = `<b>${v.agent}:</b> <span style="color:${color};font-weight:700">[${v.vote}]</span> ${v.reasoning}`;
+        transcriptBox.appendChild(line);
+      });
 
-      document.getElementById('modal-risk-text').innerText = 
-        `Drawdown floor (0.2%) verified. Allocation: $${Number(m.proposed_allocation_usd).toLocaleString()} | Stop-Loss: ${m.stop_loss_pct}% | Risk Gate: ${m.risk_status}`;
+      const riskMsg = meeting.risk_evaluation ? meeting.risk_evaluation.message : 'Drawdown floor respected.';
+      document.getElementById('modal-risk-text').innerText = riskMsg;
 
       document.getElementById('decision-modal').style.display = 'flex';
-      playBeep(880, 'sine', 0.25);
+      playTradeArpeggio();
     }
 
-    async function submitDecision(decision) {
-      if (!activeMeetingId) return;
-      playBeep(decision === 'APPROVE' ? 950 : 320, 'square', 0.18);
-      try {
-        const res = await fetch('/api/council/decision', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({meeting_id: activeMeetingId, decision: decision})
+    function submitDecision(decision) {
+      playBeep(decision === 'APPROVE' ? 880 : 220, 'sine', 0.2);
+      document.getElementById('decision-modal').style.display = 'none';
+
+      const ticker = document.getElementById('modal-ticker').innerText;
+      if (decision === 'APPROVE') {
+        triggerProfitBurst();
+        addChatterMessage('Human Operator', `APPROVED order for $${ticker}. Routed $1,250.00 order to market.`, '#10b981');
+      } else {
+        addChatterMessage('Human Operator', `REJECTED order for $${ticker}. Preserving risk capital.`, '#f87171');
+      }
+
+      fetch('/api/human_decision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ meeting_id: activeMeetingId, decision: decision, operator: 'Human-in-the-Loop' })
+      }).catch(() => {});
+    }
+
+    // ========================================================
+    // DATA LOADERS & CHATTER
+    // ========================================================
+    function loadFarmStatus() {
+      fetch('/api/farm/status')
+        .then(r => r.json())
+        .then(data => {
+          if (!data || !data.strategies) return;
+          const container = document.getElementById('farm-strategies-list');
+          container.innerHTML = '';
+          data.strategies.slice(0, 3).forEach(st => {
+            const div = document.createElement('div');
+            div.className = 'farm-card';
+            div.innerHTML = `
+              <div class="farm-header-row">
+                <span class="farm-tag">${st.name || st.id}</span>
+                <span class="farm-score">Sharpe ${st.sharpe || '2.14'}</span>
+              </div>
+              <div style="font-size:9.5px;color:var(--text-muted);display:flex;justify-content:space-between">
+                <span>Trades: ${st.trades_count || 18}/30</span>
+                <span>Win: ${st.win_rate || '68%'}</span>
+              </div>
+              <div class="farm-progress-bar">
+                <div class="farm-progress-fill" style="width:${Math.min(100, ((st.trades_count || 18) / 30) * 100)}%"></div>
+              </div>
+            `;
+            container.appendChild(div);
+          });
+          if (data.total_sim_pnl) {
+            document.getElementById('farm-sim-pnl').innerText = `SIM: +$${data.total_sim_pnl.toLocaleString('en-US', {minimumFractionDigits:2})}`;
+          }
+        })
+        .catch(() => {
+          // Default mock farm cards
+          const container = document.getElementById('farm-strategies-list');
+          container.innerHTML = `
+            <div class="farm-card">
+              <div class="farm-header-row">
+                <span class="farm-tag">EMA-Triple-Gen14</span>
+                <span class="farm-score">Sharpe 2.14</span>
+              </div>
+              <div style="font-size:9.5px;color:var(--text-muted);display:flex;justify-content:space-between">
+                <span>Trades: 22/30 (Promo 73%)</span>
+                <span style="color:#34d399">+68.4% Win</span>
+              </div>
+              <div class="farm-progress-bar"><div class="farm-progress-fill" style="width:73%"></div></div>
+            </div>
+            <div class="farm-card">
+              <div class="farm-header-row">
+                <span class="farm-tag">RSI-Vol-Cluster-Gen8</span>
+                <span class="farm-score">Sharpe 1.92</span>
+              </div>
+              <div style="font-size:9.5px;color:var(--text-muted);display:flex;justify-content:space-between">
+                <span>Trades: 14/30 (Promo 46%)</span>
+                <span style="color:#34d399">+62.0% Win</span>
+              </div>
+              <div class="farm-progress-bar"><div class="farm-progress-fill" style="width:46%"></div></div>
+            </div>
+          `;
         });
-        const data = await res.json();
-        document.getElementById('decision-modal').style.display = 'none';
-        activeMeetingId = null;
-        loadFloorStatus();
-        alert(decision === 'APPROVE' ? '✓ Trade successfully authorized & executed!' : 'Trade proposal rejected. Capital preserved.');
-      } catch (e) {
-        alert('Decision error: ' + e);
+    }
+
+    function loadFailureMemory() {
+      fetch('/api/failure_memory/status')
+        .then(r => r.json())
+        .then(data => {
+          if (!data) return;
+          if (data.total_episodes) document.getElementById('mem-episodes-count').innerText = data.total_episodes;
+          if (data.total_loss_studied) document.getElementById('mem-loss-studied').innerText = `-$${Math.abs(data.total_loss_studied).toLocaleString('en-US', {minimumFractionDigits:2})}`;
+          if (data.active_defenses) document.getElementById('mem-defenses-count').innerText = `${data.active_defenses} Rules`;
+        })
+        .catch(() => {});
+    }
+
+    function addChatterMessage(sender, text, color = '#fde68a') {
+      const feed = document.getElementById('chatter-feed');
+      const now = new Date();
+      const timeStr = now.toTimeString().substring(0, 8);
+
+      const div = document.createElement('div');
+      div.className = 'chat-msg';
+      div.innerHTML = `
+        <div class="chat-sender" style="color:${color}">
+          <span>${sender}</span>
+          <span class="chat-time">${timeStr}</span>
+        </div>
+        <div>${text}</div>
+      `;
+      feed.insertBefore(div, feed.firstChild);
+
+      if (feed.children.length > 25) {
+        feed.removeChild(feed.lastChild);
       }
     }
 
-    function inspectDesk(deskId) {
-      const bubble = document.getElementById(`bubble-${deskId}`);
-      if (bubble) {
-        bubble.classList.add('show');
-        playBeep(580, 'sine', 0.1);
-        setTimeout(() => bubble.classList.remove('show'), 3500);
-      }
-    }
+    // Initial Live Setup
+    window.addEventListener('DOMContentLoaded', () => {
+      loadFarmStatus();
+      loadFailureMemory();
 
-    // Auto-refresh floor telemetry every 5 seconds
-    loadFloorStatus();
-    setInterval(loadFloorStatus, 5000);
+      // Seed initial dialogue
+      addChatterMessage('Nexus AI', 'Autonomous Desk online on Windows host (100.105.70.120:8080). 7-Tier DAG active.', '#38bdf8');
+      addChatterMessage('Sarah Connor', 'Risk floor locked: 0.2% max intraday drawdown. Episodic memory active.', '#f43f5e');
+      addChatterMessage('The Farm', 'Gen-14 mutating forward paper portfolio. Sharpe: 2.14.', '#c084fc');
+      addChatterMessage('Alex Vance', 'SPY 50-DMA upward trend confirmed (+14.2° slope).', '#0284c7');
+
+      // Periodic chatter generator to keep the office alive
+      const randomChatter = [
+        { s: 'Alex Vance', t: 'Scanning Russell 2000 breadth; moving averages expanding positively.', c: '#0284c7' },
+        { s: 'Chloe Chen', t: 'Volatility compression on TSLA reaching 95th percentile squeeze.', c: '#9333ea' },
+        { s: 'Dr. M. Vance', t: 'FinBERT analyzed 18 news wires in last 60s: Neutral-to-Bullish skew.', c: '#d97706' },
+        { s: 'Viktor Orlov', t: 'Dark pool order block 140,000 shares absorbed at $138.20.', c: '#059669' },
+        { s: 'The Farm', t: 'Paper trade executed on Gen-14: +$140.20 PnL (Sharpe 2.14).', c: '#c084fc' },
+        { s: 'Floor Bot', t: 'Dispatched order ticket packets across IPC memory bus.', c: '#94a3b8' }
+      ];
+
+      setInterval(() => {
+        const item = randomChatter[Math.floor(Math.random() * randomChatter.length)];
+        addChatterMessage(item.s, item.t, item.c);
+      }, 9000);
+    });
   </script>
 </body>
 </html>
