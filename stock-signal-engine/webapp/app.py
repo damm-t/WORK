@@ -334,7 +334,21 @@ def api_health() -> dict:
     desks_status = {}
     for dk in ["stocks", "crypto", "futures", "forex"]:
         if dk == "stocks":
-            desks_status["stocks"] = {"configured": True, "trade_count": trade_count}
+            stk_equity = 0.0
+            stk_pos_count = 0
+            try:
+                from execution import client
+                acc = client.get_account()
+                stk_equity = round(float(acc.equity), 2)
+                stk_pos_count = len(client.get_all_positions())
+            except Exception:
+                pass
+            desks_status["stocks"] = {
+                "configured": True,
+                "trade_count": trade_count,
+                "open_positions": stk_pos_count,
+                "equity": stk_equity,
+            }
         else:
             st = _get_desk_state_file(dk) or {}
             desks_status[dk] = {
@@ -525,10 +539,12 @@ def api_journal_trades(limit: int = 50, book: str = "all", desk: str = "stocks")
         for i, t in enumerate(reversed(closed[-int(limit):])):
             ts = t.get("closed_at")
             dt_str = datetime.fromtimestamp(float(ts)).strftime("%Y-%m-%d %H:%M") if ts else "—"
+            o_ts = t.get("opened_at")
+            o_str = datetime.fromtimestamp(float(o_ts)).strftime("%Y-%m-%d %H:%M") if o_ts else dt_str
             trades.append({
                 "id": f"{d[:3].upper()}-{n - i}",
                 "ticker": t.get("symbol", "ASSET"),
-                "opened_at": dt_str,
+                "opened_at": o_str,
                 "closed_at": dt_str,
                 "qty": float(t.get("contracts") or t.get("lots") or 1.0),
                 "entry": float(t.get("entry_price") or 0.0),
@@ -572,11 +588,13 @@ def api_journal_trades(limit: int = 50, book: str = "all", desk: str = "stocks")
         for ct in st.get("closed_trades", [])[-int(limit):]:
             ts_val = float(ct.get("closed_at") or 0)
             dt_str = datetime.fromtimestamp(ts_val).strftime("%Y-%m-%d %H:%M") if ts_val > 0 else "—"
+            o_ts = ct.get("opened_at")
+            o_str = datetime.fromtimestamp(float(o_ts)).strftime("%Y-%m-%d %H:%M") if o_ts else dt_str
             all_raw.append({
                 "ts": ts_val,
                 "id": f"{dk[:3].upper()}",
                 "ticker": ct.get("symbol", "ASSET"),
-                "opened_at": dt_str, "closed_at": dt_str,
+                "opened_at": o_str, "closed_at": dt_str,
                 "qty": float(ct.get("contracts") or ct.get("lots") or 1.0),
                 "entry": float(ct.get("entry_price") or 0.0),
                 "exit": float(ct.get("exit_price") or 0.0),
@@ -598,6 +616,10 @@ def api_journal_exits(limit: int = 50) -> dict:
     return {"exits": journal.get_exits(limit=limit), "summary": journal.stats()}
 
 
+STRATEGY_UPGRADE_TS = 1792049500.0  # 2026-10-15 15:31:00 (AstraQuant Strategy Deployment Time)
+STRATEGY_UPGRADE_NAME = "AstraQuant V2 (2.0:1 R:R Floor & Hard Stop Cap)"
+
+
 @app.get("/api/journal/equity_curve")
 def api_equity_curve(desk: str = "stocks") -> dict:
     d = str(desk or "stocks").lower().strip()
@@ -605,10 +627,11 @@ def api_equity_curve(desk: str = "stocks") -> dict:
 
     if d == "stocks":
         pts = journal.equity_curve()
+        for p in pts:
+            ts_val = float(p.get("ts", 0.0) or 0.0)
+            p["is_new_strategy"] = (ts_val >= STRATEGY_UPGRADE_TS)
         last = pts[-1]["cum_pnl"] if pts else 0.0
-        return {"points": pts, "cum_pnl": last, "desk": "stocks"}
-
-    if d in ("crypto", "futures", "cme", "forex"):
+    elif d in ("crypto", "futures", "cme", "forex"):
         state = _get_desk_state_file(d) or {}
         closed = state.get("closed_trades", [])
         cum = 0.0
@@ -616,10 +639,11 @@ def api_equity_curve(desk: str = "stocks") -> dict:
         for i, t in enumerate(closed):
             pnl = float(t.get("pnl", 0.0))
             cum += pnl
-            ts = t.get("closed_at")
-            t_str = datetime.fromtimestamp(float(ts)).strftime("%d/%m %H:%M") if ts else f"#{i+1}"
+            ts = float(t.get("closed_at") or 0.0)
+            t_str = datetime.fromtimestamp(ts).strftime("%d/%m %H:%M") if ts > 0 else f"#{i+1}"
             pts.append({
                 "t": t_str,
+                "ts": ts,
                 "ticker": t.get("symbol", "ASSET"),
                 "pnl": round(pnl, 2),
                 "cum_pnl": round(cum, 2),
@@ -628,65 +652,94 @@ def api_equity_curve(desk: str = "stocks") -> dict:
                 "entry": round(float(t.get("entry_price") or 0.0), 2),
                 "exit": round(float(t.get("exit_price") or 0.0), 2),
                 "grade": t.get("strategy", d.upper()),
+                "is_new_strategy": (ts >= STRATEGY_UPGRADE_TS),
             })
         last = pts[-1]["cum_pnl"] if pts else 0.0
-        return {"points": pts, "cum_pnl": last, "desk": d}
-
-    # overall / all desks combined
-    all_events = []
-    # stocks
-    conn = journal._conn()
-    rows = conn.execute(
-        "SELECT closed_at, pnl, ticker, reason, qty, entry, exit, grade FROM trades WHERE closed_at IS NOT NULL"
-    ).fetchall()
-    conn.close()
-    for ts, pnl, sym, reason, qty, entry, exit_px, grade in rows:
-        all_events.append({
-            "ts": float(ts or 0),
-            "ticker": sym,
-            "desk": "🏛️ Stocks",
-            "pnl": float(pnl or 0),
-            "reason": reason,
-            "qty": qty,
-            "entry": entry,
-            "exit": exit_px,
-            "grade": grade,
-        })
-    # other desks
-    for dk, name in [("crypto", "⚡ Crypto"), ("futures", "📈 Futures"), ("forex", "💱 Forex")]:
-        st = _get_desk_state_file(dk) or {}
-        for t in st.get("closed_trades", []):
+    else:
+        # overall / all desks combined
+        all_events = []
+        # stocks
+        conn = journal._conn()
+        rows = conn.execute(
+            "SELECT closed_at, pnl, ticker, reason, qty, entry, exit, grade FROM trades WHERE closed_at IS NOT NULL"
+        ).fetchall()
+        conn.close()
+        for ts, pnl, sym, reason, qty, entry, exit_px, grade in rows:
             all_events.append({
-                "ts": float(t.get("closed_at") or 0),
-                "ticker": t.get("symbol", dk.upper()),
-                "desk": name,
-                "pnl": float(t.get("pnl", 0)),
-                "reason": t.get("reason", ""),
-                "qty": t.get("contracts") or t.get("lots") or 1.0,
-                "entry": t.get("entry_price", 0),
-                "exit": t.get("exit_price", 0),
-                "grade": t.get("strategy", dk.upper()),
+                "ts": float(ts or 0),
+                "ticker": sym,
+                "desk": "🏛️ Stocks",
+                "pnl": float(pnl or 0),
+                "reason": reason,
+                "qty": qty,
+                "entry": entry,
+                "exit": exit_px,
+                "grade": grade,
             })
-    all_events.sort(key=lambda x: x["ts"])
-    cum = 0.0
-    pts = []
-    for i, ev in enumerate(all_events):
-        cum += ev["pnl"]
-        ts_val = ev["ts"]
-        t_str = datetime.fromtimestamp(ts_val).strftime("%d/%m %H:%M") if ts_val > 0 else f"#{i+1}"
-        pts.append({
-            "t": t_str,
-            "ticker": ev["ticker"],
-            "pnl": round(ev["pnl"], 2),
-            "cum_pnl": round(cum, 2),
-            "reason": f"[{ev['desk']}] {ev.get('reason', '')}",
-            "qty": float(ev["qty"] or 1.0),
-            "entry": round(float(ev["entry"] or 0), 2),
-            "exit": round(float(ev["exit"] or 0), 2),
-            "grade": ev["grade"] or "Asset",
-        })
-    last = pts[-1]["cum_pnl"] if pts else 0.0
-    return {"points": pts, "cum_pnl": last, "desk": "overall"}
+        # other desks
+        for dk, name in [("crypto", "⚡ Crypto"), ("futures", "📈 Futures"), ("forex", "💱 Forex")]:
+            st = _get_desk_state_file(dk) or {}
+            for t in st.get("closed_trades", []):
+                all_events.append({
+                    "ts": float(t.get("closed_at") or 0),
+                    "ticker": t.get("symbol", dk.upper()),
+                    "desk": name,
+                    "pnl": float(t.get("pnl", 0)),
+                    "reason": t.get("reason", ""),
+                    "qty": t.get("contracts") or t.get("lots") or 1.0,
+                    "entry": t.get("entry_price", 0),
+                    "exit": t.get("exit_price", 0),
+                    "grade": t.get("strategy", dk.upper()),
+                })
+        all_events.sort(key=lambda x: x["ts"])
+        cum = 0.0
+        pts = []
+        for i, ev in enumerate(all_events):
+            cum += ev["pnl"]
+            ts_val = ev["ts"]
+            t_str = datetime.fromtimestamp(ts_val).strftime("%d/%m %H:%M") if ts_val > 0 else f"#{i+1}"
+            pts.append({
+                "t": t_str,
+                "ts": ts_val,
+                "ticker": ev["ticker"],
+                "pnl": round(ev["pnl"], 2),
+                "cum_pnl": round(cum, 2),
+                "reason": f"[{ev['desk']}] {ev.get('reason', '')}",
+                "qty": float(ev["qty"] or 1.0),
+                "entry": round(float(ev["entry"] or 0), 2),
+                "exit": round(float(ev["exit"] or 0), 2),
+                "grade": ev["grade"] or "Asset",
+                "is_new_strategy": (ts_val >= STRATEGY_UPGRADE_TS),
+            })
+        last = pts[-1]["cum_pnl"] if pts else 0.0
+
+    legacy_pts = [p for p in pts if not p.get("is_new_strategy")]
+    new_pts = [p for p in pts if p.get("is_new_strategy")]
+
+    legacy_pnl = round(sum(p["pnl"] for p in legacy_pts), 2)
+    new_strategy_pnl = round(sum(p["pnl"] for p in new_pts), 2)
+
+    new_wins = len([p for p in new_pts if p["pnl"] > 0])
+    new_losses = len([p for p in new_pts if p["pnl"] < 0])
+    new_wr = round((new_wins / len(new_pts)) * 100, 1) if len(new_pts) > 0 else 0.0
+
+    avg_win = round(sum(p["pnl"] for p in new_pts if p["pnl"] > 0) / max(1, new_wins), 2) if new_wins else 0.0
+    avg_loss = round(abs(sum(p["pnl"] for p in new_pts if p["pnl"] < 0)) / max(1, new_losses), 2) if new_losses else 0.0
+    new_rr = round(avg_win / avg_loss, 2) if avg_loss > 0 else (2.0 if new_wins > 0 else 0.0)
+
+    return {
+        "points": pts,
+        "cum_pnl": last,
+        "desk": d,
+        "strategy_upgrade_ts": STRATEGY_UPGRADE_TS,
+        "strategy_upgrade_date": "15/10 15:31",
+        "strategy_upgrade_name": STRATEGY_UPGRADE_NAME,
+        "legacy_pnl": legacy_pnl,
+        "new_strategy_pnl": new_strategy_pnl,
+        "new_trades_count": len(new_pts),
+        "new_win_rate": new_wr,
+        "new_realized_rr": new_rr,
+    }
 
 
 @app.get("/api/purchases")
@@ -1612,6 +1665,7 @@ def api_desks_status() -> Dict[str, Any]:
         "total_realized_pnl": forex_state.get("total_realized_pnl", 0.0),
         "lifetime_realized_pnl": forex_state.get("total_realized_pnl", 0.0),
         "total_pips_won": forex_state.get("total_pips_won", 0.0),
+        "feed_status": forex_state.get("feed_status", {"status": "ONLINE", "label": "🟢 Feed Online"}),
     }
 
     total_equity = stocks_data["equity"] + crypto_data["equity"] + cme_data["equity"] + forex_data["equity"]
@@ -1850,6 +1904,69 @@ def api_council_decision(payload: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
     meeting_id = payload.get("meeting_id", "")
     decision = payload.get("decision", "REJECT")
     return resolve_council_decision(meeting_id=meeting_id, decision=decision)
+
+
+# ------------------------------------------------------- The Farm & Failure Memory ----
+@app.get("/api/farm/status")
+def api_farm_status() -> Dict[str, Any]:
+    """Returns Safe Fleet (Live) vs The Farm (SIM Incubator) rosters and promotion scores."""
+    from execution.strategy_farm import strategy_farm
+    return strategy_farm.get_fleet_roster()
+
+
+@app.post("/api/farm/promote")
+def api_farm_promote(payload: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
+    """Promotes an incubating strategy from The Farm into the Safe Fleet with allocated capital."""
+    from execution.strategy_farm import strategy_farm
+    strategy_id = payload.get("strategy_id", "")
+    allocation_usd = float(payload.get("allocation_usd", 10000.0))
+    return strategy_farm.promote_strategy(strategy_id=strategy_id, allocation_usd=allocation_usd)
+
+
+@app.post("/api/farm/demote")
+def api_farm_demote(payload: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
+    """Demotes an underperforming Safe Fleet strategy to Farm Quarantine."""
+    from execution.strategy_farm import strategy_farm
+    strategy_id = payload.get("strategy_id", "")
+    reason = payload.get("reason", "Manual Quarantine")
+    return strategy_farm.demote_strategy(strategy_id=strategy_id, reason=reason)
+
+
+@app.get("/api/memory/failures")
+def api_memory_failures() -> Dict[str, Any]:
+    """Returns high-level failure memory clusters, indexed drawdowns, and active defense rules."""
+    from execution.failure_memory import failure_memory
+    return failure_memory.get_summary()
+
+
+@app.post("/api/memory/check")
+def api_memory_check(payload: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
+    """Tests a trade proposal against episodic failure clusters to evaluate regret risk."""
+    from execution.failure_memory import failure_memory
+    strategy = payload.get("strategy", "MOMENTUM_BREAKOUT")
+    side = payload.get("side", "LONG")
+    desk = payload.get("desk")
+    rsi = payload.get("rsi")
+    adx = payload.get("adx")
+    bb_status = payload.get("bb_status")
+    assessment = failure_memory.query_failure_risk(
+        strategy=strategy,
+        side=side,
+        desk=desk,
+        rsi=float(rsi) if rsi is not None else None,
+        adx=float(adx) if adx is not None else None,
+        bb_status=bb_status,
+    )
+    return {
+        "status": "success",
+        "risk_level": assessment.risk_level,
+        "failure_probability": assessment.failure_probability,
+        "matching_episodes_count": assessment.matching_episodes_count,
+        "primary_vulnerability": assessment.primary_vulnerability,
+        "recommended_action": assessment.recommended_action,
+        "defense_rule": assessment.defense_rule,
+        "similar_episodes": assessment.similar_episodes,
+    }
 
 
 # ------------------------------------------------------- Knowledge Graph (Graphify) ----
