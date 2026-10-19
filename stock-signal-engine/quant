@@ -374,6 +374,7 @@ deploy_remote() {
   fi
 
   # Create remote dir if not present
+  ssh "$target" "\"C:\\Program Files\\Git\\bin\\bash.exe\" -lc \"mkdir -p $remote_dir\"" 2>/dev/null || \
   ssh "$target" "mkdir -p '$remote_dir'" || {
     echo "❌ Failed to connect to $target via SSH. Make sure SSH is running on the host."
     return 1
@@ -391,11 +392,14 @@ deploy_remote() {
       --exclude='node_modules' \
       --exclude='.DS_Store' \
       --exclude='.remote_config' \
-      -cf - . | ssh "$target" "cd \"$remote_dir\" && tar -xf -"
+      -cf - . | (
+        ssh "$target" "\"C:\\Program Files\\Git\\bin\\bash.exe\" -lc \"cd $remote_dir && tar -xf -\"" 2>/dev/null || \
+        ssh "$target" "cd \"$remote_dir\" && tar -xf -"
+      )
 
   echo ""
   echo "🔄 Triggering remote reload on $target ..."
-  ssh "$target" "\"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"cd ~/stock-signal-engine && ./quant restart\"" 2>/dev/null || \
+  ssh "$target" "\"C:\\Program Files\\Git\\bin\\bash.exe\" -lc \"cd $remote_dir && ./quant restart\"" 2>/dev/null || \
   ssh "$target" "bash -c 'cd \"$remote_dir\" && ./quant restart'"
 
   echo ""
