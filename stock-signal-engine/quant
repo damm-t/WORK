@@ -424,10 +424,10 @@ tunnel_remote() {
   case "$action" in
     stop)
       echo "🛑 Closing SSH Funnel..."
-      pkill -f 'ssh.*8080:localhost:8080' 2>/dev/null && echo "Tunnel closed." || echo "No active tunnel found."
+      pkill -f 'ssh.*-L.*8080:' 2>/dev/null && echo "Tunnel closed." || echo "No active tunnel found."
       ;;
     status)
-      if pgrep -f 'ssh.*8080:localhost:8080' >/dev/null 2>&1; then
+      if pgrep -f 'ssh.*-L.*8080:' >/dev/null 2>&1; then
         echo "● SSH Funnel: ACTIVE"
         echo "  Forwarded: Remote 8080 -> Mac http://localhost:8080"
         echo "  Forwarded: Remote 8095 -> Mac http://localhost:8095"
@@ -450,7 +450,7 @@ tunnel_remote() {
         return 1
       fi
 
-      if pgrep -f 'ssh.*8080:localhost:8080' >/dev/null 2>&1; then
+      if pgrep -f 'ssh.*-L.*8080:' >/dev/null 2>&1; then
         echo "● SSH Funnel is ALREADY RUNNING!"
         echo "  👉 Cockpit  : http://localhost:8080"
         echo "  👉 Extractor: http://localhost:8095"
@@ -459,8 +459,8 @@ tunnel_remote() {
 
       echo "⚡ Establishing encrypted SSH Funnel from $target to Mac localhost..."
       ssh -f -N -o ExitOnForwardFailure=yes \
-          -L 8080:localhost:8080 \
-          -L 8095:localhost:8095 \
+          -L 8080:127.0.0.1:8080 \
+          -L 8095:127.0.0.1:8095 \
           "$target"
 
       if [ $? -eq 0 ]; then
@@ -611,7 +611,7 @@ except Exception:
     esac
     ;;
 
-  tunnel)
+  cloudflare|cf-tunnel)
     sub="${2:-status}"
     case "$sub" in
       restart)
