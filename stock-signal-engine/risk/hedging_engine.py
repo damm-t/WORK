@@ -92,9 +92,6 @@ BETA_OVERRIDES: Dict[str, float] = {
     "PSQ": -1.0,
 }
 
-# --- Tunable exit geometry (ATR multiples; env-overridable) -------------------
-# High-P&L Asymmetric Runner Profile:
-# stop=1.5, tp1=2.5, tp2=5.0, trail=2.5, tp1_scale=0.35 (keeps 65% as runner).
 STOP_ATR_MULT = 1.5            # hard stop distance below entry
 TP1_ATR_MULT = 2.0             # first profit target -> scale out 50%
 TP2_TRIGGER_ATR_MULT = 3.5     # runner activation level
@@ -138,9 +135,9 @@ def get_adaptive_exit_geometry(
     regime: Optional[str] = None,
 ) -> dict:
     """
-    Regime & PSI-adaptive exit geometry (Upgrade 1).
-    Dynamically adjusts stop, TP1, and trailing distances based on Price Stability Index (PSI).
-    Falls back cleanly to get_exit_geometry() when psi and regime are None, preserving tests.
+    Regime & PSI-adaptive exit geometry (Upgrade 1 + Quant Reel 1 & 2 AstraQuant).
+    Enforces minimum 2.0:1 R:R floor across all market regimes.
+    Eliminates the negative asymmetry trap where stops were 2.5 ATR vs 1.5 ATR TP.
     """
     base = get_exit_geometry()
     if psi is None and regime is None:
@@ -149,37 +146,38 @@ def get_adaptive_exit_geometry(
     regime_upper = (regime or "").upper()
     psi_val = float(psi) if psi is not None else 50.0
 
-    # LAMINAR_TREND: high stability, clean directional flow -> let winners run (R:R 2.0:1)
+    # LAMINAR_TREND: high stability, clean directional flow -> let winners run (R:R 2.5:1)
     if regime_upper in ("LAMINAR_TREND", "BULL", "BULL_EXPANSION") or psi_val >= 65.0:
         return {
-            "stop_mult": 1.5,
+            "stop_mult": 1.2,
             "tp1_mult": 3.0,
-            "trail_mult": 2.0,
-            "tp2_mult": 4.5,
-            "trail_arm_mult": 3.0,
-            "tp1_scale": base.get("tp1_scale", 0.5),
+            "trail_mult": 1.5,
+            "tp2_mult": 5.0,
+            "trail_arm_mult": 2.5,
+            "tp1_scale": 0.35,
             "regime_applied": "LAMINAR_TREND",
         }
-    # ERRATIC_NOISE: high chop, low stability -> quick targets, wider stop to prevent chop-outs
+    # ERRATIC_NOISE: high chop, low stability -> tight stop (1.0 ATR), 2.0 ATR target (2.0:1 R:R floor)
+    # Never widen stops in noise; that creates negative asymmetry!
     elif regime_upper in ("ERRATIC_NOISE", "BEAR_VOLATILITY") or psi_val < 45.0:
         return {
-            "stop_mult": 2.5,
-            "tp1_mult": 1.5,
+            "stop_mult": 1.0,
+            "tp1_mult": 2.0,
             "trail_mult": 1.0,
-            "tp2_mult": 2.5,
+            "tp2_mult": 3.0,
             "trail_arm_mult": 1.5,
-            "tp1_scale": base.get("tp1_scale", 0.5),
+            "tp1_scale": 0.35,
             "regime_applied": "ERRATIC_NOISE",
         }
-    # CALM_RANGING: standard mean reversion (R:R 1.0:1)
+    # CALM_RANGING: standard mean reversion (R:R 2.0:1)
     else:
         return {
-            "stop_mult": 2.0,
-            "tp1_mult": 2.0,
-            "trail_mult": 1.5,
-            "tp2_mult": 3.5,
+            "stop_mult": 1.2,
+            "tp1_mult": 2.4,
+            "trail_mult": 1.2,
+            "tp2_mult": 4.0,
             "trail_arm_mult": 2.0,
-            "tp1_scale": base.get("tp1_scale", 0.5),
+            "tp1_scale": 0.35,
             "regime_applied": "CALM_RANGING",
         }
 

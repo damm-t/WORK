@@ -30,38 +30,38 @@ class TestAdaptiveExitGeometry(unittest.TestCase):
         self.assertEqual(adaptive["regime_applied"], "STATIC_BASELINE")
 
     def test_laminar_trend_geometry(self):
-        """Laminar Trend (PSI >= 65) expands TP1 to 3.0x ATR and keeps stop at 1.5x ATR (2:1 R:R)."""
+        """Laminar Trend (PSI >= 65) expands TP1 to 3.0x ATR and keeps stop at 1.2x ATR (2.5:1 R:R)."""
         geo = get_adaptive_exit_geometry(psi=72.5, regime="LAMINAR_TREND")
-        self.assertEqual(geo["stop_mult"], 1.5)
+        self.assertEqual(geo["stop_mult"], 1.2)
         self.assertEqual(geo["tp1_mult"], 3.0)
-        self.assertEqual(geo["trail_mult"], 2.0)
+        self.assertEqual(geo["trail_mult"], 1.5)
         self.assertEqual(geo["regime_applied"], "LAMINAR_TREND")
 
         # Verify exit levels calculation
         levels = calculate_exit_levels(entry_price=100.0, atr=2.0, psi=72.5, regime="LAMINAR_TREND")
-        self.assertEqual(levels["hard_stop_price"], 97.0)      # 100 - (1.5 * 2)
+        self.assertEqual(levels["hard_stop_price"], 97.6)      # 100 - (1.2 * 2)
         self.assertEqual(levels["take_profit_1_price"], 106.0) # 100 + (3.0 * 2)
-        self.assertEqual(levels["trailing_stop_distance"], 4.0)
+        self.assertEqual(levels["trailing_stop_distance"], 3.0)
 
     def test_erratic_noise_geometry(self):
-        """Erratic Noise (PSI < 45) sets wider stop 2.5x ATR and tighter TP1 1.5x ATR."""
+        """Erratic Noise (PSI < 45) enforces tight stop 1.0x ATR and 2.0x ATR TP1 (positive asymmetry)."""
         geo = get_adaptive_exit_geometry(psi=35.0, regime="ERRATIC_NOISE")
-        self.assertEqual(geo["stop_mult"], 2.5)
-        self.assertEqual(geo["tp1_mult"], 1.5)
+        self.assertEqual(geo["stop_mult"], 1.0)
+        self.assertEqual(geo["tp1_mult"], 2.0)
         self.assertEqual(geo["trail_mult"], 1.0)
         self.assertEqual(geo["regime_applied"], "ERRATIC_NOISE")
 
         levels = calculate_exit_levels(entry_price=100.0, atr=2.0, psi=35.0, regime="ERRATIC_NOISE")
-        self.assertEqual(levels["hard_stop_price"], 95.0)      # 100 - (2.5 * 2)
-        self.assertEqual(levels["take_profit_1_price"], 103.0) # 100 + (1.5 * 2)
+        self.assertEqual(levels["hard_stop_price"], 98.0)      # 100 - (1.0 * 2)
+        self.assertEqual(levels["take_profit_1_price"], 104.0) # 100 + (2.0 * 2)
         self.assertEqual(levels["trailing_stop_distance"], 2.0)
 
     def test_calm_ranging_geometry(self):
-        """Calm Ranging (45 <= PSI < 65) sets 2.0x ATR stop and 2.0x ATR TP1."""
+        """Calm Ranging (45 <= PSI < 65) sets 1.2x ATR stop and 2.4x ATR TP1 (2:1 R:R)."""
         geo = get_adaptive_exit_geometry(psi=52.0, regime="CALM_RANGING")
-        self.assertEqual(geo["stop_mult"], 2.0)
-        self.assertEqual(geo["tp1_mult"], 2.0)
-        self.assertEqual(geo["trail_mult"], 1.5)
+        self.assertEqual(geo["stop_mult"], 1.2)
+        self.assertEqual(geo["tp1_mult"], 2.4)
+        self.assertEqual(geo["trail_mult"], 1.2)
         self.assertEqual(geo["regime_applied"], "CALM_RANGING")
 
 
@@ -88,7 +88,7 @@ class TestDynamicHedgeRatio(unittest.TestCase):
 
 class TestAdaptiveScaleOutAndTrail(unittest.TestCase):
     def test_adaptive_tp1_scale_plan(self):
-        """Scale-out triggers at 3.0x ATR in Laminar Trend, not 2.0x."""
+        """Scale-out triggers at 3.0x ATR in Laminar Trend, selling 35% and keeping 65% runner."""
         entry = 100.0
         atr = 2.0
         shares = 100
@@ -102,18 +102,18 @@ class TestAdaptiveScaleOutAndTrail(unittest.TestCase):
         plan_hit = tp1_scale_plan(price=106.5, entry_price=entry, atr=atr, shares=shares,
                                   psi=70.0, regime="LAMINAR_TREND")
         self.assertEqual(plan_hit["action"], "scale_out")
-        self.assertEqual(plan_hit["sell_qty"], 50)
+        self.assertEqual(plan_hit["sell_qty"], 35)
 
     def test_adaptive_ratchet_trailing_stop(self):
-        """Trailing stop arms at 3.0x ATR in Laminar Trend and trails by 2.0x ATR."""
+        """Trailing stop arms at 2.5x ATR in Laminar Trend and trails by 1.5x ATR."""
         entry = 100.0
         atr = 2.0
-        # High reached 107.0 (> arm trigger 106.0 for laminar)
+        # High reached 107.0 (> arm trigger 105.0 for laminar 2.5*2)
         ratchet = ratchet_trailing_stop(entry_price=entry, atr=atr, highest_price_seen=107.0,
                                         current_stop_price=97.0, psi=70.0, regime="LAMINAR_TREND")
         self.assertTrue(ratchet["trailing_armed"])
-        # Stop trailed by 2.0 * atr = 4.0 -> 107 - 4 = 103.0
-        self.assertEqual(ratchet["stop_price"], 103.0)
+        # Stop trailed by 1.5 * atr = 3.0 -> 107 - 3 = 104.0
+        self.assertEqual(ratchet["stop_price"], 104.0)
 
 
 class TestRegimeAdaptivePositionSizing(unittest.TestCase):
