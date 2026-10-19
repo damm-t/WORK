@@ -14,7 +14,13 @@ set -u
 cd "$(dirname "$0")"
 
 RUN=".run"; mkdir -p "$RUN" logs
-PY=".venv/bin/python"
+if [ -f ".venv/Scripts/python.exe" ]; then
+  PY=".venv/Scripts/python.exe"
+elif [ -f ".venv/bin/python" ]; then
+  PY=".venv/bin/python"
+else
+  PY="python3"
+fi
 
 # --- Runtime Stability Defaults ---
 export USE_LGBM_RUNTIME=0
@@ -23,6 +29,7 @@ export TOKENIZERS_PARALLELISM=false
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 export PYTHONUNBUFFERED=1
+export PYTHONIOENCODING=utf-8
 export NEWS_MEMORY=1
 
 # --- Tuned Risk & Exit Geometry (Validated 11-Year Walk-Forward) ---
@@ -43,7 +50,17 @@ export DAILY_LOSS_LIMIT="${DAILY_LOSS_LIMIT:--0.03}"     # -3% daily max loss ki
 export MIN_TRADE_SCORE="${MIN_TRADE_SCORE:-85}"          # Grade A sniper setup threshold
 export MIN_AUTO_SCORE="${MIN_AUTO_SCORE:-85}"            # Quality gate for automated entries
 
-is_up() { [ -f "$RUN/$1.pid" ] && kill -0 "$(cat "$RUN/$1.pid")" 2>/dev/null; }
+is_up() {
+  [ -f "$RUN/$1.pid" ] || return 1
+  local pid
+  pid=$(cat "$RUN/$1.pid")
+  [ -n "$pid" ] || return 1
+  if [[ "${OSTYPE:-}" == "msys"* ]] || [[ "${OSTYPE:-}" == "cygwin"* ]]; then
+    ps -W 2>/dev/null | grep -w "$pid" >/dev/null 2>&1
+  else
+    kill -0 "$pid" 2>/dev/null
+  fi
+}
 
 start_bg() {
   local name="$1"; shift
@@ -51,7 +68,11 @@ start_bg() {
     echo "• $name already running (pid $(cat "$RUN/$name.pid"))"
     return 0
   fi
-  nohup caffeinate -ims "$@" >>"logs/$name.log" 2>&1 &
+  if command -v caffeinate >/dev/null 2>&1; then
+    nohup caffeinate -ims "$@" >>"logs/$name.log" 2>&1 &
+  else
+    nohup "$@" >>"logs/$name.log" 2>&1 &
+  fi
   echo $! >"$RUN/$name.pid"
   sleep 1
   if is_up "$name"; then
@@ -138,6 +159,22 @@ stop_desk() {
 }
 
 show_status() {
+  local target_mode="${1:-}"
+
+  if [ "$target_mode" = "remote" ] || [ "$target_mode" = "win" ]; then
+    if [ -f "$REMOTE_CONF" ]; then
+      # shellcheck disable=SC1090
+      source "$REMOTE_CONF"
+      echo "📡 Fetching full live status from 24/7 host ($REMOTE_TARGET)..."
+      ssh -i ~/.ssh/id_ed25519 "$REMOTE_TARGET" "\"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"cd ~/stock-signal-engine && ./quant status\"" 2>/dev/null || \
+      ssh -i ~/.ssh/id_ed25519 "$REMOTE_TARGET" "bash -c 'cd stock-signal-engine && ./quant status'"
+      return 0
+    else
+      echo "❌ No remote host configured. Run './quant deploy' first."
+      return 1
+    fi
+  fi
+
   echo "==========================================================================="
   echo "   📊 QUANT DESK STATUS — 4 CONCURRENT ASSET DESKS (ISOLATED PIDS)"
   echo "==========================================================================="
@@ -149,9 +186,40 @@ show_status() {
 
   code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/ 2>/dev/null)
   if [ "$code" = "200" ]; then
-    echo "  ● Web UI          : http://localhost:8080 (Active) [Forwarded: 8081]"
+    echo "  ● Local Web UI    : http://localhost:8080 (Active) [Forwarded: 8081]"
   else
-    echo "  ○ Web UI          : Unreachable (Run ./quant start to launch)"
+    echo "  ○ Local Web UI    : stopped"
+  fi
+
+  if [ -f "$REMOTE_CONF" ]; then
+    # shellcheck disable=SC1090
+    source "$REMOTE_CONF"
+    local rhost
+    rhost=$(echo "$REMOTE_TARGET" | awk -F'@' '{print $NF}')
+    if [ -n "$rhost" ]; then
+      local rcode
+      rcode=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 2 "http://$rhost:8080/api/health" 2>/dev/null)
+      if [ "$rcode" = "200" ]; then
+        echo ""
+        echo "  [🌐 24/7 REMOTE ENGINE ($rhost)]"
+        "$PY" -c "
+import urllib.request, json
+try:
+    with urllib.request.urlopen('http://$rhost:8080/api/health', timeout=3) as r:
+        d = json.loads(r.read())
+        up = int(d.get('uptime_seconds', 0))
+        h, m = divmod(up // 60, 60)
+        print(f'  ● Remote Cockpit  : http://$rhost:8080 (Healthy, Uptime {h}h {m}m)')
+        print(f'  ● Autopilot Cycle : {d.get(\"autopilot\", {}).get(\"status\", \"active\")} (Cycle #{d.get(\"autopilot\", {}).get(\"cycle\", 0)})')
+        ds = d.get('desks', {})
+        stk_eq = ds.get('stocks', {}).get('equity', 0)
+        print(f'  ● Live Equities   : Stocks \${stk_eq:,.2f} | Crypto \${ds.get(\"crypto\", {}).get(\"equity\", 0):,.2f} | CME \${ds.get(\"futures\", {}).get(\"equity\", 0):,.2f} | Forex \${ds.get(\"forex\", {}).get(\"equity\", 0):,.2f}')
+        print(f'  ● Quick Web View  : http://$rhost:8080/widget')
+except Exception:
+    pass
+" 2>/dev/null
+      fi
+    fi
   fi
 
   echo ""
@@ -270,6 +338,139 @@ else:
   return 0
 }
 
+REMOTE_CONF=".remote_config"
+
+deploy_remote() {
+  local target="${1:-}"
+  local remote_dir="${2:-~/stock-signal-engine}"
+
+  if [ -n "$target" ]; then
+    echo "REMOTE_TARGET=\"$target\"" > "$REMOTE_CONF"
+    echo "REMOTE_DIR=\"$remote_dir\"" >> "$REMOTE_CONF"
+  elif [ -f "$REMOTE_CONF" ]; then
+    # shellcheck disable=SC1090
+    source "$REMOTE_CONF"
+    target="${REMOTE_TARGET:-}"
+    remote_dir="${REMOTE_DIR:-~/stock-signal-engine}"
+  fi
+
+  if [ -z "$target" ]; then
+    echo "❌ No remote target configured."
+    echo "Usage:   ./quant deploy <user@ip-or-host> [remote_dir]"
+    echo "Example: ./quant deploy ubuntu@192.168.1.120"
+    return 1
+  fi
+
+  echo "==========================================================================="
+  echo "🚀 [QUANT DEPLOY] Syncing Mac code -> 24/7 Engine Host ($target)"
+  echo "==========================================================================="
+  echo "• Remote Target : $target"
+  echo "• Remote Path   : $remote_dir"
+  echo ""
+
+  # Test SSH connection
+  if ! ssh -q -o BatchMode=yes -o ConnectTimeout=5 "$target" exit 2>/dev/null; then
+    echo "ℹ️  Testing interactive SSH connection to $target..."
+  fi
+
+  # Create remote dir if not present
+  ssh "$target" "mkdir -p '$remote_dir'" || {
+    echo "❌ Failed to connect to $target via SSH. Make sure SSH is running on the host."
+    return 1
+  }
+
+  echo "📦 Syncing codebase (excluding virtualenv, git history, and runtime logs)..."
+  tar --exclude='.venv' \
+      --exclude='__pycache__' \
+      --exclude='*.pyc' \
+      --exclude='.git' \
+      --exclude='.run' \
+      --exclude='logs/*.log' \
+      --exclude='logs/*.pid' \
+      --exclude='.tempmediaStorage' \
+      --exclude='node_modules' \
+      --exclude='.DS_Store' \
+      --exclude='.remote_config' \
+      -cf - . | ssh "$target" "cd \"$remote_dir\" && tar -xf -"
+
+  echo ""
+  echo "🔄 Triggering remote reload on $target ..."
+  ssh "$target" "\"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"cd ~/stock-signal-engine && ./quant restart\"" 2>/dev/null || \
+  ssh "$target" "bash -c 'cd \"$remote_dir\" && ./quant restart'"
+
+  echo ""
+  echo "==========================================================================="
+  echo "✅ Remote deployment complete! 24/7 engine running on $target."
+  echo "💡 To view the live cockpit on your Mac, run: ./quant tunnel"
+  echo "==========================================================================="
+}
+
+tunnel_remote() {
+  local action="${1:-start}"
+  local target="${2:-}"
+
+  if [ -n "$target" ]; then
+    echo "REMOTE_TARGET=\"$target\"" > "$REMOTE_CONF"
+  elif [ -f "$REMOTE_CONF" ]; then
+    # shellcheck disable=SC1090
+    source "$REMOTE_CONF"
+    target="${REMOTE_TARGET:-}"
+  fi
+
+  case "$action" in
+    stop)
+      echo "🛑 Closing SSH Funnel..."
+      pkill -f 'ssh.*8080:localhost:8080' 2>/dev/null && echo "Tunnel closed." || echo "No active tunnel found."
+      ;;
+    status)
+      if pgrep -f 'ssh.*8080:localhost:8080' >/dev/null 2>&1; then
+        echo "● SSH Funnel: ACTIVE"
+        echo "  Forwarded: Remote 8080 -> Mac http://localhost:8080"
+        echo "  Forwarded: Remote 8095 -> Mac http://localhost:8095"
+      else
+        echo "○ SSH Funnel: INACTIVE (Run './quant tunnel' to connect)"
+      fi
+      ;;
+    start|*)
+      if [ -z "$target" ]; then
+        if [ "$action" != "start" ] && [[ "$action" == *"@"* || "$action" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          target="$action"
+          echo "REMOTE_TARGET=\"$target\"" > "$REMOTE_CONF"
+        fi
+      fi
+
+      if [ -z "$target" ]; then
+        echo "❌ No remote target configured."
+        echo "Usage:   ./quant tunnel [user@ip-or-host]"
+        echo "Example: ./quant tunnel ubuntu@192.168.1.120"
+        return 1
+      fi
+
+      if pgrep -f 'ssh.*8080:localhost:8080' >/dev/null 2>&1; then
+        echo "● SSH Funnel is ALREADY RUNNING!"
+        echo "  👉 Cockpit  : http://localhost:8080"
+        echo "  👉 Extractor: http://localhost:8095"
+        return 0
+      fi
+
+      echo "⚡ Establishing encrypted SSH Funnel from $target to Mac localhost..."
+      ssh -f -N -o ExitOnForwardFailure=yes \
+          -L 8080:localhost:8080 \
+          -L 8095:localhost:8095 \
+          "$target"
+
+      if [ $? -eq 0 ]; then
+        echo "✅ Encrypted SSH Funnel connected!"
+        echo "   👉 Cockpit  : http://localhost:8080"
+        echo "   👉 Extractor: http://localhost:8095"
+        echo "   (Remote 24/7 PIDs running; close your Mac anytime without stopping trades)"
+      else
+        echo "❌ Failed to connect SSH tunnel. Check your network or SSH credentials."
+      fi
+      ;;
+  esac
+}
+
 case "${1:-start}" in
   start)
     TARGET="${2:-all}"
@@ -354,9 +555,11 @@ except Exception:
         start_bg webapp "$PY" -m uvicorn webapp.app:app \
                         --host 0.0.0.0 --port 8080 || true
 
-        # 8. Launch macOS Menu Bar Widget
-        echo "🍎 Launching macOS Menu Bar Widget..."
-        ./mac_widget/launch.sh || true
+        # 8. Launch macOS Menu Bar Widget (macOS only)
+        if [ "$(uname)" = "Darwin" ]; then
+          echo "🍎 Launching macOS Menu Bar Widget..."
+          ./mac_widget/launch.sh || true
+        fi
 
         sleep 2
         if [ -x /usr/bin/open ] && [ "${NO_BROWSER:-0}" != "1" ]; then
@@ -385,7 +588,7 @@ except Exception:
     stop_desk "${2:-all}" ;;
 
   status)
-    show_status ;;
+    show_status "${2:-}" ;;
 
   restart)
     target="${2:-all}"
@@ -446,6 +649,22 @@ except Exception:
   sniper)
     shift
     "$PY" backtest/daily_sniper.py "$@" ;;
+
+  refer|alpha)
+    shift
+    target="${1:-}"
+    if [[ "$target" == http* ]]; then
+      "$PY" -m instagram_extractor.cli extract "$target" || true
+      meta="instagram_extractor/output/DdsCOmdkZux_metadata.json"
+      if [ -f "$meta" ]; then
+        "$PY" -m market.external_alpha_bridge --meta "$meta"
+      fi
+    elif [ -n "$target" ]; then
+      "$PY" -m market.external_alpha_bridge --tickers "$target"
+    else
+      "$PY" -m market.external_alpha_bridge --meta instagram_extractor/output/DdsCOmdkZux_metadata.json
+    fi
+    ;;
 
   graphify)
     shift
@@ -541,28 +760,40 @@ print('   Architecture Doc  : graphify-out/GRAPH_REPORT.md')
     shift
     exec ./mac_widget/launch.sh "$@" ;;
 
+  deploy)
+    shift
+    deploy_remote "$@" ;;
+
+  tunnel)
+    shift
+    tunnel_remote "$@" ;;
+
   help|--help|-h|*)
     echo "╔════════════════════════════════════════════════════════════════╗"
-    echo "║   QUANT DESK — 3-ASSET CONCURRENT AUTONOMOUS CONTROL PLANE     ║"
+    echo "║   QUANT DESK — 4-ASSET CONCURRENT AUTONOMOUS CONTROL PLANE     ║"
     echo "╚════════════════════════════════════════════════════════════════╝"
     echo "  Usage:"
-    echo "    ./quant start [desk]  Starts all 3 desks or a specific desk (stocks|crypto|futures)"
-    echo "    ./quant stop [desk]   Stops all desks or a specific desk cleanly"
-    echo "    ./quant status        Shows running state, PIDs, equity & open positions"
-    echo "    ./quant logs [desk]   Streams live logs (stocks|crypto|futures|webapp)"
-    echo "    ./quant exits         Shows database ledger of all partial & full exits"
-    echo "    ./quant dips          Scans market for High-Volume Dip opportunities"
-    echo "    ./quant ross          Scans small-caps using Ross Cameron's 5 Pillars"
-    echo "    ./quant mock-ross     Simulates Ross Cameron 1st pullback momentum execution"
-    echo "    ./quant scan          Ranks entire market universe (breakouts & dips)"
-    echo "    ./quant sniper        Shows today's #1 single best setup card"
-    echo "    ./quant widget        Launches native macOS menu bar status widget"
-    echo "    ./quant restart       Restarts the entire desk"
+    echo "    ./quant start [desk]   Starts all 4 desks or a specific desk"
+    echo "    ./quant stop [desk]    Stops all desks or a specific desk cleanly"
+    echo "    ./quant status         Shows running state, PIDs, equity & open positions"
+    echo "    ./quant logs [desk]    Streams live logs (stocks|crypto|futures|forex|webapp)"
+    echo "    ./quant exits          Shows database ledger of all partial & full exits"
+    echo "    ./quant dips           Scans market for High-Volume Dip opportunities"
+    echo "    ./quant ross           Scans small-caps using Ross Cameron's 5 Pillars"
+    echo "    ./quant mock-ross      Simulates Ross Cameron 1st pullback momentum execution"
+    echo "    ./quant scan           Ranks entire market universe (breakouts & dips)"
+    echo "    ./quant sniper         Shows today's #1 single best setup card"
+    echo "    ./quant refer [target] Cross-references external bot/IG ideas through quant math"
+    echo "    ./quant widget         Launches native macOS menu bar status widget"
+    echo "    ./quant restart        Restarts the entire desk"
+    echo "    ./quant deploy [host]  Syncs Mac code to 24/7 host & restarts remote engine"
+    echo "    ./quant tunnel [host]  Funnels remote 8080 & 8095 to Mac localhost"
     echo ""
     echo "  Desks:"
-    echo "    Desk 1 (Stocks)  : US Equities & Macro Autopilot (Alpaca Paper / Live)"
-    echo "    Desk 2 (Crypto)  : 24/7/365 CCXT Perpetual Futures Demo (Binance/OKX)"
-    echo "    Desk 3 (Futures) : CME Micro Index Futures Demo 23h (MES, MNQ, MCL, MGC)"
+    echo "    Desk 1 (Stocks)   : US Equities & Macro Autopilot (Alpaca Paper / Live)"
+    echo "    Desk 2 (Crypto)   : 24/7/365 CCXT Perpetual Futures Demo (Binance/OKX)"
+    echo "    Desk 3 (Futures)  : CME Micro Index Futures Demo 23h (MES, MNQ, MCL, MGC)"
+    echo "    Desk 4 (Forex)    : 24/5 Macro Currencies Demo"
     echo ""
     echo "  Optional Overrides:"
     echo "    RISK_PCT=0.01 ./quant start    Risk 1% per trade (default 0.02 = 2%)"

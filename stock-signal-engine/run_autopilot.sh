@@ -27,9 +27,20 @@ if [ -f "$LOG_DIR/autopilot.pid" ] && kill -0 "$(cat "$LOG_DIR/autopilot.pid")" 
     exit 1
 fi
 
-echo "Starting autopilot -> $LOG_FILE"
-# caffeinate -is: prevents idle/system sleep while the bot runs
-nohup caffeinate -is .venv/bin/python -m execution.autopilot "$@" >> "$LOG_FILE" 2>&1 &
+if [ -f ".venv/Scripts/python.exe" ]; then
+    PY=".venv/Scripts/python.exe"
+elif [ -f ".venv/bin/python" ]; then
+    PY=".venv/bin/python"
+else
+    PY="python3"
+fi
+
+# caffeinate -is: prevents idle/system sleep while the bot runs on macOS
+if command -v caffeinate >/dev/null 2>&1; then
+    nohup caffeinate -is "$PY" -m execution.autopilot "$@" >> "$LOG_FILE" 2>&1 &
+else
+    nohup "$PY" -m execution.autopilot "$@" >> "$LOG_FILE" 2>&1 &
+fi
 echo $! > "$LOG_DIR/autopilot.pid"
 sleep 2
 
