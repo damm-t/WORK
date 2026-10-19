@@ -1,8 +1,8 @@
 {
   "_day": {
-    "date": "2026-10-13",
-    "start_equity": 96512.22,
-    "peak_equity": 96512.22
+    "date": "2026-10-16",
+    "start_equity": 96350.6,
+    "peak_equity": 96386.84
   },
   "MSFT": {
     "stop_price": 529.89,

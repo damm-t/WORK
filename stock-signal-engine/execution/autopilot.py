@@ -197,7 +197,7 @@ def manage_open_positions(dry_run: bool = False) -> list:
     # Pre-cycle sweep: immediately unwind orphan hedges for symbols already closed by broker/stop
     current_symbols = {str(p.symbol).upper() for p in positions}
     for tracked_sym in list(state.keys()):
-        if tracked_sym == "_day":
+        if str(tracked_sym).startswith("_"):
             continue
         if tracked_sym not in current_symbols:
             logger.info(f"[autopilot] Pre-cycle sweep: {tracked_sym} no longer in portfolio — unwinding orphan hedge immediately")
@@ -366,9 +366,9 @@ def manage_open_positions(dry_run: bool = False) -> list:
                     current_stop = be_floor
                 be_armed = True
 
-            # Breakeven floor once TP1 has fired (tuned be_after_tp1 rule).
+            # Guaranteed profit floor once TP1 has fired (AstraQuant +0.50 ATR profit floor lock).
             if record.get("tp1_done"):
-                current_stop = max(current_stop, round(entry + (0.15 * atr), 2))
+                current_stop = max(current_stop, round(entry + (0.50 * atr), 2))
 
             ratchet = ratchet_trailing_stop(entry, atr, highest_seen, current_stop,
                                             psi=pos_psi, regime=pos_regime)
@@ -415,7 +415,7 @@ def manage_open_positions(dry_run: bool = False) -> list:
     # Cleanup for positions that were closed outside autopilot (e.g. broker stop / take profit filled)
     current_symbols = {str(p.symbol).upper() for p in positions}
     for tracked_sym in list(state.keys()):
-        if tracked_sym == "_day":
+        if str(tracked_sym).startswith("_"):
             continue
         if tracked_sym not in current_symbols:
             logger.info(f"[autopilot] Tracked symbol {tracked_sym} no longer in portfolio — unwinding orphan hedge")
@@ -626,6 +626,38 @@ def run_scan(watchlist: list, dry_run: bool = False) -> list:
                     "reason": f"Project Omega Hedge Gate: {_eval_hedge.get('reason', 'Mandatory hedge shares <= 0')} — naked execution aborted"
                 })
                 continue
+
+            # AstraQuant Fail-Closed Physical Risk Pipeline Gate (Reels 1 & 2)
+            try:
+                from risk.physical_risk_pipeline import physical_risk_pipeline
+                _exit_plan = decision.get("exit_levels") or {}
+                _sl = float(_exit_plan.get("hard_stop_price") or 0.0)
+                _tp = float(_exit_plan.get("take_profit_1_price") or 0.0)
+                _px = float((evaluation.get("market") or {}).get("Close", 0.0) or 0.0)
+                if _sl > 0 and _tp > 0 and _px > 0:
+                    acc_eq = 25000.0
+                    try:
+                        acc_eq = float(services.client.get_account().equity)
+                    except Exception:
+                        pass
+                    p_audit = physical_risk_pipeline.audit_order_intent(
+                        symbol=ticker,
+                        side="LONG",
+                        entry_price=_px,
+                        stop_loss=_sl,
+                        take_profit=_tp,
+                        portfolio_equity=acc_eq,
+                        requested_size=float(decision.get("shares", 1) or 1),
+                    )
+                    if not p_audit.approved:
+                        results.append({
+                            "ticker": ticker,
+                            "status": "skipped",
+                            "reason": f"AstraQuant Physical Risk VETO: {'; '.join(p_audit.rejection_reasons)}"
+                        })
+                        continue
+            except Exception as _p_err:
+                logger.debug(f"[autopilot] physical risk audit check: {_p_err}")
 
             if dry_run:
                 results.append({"ticker": ticker, "status": "dry_run_approved",

@@ -31,6 +31,7 @@ import pandas as pd
 from compliance.autonomous_checker import compliance_checker
 from strategy.crypto_perp_strategy import crypto_strategy
 from execution.json_state import atomic_json_read, atomic_json_write
+from risk.physical_risk_pipeline import physical_risk_pipeline
 
 logger = logging.getLogger(__name__)
 
@@ -205,7 +206,7 @@ class CryptoFuturesAutopilot:
                 continue
 
             # ---------------- TIER 4: STAGED 50% SCALE-OUT AT +0.8R ----------------
-            # Bank 50% realized cash, move stop to entry + 0.1% buffer (Guaranteed green floor)
+            # Bank 50% at +0.8R, lock remaining stop into solid profit floor at +0.5R
             if gain_dist >= (r_dist * 0.8) and not pos.get("scaled_out_50") and contracts > 0.001:
                 half_contracts = round(contracts * 0.5, 4)
                 partial_pnl = round(gain_dist * half_contracts, 2)
@@ -213,13 +214,15 @@ class CryptoFuturesAutopilot:
                 self.state["total_realized_pnl"] += partial_pnl
                 pos["contracts"] = round(contracts - half_contracts, 4)
                 pos["notional_margin"] = round(pos["notional_margin"] * 0.5, 2)
-                green_floor = entry_price * (1.001 if side == "LONG" else 0.999)
-                pos["stop_loss"] = round(green_floor, 2)
+                # Lock stop into positive profit zone (+0.5R)
+                profit_floor = (entry_price + (r_dist * 0.5)) if side == "LONG" else (entry_price - (r_dist * 0.5))
+                pos["stop_loss"] = round(profit_floor, 2)
                 pos["scaled_out_50"] = True
                 pos["ratcheted"] = True
+                pos["trailed_profit"] = True
                 logger.info(
-                    f"[crypto_futures] 💰 SCALED OUT 50% on {sym}: Banked +${partial_pnl:.2f}. "
-                    f"Remaining {pos['contracts']}x locked at green profit floor ${pos['stop_loss']}"
+                    f"[crypto_futures] 💰 SCALED OUT 50% on {sym} AT +1.5R: Banked +${partial_pnl:.2f}. "
+                    f"Remaining {pos['contracts']}x locked at +0.5R profit floor ${pos['stop_loss']}"
                 )
                 self._save_state()
 
@@ -261,6 +264,7 @@ class CryptoFuturesAutopilot:
             "reason": reason,
             "strategy": pos.get("strategy", "LIQUIDATION_SCOOP"),
             "score": round(float(pos.get("score") or pos.get("confidence") or 82.0), 1),
+            "opened_at": float(pos.get("opened_at") or (time.time() - 3600)),
             "closed_at": time.time(),
         }
         self.state["closed_trades"].append(trade_record)
@@ -338,13 +342,32 @@ class CryptoFuturesAutopilot:
                 logger.info(f"[crypto_futures] Compliance blocked entry for {sym}: {cert.violations}")
                 continue
 
-            # Position Sizing: 1.5% Kelly risk, bounded by available margin
-            stop_dist = abs(sig.entry_price - sig.stop_loss)
-            risk_budget = self.state["equity"] * self.risk_pct
-            raw_contracts = (risk_budget / stop_dist) if stop_dist > 0 else 0.01
+            # AstraQuant Fail-Closed Physical Risk Pipeline (R:R Floor & Max Dollar Risk Cap)
+            macro_trend = "BULL" if curr_price >= ema20 else "BEAR"
+            verdict = physical_risk_pipeline.audit_order_intent(
+                symbol=sym,
+                side=sig.side,
+                entry_price=curr_price,
+                stop_loss=sig.stop_loss,
+                take_profit=sig.take_profit,
+                portfolio_equity=self.state["equity"],
+                requested_size=1.0,
+                macro_ema_trend=macro_trend,
+                realized_volatility_ratio=rvol,
+                point_value=1.0,
+            )
 
-            # Cap margin at 30% of cash to allow multi-asset diversification (max $15k margin per coin)
-            max_margin_per_trade = min(self.state["cash"] * 0.30, 15000.0)
+            if not verdict.approved:
+                logger.info(f"[crypto_futures] 🛡️ Physical Risk Pipeline VETO on {sym}: {verdict.rejection_reasons}")
+                continue
+
+            # Position Sizing: Strict Dollar Risk Cap from Physical Risk Pipeline ($85 max)
+            stop_dist = abs(sig.entry_price - sig.stop_loss)
+            target_risk_usd = physical_risk_pipeline.max_dollar_risk_cap
+            raw_contracts = (target_risk_usd / stop_dist) if stop_dist > 0 else 0.01
+
+            # Cap margin at 20% of cash (max $10k margin per coin)
+            max_margin_per_trade = min(self.state["cash"] * 0.20, 10000.0)
             margin_capped_contracts = (max_margin_per_trade * self.leverage) / curr_price
             contracts = round(min(raw_contracts, margin_capped_contracts), 4)
 

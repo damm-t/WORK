@@ -34,6 +34,7 @@ from compliance.autonomous_checker import compliance_checker
 from market.price_fetcher import fetch_prices
 from strategy.cme_futures_strategy import cme_strategy
 from execution.json_state import atomic_json_read, atomic_json_write
+from risk.physical_risk_pipeline import physical_risk_pipeline
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -226,21 +227,22 @@ class CMEFuturesAutopilot:
                 continue
 
             # ---------------- TIER 4: STAGED 50% SCALE-OUT AT +0.8R ----------------
-            # Bank 1 contract (50%), move stop to entry + 1 tick buffer (Guaranteed green floor)
+            # Bank 1 contract (50%), move stop to entry + 0.5R (Guaranteed green profit floor)
             if gain_pts >= (r_pts * 0.8) and not pos.get("scaled_out_50") and contracts >= 2:
                 half_contracts = contracts // 2
                 partial_pnl = round(gain_pts * half_contracts * pt_val, 2)
-                margin_freed = round(pos.get("margin_held", 1250.0) * 0.5, 2)
+                margin_freed = round(pos.get("margin_held", 1250.0) * (half_contracts / contracts), 2)
                 self.state["cash"] += round(margin_freed + partial_pnl, 2)
                 self.state["total_realized_pnl"] += partial_pnl
                 pos["contracts"] = contracts - half_contracts
                 pos["margin_held"] = round(pos.get("margin_held", 1250.0) - margin_freed, 2)
-                green_floor = entry_price + (tick_size if side == "LONG" else -tick_size)
+                # True +0.5R profit floor lock!
+                green_floor = entry_price + (r_pts * 0.5) if side == "LONG" else entry_price - (r_pts * 0.5)
                 pos["stop_loss"] = round(green_floor, 2)
                 pos["scaled_out_50"] = True
                 pos["ratcheted"] = True
                 logger.info(
-                    f"[cme_futures] 💰 SCALED OUT 50% on {sym}: Banked +${partial_pnl:.2f}. "
+                    f"[cme_futures] 💰 SCALED OUT 50% on {sym} AT +1.5R: Banked +${partial_pnl:.2f}. "
                     f"Remaining {pos['contracts']} ctrs locked at green profit floor {pos['stop_loss']}"
                 )
                 self._save_state()
@@ -285,6 +287,7 @@ class CMEFuturesAutopilot:
             "reason": reason,
             "strategy": pos.get("strategy", "INDEX_BREAKOUT"),
             "score": round(float(pos.get("score") or pos.get("confidence") or 80.0), 1),
+            "opened_at": float(pos.get("opened_at") or (time.time() - 3600)),
             "closed_at": time.time(),
         }
         self.state["closed_trades"].append(trade_record)
@@ -344,8 +347,31 @@ class CMEFuturesAutopilot:
 
             cfg = cme_strategy.TICK_CONFIG.get(sym, {"tick_size": 0.01, "point_value": 50.0})
             pt_val = cfg.get("point_value", 50.0)
+            tick_sz = cfg.get("tick_size", 0.01)
+
+            # AstraQuant Fail-Closed Physical Risk Pipeline Gate (Reels 1 & 2)
+            p_audit = physical_risk_pipeline.audit_order_intent(
+                symbol=sym,
+                side=sig.side,
+                entry_price=curr_price,
+                stop_loss=sig.stop_loss,
+                take_profit=sig.take_profit,
+                portfolio_equity=self.state.get("equity", 25000.0),
+                requested_size=float(sig.contracts),
+                point_value=pt_val,
+                tick_size=tick_sz,
+            )
+
+            if not p_audit.approved:
+                logger.info(
+                    f"[cme_futures] 🛑 AstraQuant Physical Risk VETO for {sym}: "
+                    f"{'; '.join(p_audit.rejection_reasons)}"
+                )
+                continue
+
+            safe_contracts = max(1, int(p_audit.allowed_position_size))
             margin_per_contract = 1000.0  # commodity demo margin per contract
-            total_margin = sig.contracts * margin_per_contract
+            total_margin = safe_contracts * margin_per_contract
             if total_margin > self.state["cash"]:
                 continue
 
@@ -357,7 +383,7 @@ class CMEFuturesAutopilot:
                 "current_price": curr_price,
                 "stop_loss": sig.stop_loss,
                 "take_profit": sig.take_profit,
-                "contracts": sig.contracts,
+                "contracts": safe_contracts,
                 "point_value": pt_val,
                 "margin_held": total_margin,
                 "strategy": getattr(sig, "strategy_type", getattr(sig, "setup_name", "COMMODITY_MOMENTUM")),
@@ -365,8 +391,8 @@ class CMEFuturesAutopilot:
                 "opened_at": time.time(),
             }
             logger.info(
-                f"[cme_futures] ⚡ ENTERED {sig.side} {sig.contracts}x {sym} @ {curr_price:.2f} "
-                f"(Stop: {sig.stop_loss:.2f}, TP: {sig.take_profit:.2f}) | {sig.rationale}"
+                f"[cme_futures] ⚡ ENTERED {sig.side} {safe_contracts}x {sym} @ {curr_price:.2f} "
+                f"(Stop: {sig.stop_loss:.2f}, TP: {sig.take_profit:.2f}, R:R: {p_audit.calculated_rr}:1) | {sig.rationale}"
             )
             self._save_state()
 

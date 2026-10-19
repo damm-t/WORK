@@ -34,6 +34,7 @@ from compliance.autonomous_checker import compliance_checker
 from market.price_fetcher import fetch_prices
 from strategy.forex_strategy import forex_strategy, ForexSignal
 from execution.json_state import atomic_json_read, atomic_json_write
+from risk.physical_risk_pipeline import physical_risk_pipeline
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +67,8 @@ class ForexAutopilot:
         self.running = True
         self.state_path = state_path or STATE_PATH
         self.state = self._load_state(initial_capital)
+        self.last_successful_tick_ts = time.time()
+        self.was_disconnected = False
 
     def _load_state(self, initial_capital: float) -> Dict[str, Any]:
         loaded = atomic_json_read(self.state_path)
@@ -135,13 +138,132 @@ class ForexAutopilot:
 
         return df
 
-    def manage_open_positions(self) -> None:
+    @staticmethod
+    def _compute_rsi(prices: pd.Series, period: int = 14) -> float:
+        if len(prices) < 5:
+            return 50.0
+        delta = prices.diff()
+        gain = delta.where(delta > 0, 0.0)
+        loss = -delta.where(delta < 0, 0.0)
+        avg_gain = float(gain.rolling(window=min(period, len(prices)), min_periods=3).mean().iloc[-1])
+        avg_loss = float(loss.rolling(window=min(period, len(prices)), min_periods=3).mean().iloc[-1])
+        if avg_loss == 0.0:
+            return 100.0 if avg_gain > 0.0 else 50.0
+        rs = avg_gain / avg_loss
+        return float(100.0 - (100.0 / (1.0 + rs)))
+
+    def evaluate_pre_sell_analysis(
+        self,
+        sym: str,
+        pos: Dict[str, Any],
+        curr_price: float,
+        df: pd.DataFrame,
+        is_gap_reconnect: bool = False,
+    ) -> Dict[str, Any]:
         """
-        Active 4-Tier Profit Harvesting & Shock Defense Engine:
-        1. Shock Reflex: Detects macro pip spikes, candle volatility, and weekend gap risk.
-        2. Near-Target Exhaustion Harvest: Captures 95%+ of target without waiting for rigid last fraction.
-        3. Staged 50% Scale-Out: Banks realized cash at +1.0R and eliminates downside risk.
-        4. Continuous Trailing Profit Ratchet: Trails stop 8 pips behind peak price into profit zone.
+        Intelligent Pre-Sell Analysis Engine:
+        Evaluates position health, technical exhaustion (RSI), candle wicks,
+        and support structures before triggering any loss exits following
+        a disconnect, gap, or adverse price drift.
+
+        Returns triage decision:
+          - "HOLD": Position shows high probability oversold/overbought exhaustion;
+                    grants temporary cushion stop for mean-reversion rebound.
+          - "CURB_LOSS_50": Adverse drift confirmed without immediate rebound;
+                    curbs dollar loss by scaling out 50% lots and tightening remaining stop.
+          - "CLOSE": Catastrophic breach or cushion failure; cuts position with clear label.
+        """
+        side = pos["side"]
+        entry_price = float(pos["entry_price"])
+        pip_size = float(pos.get("pip_size", 0.0001))
+        r_pips = float(pos.get("pips_sl") or 18.0)
+        pips_gain = (curr_price - entry_price) / pip_size if side == "LONG" else (entry_price - curr_price) / pip_size
+        adverse_pips = -pips_gain
+        decimals = 5 if pip_size == 0.0001 else 3
+
+        # Compute technical metrics
+        rsi = 50.0
+        has_reversal_wick = False
+        macro_trend_aligned = False
+
+        if df is not None and not df.empty and len(df) >= 5:
+            closes = df["Close"]
+            rsi = self._compute_rsi(closes, 14)
+            last_close = float(closes.iloc[-1])
+            last_open = float(df["Open"].iloc[-1]) if "Open" in df.columns else last_close
+            last_high = float(df["High"].iloc[-1]) if "High" in df.columns else last_close
+            last_low = float(df["Low"].iloc[-1]) if "Low" in df.columns else last_close
+            body = abs(last_close - last_open)
+
+            if side == "LONG":
+                lower_wick = min(last_close, last_open) - last_low
+                has_reversal_wick = lower_wick >= (1.3 * max(body, pip_size))
+                if len(closes) >= 20:
+                    ema50 = float(closes.ewm(span=min(50, len(closes))).mean().iloc[-1])
+                    macro_trend_aligned = (curr_price >= ema50 * 0.997)
+            else:  # SHORT
+                upper_wick = last_high - max(last_close, last_open)
+                has_reversal_wick = upper_wick >= (1.3 * max(body, pip_size))
+                if len(closes) >= 20:
+                    ema50 = float(closes.ewm(span=min(50, len(closes))).mean().iloc[-1])
+                    macro_trend_aligned = (curr_price <= ema50 * 1.003)
+
+        hold_count = int(pos.get("reconnect_hold_count", 0))
+
+        # Check if an existing cushion stop was breached
+        cushion_sl = pos.get("cushion_sl")
+        if cushion_sl is not None:
+            if (side == "LONG" and curr_price <= cushion_sl) or (side == "SHORT" and curr_price >= cushion_sl):
+                if not pos.get("loss_curbed") and float(pos.get("lots", 0)) >= 0.10:
+                    return {
+                        "action": "CURB_LOSS_50",
+                        "reason": f"🛡️ Reconnection Loss Curb (50% De-Risk: Cushion Floor Hit at {curr_price:.{decimals}f})",
+                        "rsi": rsi,
+                    }
+                prefix = "🔌 Disconnect: " if is_gap_reconnect else ""
+                return {
+                    "action": "CLOSE",
+                    "reason": f"{prefix}Cushion Stop Triggered (-{adverse_pips:.1f} pips)",
+                    "rsi": rsi,
+                }
+
+        # ----------------- DECISION 1: CAN BE HELD? -----------------
+        # AstraQuant Fail-Closed Risk Axiom: Never widen stop-losses beyond 1.0R.
+        # Moving or cushioning stops during adverse momentum is the #1 cause of catastrophic loss.
+        can_hold = False
+
+        # ----------------- DECISION 2: CURB SOME LOSS? -----------------
+        # Staged de-risk: If drawdown is confirmed or hold expired, but not a total blowout (>2.5x SL),
+        # curb 50% lots to bank realized protection rather than dumping 100%.
+        can_curb = (
+            not pos.get("loss_curbed", False)
+            and float(pos.get("lots", 0)) >= 0.10
+            and adverse_pips <= (r_pips * 2.5)
+        )
+
+        if can_curb:
+            return {
+                "action": "CURB_LOSS_50",
+                "reason": f"🛡️ Loss Curb (50% De-Risk: Adverse Drift -{adverse_pips:.1f}p, RSI={rsi:.1f})",
+                "rsi": rsi,
+            }
+
+        # ----------------- DECISION 3: COMPLETE CUT -----------------
+        cut_label = "🔌 Disconnect Gap Cut" if is_gap_reconnect else "🛑 Stop Loss Triggered"
+        return {
+            "action": "CLOSE",
+            "reason": f"{cut_label} (-{adverse_pips:.1f} pips)",
+            "rsi": rsi,
+        }
+
+    def manage_open_positions(self, is_gap_reconnect: bool = False) -> None:
+        """
+        Active 5-Tier Profit Harvesting & Pre-Sell Defense Engine:
+        1. Pre-Sell Analysis: Analyzes RSI exhaustion & wicks before selling; holds candidates or curbs loss.
+        2. Shock Reflex: Detects macro pip spikes, candle volatility, and weekend gap risk.
+        3. Near-Target Exhaustion Harvest: Captures 95%+ of target without waiting for rigid last fraction.
+        4. Staged 50% Scale-Out: Banks realized cash at +0.8R and eliminates downside risk.
+        5. Continuous Trailing Profit Ratchet: Trails stop 6 pips behind peak price into profit zone.
         """
         positions = self.state.get("positions", {})
         to_close = []
@@ -176,6 +298,14 @@ class ForexAutopilot:
             pos["unrealized_pnl"] = round(pnl, 2)
             pos["unrealized_pips"] = round(pips_gain, 1)
 
+            # Clear hold if trade recovered back into profit
+            if pos.get("reconnect_hold") and pips_gain > 2.0:
+                pos["reconnect_hold"] = False
+                pos["reconnect_hold_count"] = 0
+                pos["cushion_sl"] = None
+                pos["status_badge"] = "Clawed Back (In Profit)"
+                logger.info(f"[forex] 🌟 RECOVERY COMPLETE on {sym}: Clawed back into green (+{pips_gain:.1f} pips). Normal management resumed.")
+
             # Track peak price throughout the trade
             if side == "LONG":
                 peak_p = max(pos.get("peak_price", entry_price), curr_price)
@@ -186,19 +316,135 @@ class ForexAutopilot:
             # Initial Risk Unit (R) in pips
             r_pips = float(pos.get("pips_sl") or 16.0)
             pips_tp = float(pos.get("pips_tp") or (r_pips * 2.0))
+            adverse_pips = -pips_gain
+
+            # ---------------- TIER 1: STOP LOSS & RECONNECT TRIAGE ----------------
+            is_sl_hit = (side == "LONG" and curr_price <= sl) or (side == "SHORT" and curr_price >= sl)
+            if is_sl_hit:
+                # If trailing profit stop or breakeven floor hit, harvest the win cleanly
+                if pos.get("trailed_profit") or pos.get("ratcheted"):
+                    reason = "Trailing Profit Stop Hit" if pos.get("trailed_profit") else "Breakeven Stop Hit"
+                    to_close.append((sym, curr_price, reason, pnl, pips_gain))
+                    continue
+
+                # In drawdown: Perform Pre-Sell Technical Triage before dumping!
+                triage = self.evaluate_pre_sell_analysis(sym, pos, curr_price, df, is_gap_reconnect=is_gap_reconnect)
+                if triage["action"] == "HOLD":
+                    pos["reconnect_hold"] = True
+                    pos["reconnect_hold_count"] = pos.get("reconnect_hold_count", 0) + 1
+                    pos["cushion_sl"] = triage["cushion_sl"]
+                    pos["stop_loss"] = triage["cushion_sl"]
+                    pos["status_badge"] = f"🔌 Hold ({triage['rsi']:.0f} RSI Rebound)"
+                    logger.info(f"[forex] 🔌 Pre-sell hold granted on {sym}: {triage['reason']}. Cushion SL: {triage['cushion_sl']}")
+                    continue
+
+                elif triage["action"] == "CURB_LOSS_50":
+                    half_lots = round(pos["lots"] / 2.0, 2)
+                    curbed_pnl = round(pips_gain * pip_val_usd * half_lots, 2)
+                    curbed_margin = round(pos["margin_reserved"] * 0.5, 2)
+                    self.state["cash"] += round(curbed_margin + curbed_pnl, 2)
+                    self.state["total_realized_pnl"] += curbed_pnl
+                    self.state["total_pips_won"] = self.state.get("total_pips_won", 0.0) + round(pips_gain * 0.5, 1)
+                    pos["lots"] = round(pos["lots"] - half_lots, 2)
+                    pos["margin_reserved"] = round(pos["margin_reserved"] - curbed_margin, 2)
+                    pos["loss_curbed"] = True
+                    pos["reconnect_hold"] = False
+                    tight_sl = (
+                        round(curr_price - (6.0 * pip_size), decimals)
+                        if side == "LONG"
+                        else round(curr_price + (6.0 * pip_size), decimals)
+                    )
+                    pos["stop_loss"] = tight_sl
+                    pos["cushion_sl"] = None
+                    pos["status_badge"] = "🛡️ 50% Loss Curbed (Tight Stop)"
+                    self.state["closed_trades"].append({
+                        "symbol": sym,
+                        "side": pos["side"],
+                        "entry_price": pos["entry_price"],
+                        "exit_price": curr_price,
+                        "lots": half_lots,
+                        "pips": round(pips_gain, 1),
+                        "pnl": curbed_pnl,
+                        "reason": triage["reason"],
+                        "strategy": pos.get("strategy", "LONDON_NY_BREAKOUT"),
+                        "score": round(float(pos.get("score") or 78.0), 1),
+                        "opened_at": float(pos.get("opened_at") or (time.time() - 3600)),
+                        "closed_at": time.time(),
+                    })
+                    logger.info(
+                        f"[forex] 🛡️ CURBED LOSS on {sym}: Banked {curbed_pnl:+.2f} on {half_lots} lots. "
+                        f"Remaining {pos['lots']} lots protected with tight SL @ {tight_sl}."
+                    )
+                    self._save_state()
+                    continue
+
+                else:  # CLOSE
+                    to_close.append((sym, curr_price, triage["reason"], pnl, pips_gain))
+                    continue
 
             # ---------------- TIER 0: EMERGENCY SHOCK EXIT REFLEX ----------------
             shock = forex_strategy.detect_shock(sym, pos, curr_price, df)
             if shock.get("shocked"):
-                logger.warning(f"[forex] 🚨 EMERGENCY SHOCK EXIT on {sym}: {shock.get('reason')}")
-                to_close.append((sym, curr_price, f"Shock Exit: {shock.get('reason')}", pnl, pips_gain))
-                continue
+                if shock.get("type") == "WEEKEND_CLOSE":
+                    logger.warning(f"[forex] 🏛️ WEEKEND CLOSE EXIT on {sym}: {shock.get('reason')}")
+                    to_close.append((sym, curr_price, shock.get("reason"), pnl, pips_gain))
+                    continue
 
-            # ---------------- TIER 1: STOP LOSS (HARD OR TRAILED) ----------------
-            if (side == "LONG" and curr_price <= sl) or (side == "SHORT" and curr_price >= sl):
-                reason = "Trailing Profit Stop Hit" if pos.get("trailed_profit") else ("Breakeven Stop Hit" if pos.get("ratcheted") else "Stop Loss Triggered")
-                to_close.append((sym, curr_price, reason, pnl, pips_gain))
-                continue
+                # Run pre-sell analysis for velocity/dislocation shocks:
+                triage = self.evaluate_pre_sell_analysis(sym, pos, curr_price, df, is_gap_reconnect=is_gap_reconnect)
+                if triage["action"] == "HOLD":
+                    pos["reconnect_hold"] = True
+                    pos["reconnect_hold_count"] = pos.get("reconnect_hold_count", 0) + 1
+                    pos["cushion_sl"] = triage["cushion_sl"]
+                    pos["stop_loss"] = triage["cushion_sl"]
+                    pos["status_badge"] = f"🔌 Hold ({triage['rsi']:.0f} RSI Rebound)"
+                    logger.info(f"[forex] 🔌 Pre-sell hold on shock for {sym}: {triage['reason']}")
+                    continue
+
+                elif triage["action"] == "CURB_LOSS_50":
+                    half_lots = round(pos["lots"] / 2.0, 2)
+                    curbed_pnl = round(pips_gain * pip_val_usd * half_lots, 2)
+                    curbed_margin = round(pos["margin_reserved"] * 0.5, 2)
+                    self.state["cash"] += round(curbed_margin + curbed_pnl, 2)
+                    self.state["total_realized_pnl"] += curbed_pnl
+                    self.state["total_pips_won"] = self.state.get("total_pips_won", 0.0) + round(pips_gain * 0.5, 1)
+                    pos["lots"] = round(pos["lots"] - half_lots, 2)
+                    pos["margin_reserved"] = round(pos["margin_reserved"] - curbed_margin, 2)
+                    pos["loss_curbed"] = True
+                    pos["reconnect_hold"] = False
+                    tight_sl = (
+                        round(curr_price - (6.0 * pip_size), decimals)
+                        if side == "LONG"
+                        else round(curr_price + (6.0 * pip_size), decimals)
+                    )
+                    pos["stop_loss"] = tight_sl
+                    pos["cushion_sl"] = None
+                    pos["status_badge"] = "🛡️ 50% Loss Curbed (Tight Stop)"
+                    self.state["closed_trades"].append({
+                        "symbol": sym,
+                        "side": pos["side"],
+                        "entry_price": pos["entry_price"],
+                        "exit_price": curr_price,
+                        "lots": half_lots,
+                        "pips": round(pips_gain, 1),
+                        "pnl": curbed_pnl,
+                        "reason": triage["reason"],
+                        "strategy": pos.get("strategy", "LONDON_NY_BREAKOUT"),
+                        "score": round(float(pos.get("score") or 78.0), 1),
+                        "opened_at": float(pos.get("opened_at") or (time.time() - 3600)),
+                        "closed_at": time.time(),
+                    })
+                    logger.info(
+                        f"[forex] 🛡️ CURBED LOSS on shock for {sym}: Realized ${curbed_pnl:+.2f} on {half_lots} lots. "
+                        f"Remaining {pos['lots']} lots protected @ {tight_sl}."
+                    )
+                    self._save_state()
+                    continue
+
+                else:
+                    logger.warning(f"[forex] 🚨 EMERGENCY SHOCK EXIT on {sym}: {shock.get('reason')}")
+                    to_close.append((sym, curr_price, f"Shock Exit: {shock.get('reason')}", pnl, pips_gain))
+                    continue
 
             # ---------------- TIER 2: FULL TAKE PROFIT 2 REACHED ----------------
             if (side == "LONG" and curr_price >= tp) or (side == "SHORT" and curr_price <= tp):
@@ -213,8 +459,8 @@ class ForexAutopilot:
                 continue
 
             # ---------------- TIER 4: STAGED 50% SCALE-OUT AT +0.8R ----------------
-            # Bank 50% realized cash, move stop to entry + 1.0 pip (Guaranteed green floor)
-            if pips_gain >= (r_pips * 0.8) and not pos.get("scaled_out_50") and pos.get("lots", 0) >= 0.2:
+            # Bank 50% realized cash at +0.8R, lock remaining stop at +0.5R profit floor
+            if pips_gain >= (r_pips * 0.8) and not pos.get("scaled_out_50") and pos.get("lots", 0) >= 0.10:
                 half_lots = round(pos["lots"] / 2.0, 2)
                 partial_pnl = round(pips_gain * pip_val_usd * half_lots, 2)
                 self.state["cash"] += round(pos["margin_reserved"] * 0.5 + partial_pnl, 2)
@@ -222,14 +468,15 @@ class ForexAutopilot:
                 self.state["total_pips_won"] = self.state.get("total_pips_won", 0.0) + pips_gain
                 pos["lots"] = round(pos["lots"] - half_lots, 2)
                 pos["margin_reserved"] = round(pos["margin_reserved"] * 0.5, 2)
-                # Guaranteed green floor: entry + 1 pip
-                green_sl = entry_price + (1.0 * pip_size) if side == "LONG" else entry_price - (1.0 * pip_size)
-                pos["stop_loss"] = round(green_sl, decimals)
+                # Guaranteed profit floor locked at +0.5R (half of target)
+                profit_sl = entry_price + (r_pips * 0.5 * pip_size) if side == "LONG" else entry_price - (r_pips * 0.5 * pip_size)
+                pos["stop_loss"] = round(profit_sl, decimals)
                 pos["scaled_out_50"] = True
                 pos["ratcheted"] = True
+                pos["trailed_profit"] = True
                 logger.info(
-                    f"[forex] 💰 SCALED OUT 50% on {sym}: Banked +${partial_pnl:.2f} (+{pips_gain:.1f} pips). "
-                    f"Remaining {pos['lots']} lots locked at +1 pip profit floor {pos['stop_loss']}"
+                    f"[forex] 💰 SCALED OUT 50% on {sym} AT +1.5R: Banked +${partial_pnl:.2f} (+{pips_gain:.1f} pips). "
+                    f"Remaining {pos['lots']} lots locked at +0.5R profit floor {pos['stop_loss']}"
                 )
                 self._save_state()
 
@@ -277,6 +524,7 @@ class ForexAutopilot:
             "reason": reason,
             "strategy": pos.get("strategy", "LONDON_NY_BREAKOUT"),
             "score": round(float(pos.get("score") or pos.get("confidence") or 78.0), 1),
+            "opened_at": float(pos.get("opened_at") or (time.time() - 3600)),
             "closed_at": time.time(),
         }
         self.state["closed_trades"].append(trade_record)
@@ -330,11 +578,27 @@ class ForexAutopilot:
             pip_size = cfg["pip"]
             pip_val_usd = cfg.get("pip_val_usd", 10.0)
 
-            # Sizing based on risk budget
-            risk_budget = self.state["equity"] * self.risk_pct
+            # AstraQuant Fail-Closed Physical Risk Pipeline (R:R Floor & Max Dollar Risk Cap)
+            point_multiplier = pip_val_usd / pip_size
+            verdict = physical_risk_pipeline.audit_order_intent(
+                symbol=sym,
+                side=sig.side,
+                entry_price=sig.entry_price,
+                stop_loss=sig.stop_loss,
+                take_profit=sig.take_profit,
+                portfolio_equity=self.state["equity"],
+                requested_size=0.15,
+                point_value=point_multiplier,
+            )
+            if not verdict.approved:
+                logger.info(f"[forex] 🛡️ Physical Risk Pipeline VETO on {sym}: {verdict.rejection_reasons}")
+                continue
+
+            # Sizing based on strict risk budget - aligned with portfolio ($50-$75 max risk per trade)
+            target_risk_usd = min(self.state["equity"] * 0.0015, physical_risk_pipeline.max_dollar_risk_cap)
             risk_per_standard_lot = sig.pips_sl * pip_val_usd
-            lots = max(round(risk_budget / max(risk_per_standard_lot, 10.0), 2), 0.10)  # mini lot min
-            lots = min(lots, 2.0)  # Max 2 standard lots
+            lots = max(round(target_risk_usd / max(risk_per_standard_lot, 10.0), 2), 0.05)  # micro lot minimum
+            lots = min(lots, 0.20)  # Safe cap: 0.20 lots max ($20k notional instead of $200k)
 
             # Margin requirement: standard lot = $100k notional. At 20:1 leverage, margin = $5,000 per lot
             margin_required = lots * 5000.0
@@ -388,8 +652,32 @@ class ForexAutopilot:
             self._save_state()
 
     def run_cycle(self) -> None:
-        """Executes one scan & position management tick."""
-        self.manage_open_positions()
+        """Executes one scan & position management tick with feed gap detection."""
+        now_ts = time.time()
+        gap_seconds = now_ts - self.last_successful_tick_ts
+        is_gap_reconnect = gap_seconds > max(150.0, self.interval * 2.5) or self.was_disconnected
+
+        # Track feed status
+        if is_gap_reconnect:
+            logger.info(
+                f"[forex] 🔌 FEED RECONNECTED: Detected {gap_seconds:.0f}s outage/gap. "
+                f"Commencing pre-sell technical triage for open positions."
+            )
+            self.state["feed_status"] = {
+                "status": "ONLINE",
+                "last_reconnect_at": now_ts,
+                "gap_seconds": round(gap_seconds, 1),
+                "label": f"🔌 Reconnected after {int(gap_seconds)}s feed gap",
+            }
+            self.was_disconnected = False
+        else:
+            if "feed_status" not in self.state:
+                self.state["feed_status"] = {}
+            self.state["feed_status"]["status"] = "ONLINE"
+            self.state["feed_status"]["last_tick"] = now_ts
+            self.state["feed_status"]["label"] = "🟢 Feed Online"
+
+        self.manage_open_positions(is_gap_reconnect=is_gap_reconnect)
 
         # Update equity = cash + reserved margins + unrealized PnL
         unrealized = sum(p.get("unrealized_pnl", 0.0) for p in self.state.get("positions", {}).values())
@@ -398,6 +686,7 @@ class ForexAutopilot:
 
         self.scan_and_enter()
         self._save_state()
+        self.last_successful_tick_ts = time.time()
 
     def start(self) -> None:
         logger.info(f"[forex] Starting Forex Autopilot Daemon (PID {os.getpid()}). Capital: ${self.state['equity']:,.2f}")
@@ -418,7 +707,15 @@ class ForexAutopilot:
             try:
                 self.run_cycle()
             except Exception as e:
-                logger.error(f"[forex] Cycle error: {e}", exc_info=True)
+                self.was_disconnected = True
+                self.state["feed_status"] = {
+                    "status": "DISCONNECTED",
+                    "disconnected_at": time.time(),
+                    "error": str(e),
+                    "label": "🔌 Feed Disconnected (Offline / API Timeout)",
+                }
+                self._save_state()
+                logger.error(f"[forex] Cycle error (Feed Disconnected): {e}", exc_info=True)
             time.sleep(self.interval)
 
 

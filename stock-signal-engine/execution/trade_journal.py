@@ -551,8 +551,10 @@ class TradeJournal:
         for ts, pnl, sym, reason, qty, entry, exit_px, grade, score in rows:
             pnl_f = float(pnl or 0.0)
             cum += pnl_f
+            ts_f = float(ts or 0.0)
             points.append({
-                "t": datetime.fromtimestamp(float(ts)).strftime("%d/%m %H:%M"),
+                "t": datetime.fromtimestamp(ts_f).strftime("%d/%m %H:%M") if ts_f > 0 else "—",
+                "ts": ts_f,
                 "ticker": sym or "UNKNOWN",
                 "pnl": round(pnl_f, 2),
                 "cum_pnl": round(cum, 2),
