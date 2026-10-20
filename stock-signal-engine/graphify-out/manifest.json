@@ -1834,5 +1834,23 @@
     "seen": 1792383561.733752,
     "ast_hash": "3da56f2c258be113780782c8e5d3fa9a",
     "semantic_hash": ""
+  },
+  "backtest/unified_four_desk_simulation.py": {
+    "mtime": 1792459672.0840385,
+    "seen": 1792459730.79008,
+    "ast_hash": "91c8b8449f0cc55c82a5b992bd4077c8",
+    "semantic_hash": ""
+  },
+  "reports/unified_simulation_report.json": {
+    "mtime": 1792459705.0659943,
+    "seen": 1792459730.792948,
+    "ast_hash": "06f01e465bd7da3bfa928b2b9b1f9ca9",
+    "semantic_hash": ""
+  },
+  "scratch/analyze_pnl.py": {
+    "mtime": 1792400423.5332828,
+    "seen": 1792459730.793256,
+    "ast_hash": "88628e7e711fb4819383243254cbc5fc",
+    "semantic_hash": ""
   }
 }
