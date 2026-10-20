@@ -475,31 +475,36 @@ class ForexAutopilot:
                 pos["ratcheted"] = True
                 pos["trailed_profit"] = True
                 logger.info(
-                    f"[forex] 💰 SCALED OUT 50% on {sym} AT +1.5R: Banked +${partial_pnl:.2f} (+{pips_gain:.1f} pips). "
+                    f"[forex] 💰 SCALED OUT 50% on {sym} AT +0.8R: Banked +${partial_pnl:.2f} (+{pips_gain:.1f} pips). "
                     f"Remaining {pos['lots']} lots locked at +0.5R profit floor {pos['stop_loss']}"
                 )
                 self._save_state()
 
-            # ---------------- TIER 5: CONTINUOUS TRAILING PROFIT RATCHET ----------------
-            # Once in solid profit (>= 1.0R), trail stop 6 pips behind peak price
-            if pips_gain >= (r_pips * 1.0):
-                trail_pips = max(6.0, r_pips * 0.4)
+            # ---------------- TIER 5: UNCHOKED TRAILING PROFIT RATCHET ----------------
+            # Once in solid profit (>= 1.5R), trail stop with generous 0.6R cushion behind peak price
+            # This eliminates premature choking while safeguarding the green profit floor (+0.5R)
+            if pips_gain >= (r_pips * 1.5):
+                trail_pips = max(8.0, r_pips * 0.6)
                 if side == "LONG":
                     proposed_sl = round(peak_p - (trail_pips * pip_size), decimals)
-                    if proposed_sl > pos["stop_loss"]:
-                        pos["stop_loss"] = proposed_sl
+                    floor_sl = round(entry_price + (r_pips * 0.5 * pip_size), decimals)
+                    target_sl = max(proposed_sl, floor_sl)
+                    if target_sl > pos["stop_loss"]:
+                        pos["stop_loss"] = target_sl
                         pos["ratcheted"] = True
                         pos["trailed_profit"] = True
-                        locked_pips = (proposed_sl - entry_price) / pip_size
-                        logger.info(f"[forex] 📈 Trailed stop into PROFIT for {sym} @ {proposed_sl} (Locked +{locked_pips:.1f} pips in bank)")
+                        locked_pips = (target_sl - entry_price) / pip_size
+                        logger.info(f"[forex] 📈 Trailed stop into PROFIT for {sym} @ {target_sl} (Locked +{locked_pips:.1f} pips in bank)")
                 elif side == "SHORT":
                     proposed_sl = round(peak_p + (trail_pips * pip_size), decimals)
-                    if proposed_sl < pos["stop_loss"]:
-                        pos["stop_loss"] = proposed_sl
+                    floor_sl = round(entry_price - (r_pips * 0.5 * pip_size), decimals)
+                    target_sl = min(proposed_sl, floor_sl)
+                    if target_sl < pos["stop_loss"]:
+                        pos["stop_loss"] = target_sl
                         pos["ratcheted"] = True
                         pos["trailed_profit"] = True
-                        locked_pips = (entry_price - proposed_sl) / pip_size
-                        logger.info(f"[forex] 📈 Trailed stop into PROFIT for {sym} @ {proposed_sl} (Locked +{locked_pips:.1f} pips in bank)")
+                        locked_pips = (entry_price - target_sl) / pip_size
+                        logger.info(f"[forex] 📈 Trailed stop into PROFIT for {sym} @ {target_sl} (Locked +{locked_pips:.1f} pips in bank)")
 
         for sym, exit_px, reason, pnl, pips in to_close:
             self._close_position(sym, exit_px, reason, pnl, pips)
@@ -529,6 +534,22 @@ class ForexAutopilot:
         }
         self.state["closed_trades"].append(trade_record)
         logger.info(f"[forex] CLOSED {sym} @ {exit_price} | PnL: ${pnl:+.2f} ({pips:+.1f} pips) [{reason}]")
+
+        # Record trade into Self-Improving Expectancy Tracker
+        try:
+            r_unit = float(pos.get("pips_sl", 16.0))
+            r_mult = pips / max(r_unit, 1.0)
+            strat = pos.get("strategy", "LONDON_NY_BREAKOUT")
+            forex_strategy.learner.record_trade(
+                strategy_type=strat,
+                pnl=pnl,
+                r_multiple=r_mult,
+                entry_price=pos["entry_price"],
+                exit_price=exit_price,
+                pair=sym,
+            )
+        except Exception as e:
+            logger.debug(f"[forex] self-learning log failed: {e}")
 
         try:
             compliance_checker.audit_closed_trade(
@@ -594,10 +615,17 @@ class ForexAutopilot:
                 logger.info(f"[forex] 🛡️ Physical Risk Pipeline VETO on {sym}: {verdict.rejection_reasons}")
                 continue
 
+            # Self-Learning Expectancy Multiplier Gate
+            fx_mult = forex_strategy.learner.get_multiplier(sig.strategy_type)
+            if fx_mult <= 0.0:
+                logger.info(f"[forex] 🛑 Vetoed by Self-Learning Engine: {sig.strategy_type} multiplier is 0.00x")
+                continue
+
             # Sizing based on strict risk budget - aligned with portfolio ($50-$75 max risk per trade)
             target_risk_usd = min(self.state["equity"] * 0.0015, physical_risk_pipeline.max_dollar_risk_cap)
             risk_per_standard_lot = sig.pips_sl * pip_val_usd
-            lots = max(round(target_risk_usd / max(risk_per_standard_lot, 10.0), 2), 0.05)  # micro lot minimum
+            raw_lots = max(round(target_risk_usd / max(risk_per_standard_lot, 10.0), 2), 0.05)  # micro lot minimum
+            lots = max(round(raw_lots * fx_mult, 2), 0.05)
             lots = min(lots, 0.20)  # Safe cap: 0.20 lots max ($20k notional instead of $200k)
 
             # Margin requirement: standard lot = $100k notional. At 20:1 leverage, margin = $5,000 per lot
@@ -630,6 +658,7 @@ class ForexAutopilot:
                 "entry_price": sig.entry_price,
                 "current_price": sig.entry_price,
                 "stop_loss": sig.stop_loss,
+                "orig_stop_loss": sig.stop_loss,
                 "take_profit": sig.take_profit,
                 "pip_size": pip_size,
                 "pips_sl": sig.pips_sl,
@@ -647,7 +676,7 @@ class ForexAutopilot:
             logger.info(
                 f"[forex] 🚀 ENTERED {sig.side} {lots} lots on {sym} @ {sig.entry_price} | "
                 f"SL: {sig.stop_loss} ({sig.pips_sl} pips) | TP: {sig.take_profit} ({sig.pips_tp} pips) | "
-                f"Setup: {sig.strategy_type}"
+                f"Setup: {sig.strategy_type} (LearnerMult: {fx_mult:.2f}x)"
             )
             self._save_state()
 

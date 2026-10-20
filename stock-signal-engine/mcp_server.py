@@ -291,6 +291,16 @@ def get_multi_desk_status() -> Dict[str, Any]:
         self_learning["crypto_perp"] = crypto_strategy.learner.get_performance_summary()
     except Exception:
         pass
+    try:
+        from strategy.cme_futures_strategy import cme_strategy
+        self_learning["cme_futures"] = cme_strategy.learner.get_performance_summary()
+    except Exception:
+        pass
+    try:
+        from strategy.forex_strategy import forex_strategy
+        self_learning["forex"] = forex_strategy.learner.get_performance_summary()
+    except Exception:
+        pass
 
     return {"status": "success", "desks": desks, "self_learning": self_learning}
 

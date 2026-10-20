@@ -214,7 +214,8 @@ class CryptoFuturesAutopilot:
             peak_p = max(pos.get("peak_price", entry_price), curr_price) if side == "LONG" else min(pos.get("peak_price", entry_price), curr_price)
             pos["peak_price"] = round(peak_p, 2)
 
-            r_dist = abs(entry_price - sl)
+            orig_sl = float(pos.get("orig_stop_loss", sl))
+            r_dist = abs(entry_price - orig_sl)
             gain_dist = (curr_price - entry_price) if side == "LONG" else (entry_price - curr_price)
             tp_dist = abs(tp - entry_price)
 

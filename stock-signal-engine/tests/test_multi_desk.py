@@ -304,14 +304,14 @@ class TestMultiDeskArchitecture(unittest.TestCase):
             self.assertGreaterEqual(pos["stop_loss"], 1.3201)  # Green floor: entry + 1 pip or trailed
             self.assertGreater(engine.state["total_realized_pnl"], 150.0)
             
-            # Pass 2: Price advances to 1.3225 (+25 pips > 1.0R)
-            # Trailing stop should ratchet 6 pips behind peak price: 1.3225 - 0.0006 = 1.3219
+            # Pass 2: Price advances to 1.3225 (+25 pips >= 1.5R)
+            # Unchoked trailing stop ratchets 0.6R (9.6 pips) behind peak price: 1.3225 - 0.00096 = 1.32154
             test_price[0] = 1.3225
             engine.manage_open_positions()
             
             pos_updated = engine.state["positions"]["EUR/USD"]
             self.assertTrue(pos_updated["trailed_profit"])
-            self.assertAlmostEqual(pos_updated["stop_loss"], 1.3219, places=4)
+            self.assertAlmostEqual(pos_updated["stop_loss"], 1.32154, places=4)
             self.assertGreater(pos_updated["stop_loss"], pos_updated["entry_price"])
 
     def test_crypto_strategy_short_setups(self):

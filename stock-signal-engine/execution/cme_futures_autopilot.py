@@ -204,7 +204,8 @@ class CMEFuturesAutopilot:
             peak_p = max(pos.get("peak_price", entry_price), curr_price) if side == "LONG" else min(pos.get("peak_price", entry_price), curr_price)
             pos["peak_price"] = round(peak_p, 2)
 
-            r_pts = abs(entry_price - sl)
+            orig_sl = float(pos.get("orig_stop_loss", sl))
+            r_pts = abs(entry_price - orig_sl)
             gain_pts = (curr_price - entry_price) if side == "LONG" else (entry_price - curr_price)
             tp_pts = abs(tp - entry_price)
 
@@ -242,29 +243,34 @@ class CMEFuturesAutopilot:
                 pos["scaled_out_50"] = True
                 pos["ratcheted"] = True
                 logger.info(
-                    f"[cme_futures] 💰 SCALED OUT 50% on {sym} AT +1.5R: Banked +${partial_pnl:.2f}. "
+                    f"[cme_futures] 💰 SCALED OUT 50% on {sym} AT +0.8R: Banked +${partial_pnl:.2f}. "
                     f"Remaining {pos['contracts']} ctrs locked at green profit floor {pos['stop_loss']}"
                 )
                 self._save_state()
 
-            # ---------------- TIER 5: CONTINUOUS TRAILING PROFIT RATCHET ----------------
-            # Once in solid profit (>= 1.0R), trail stop 0.4R behind peak price
-            if gain_pts >= (r_pts * 1.0):
-                trail_dist = max(r_pts * 0.4, tick_size * 4.0)
+            # ---------------- TIER 5: UNCHOKED TRAILING PROFIT RATCHET ----------------
+            # Once in solid profit (>= 1.5R), trail stop with generous 0.6R cushion behind peak price
+            # This eliminates premature choking while safeguarding the green profit floor (+0.5R)
+            if gain_pts >= (r_pts * 1.5):
+                trail_dist = max(r_pts * 0.6, tick_size * 4.0)
                 if side == "LONG":
                     proposed_sl = round(peak_p - trail_dist, 2)
-                    if proposed_sl > pos["stop_loss"]:
-                        pos["stop_loss"] = proposed_sl
+                    floor_sl = round(entry_price + (r_pts * 0.5), 2)
+                    target_sl = max(proposed_sl, floor_sl)
+                    if target_sl > pos["stop_loss"]:
+                        pos["stop_loss"] = target_sl
                         pos["ratcheted"] = True
                         pos["trailed_profit"] = True
-                        logger.info(f"[cme_futures] 📈 Trailed stop into PROFIT for {sym} @ {proposed_sl}")
+                        logger.info(f"[cme_futures] 📈 Trailed stop into PROFIT for {sym} @ {target_sl:.2f} (peak: {peak_p:.2f})")
                 elif side == "SHORT":
                     proposed_sl = round(peak_p + trail_dist, 2)
-                    if proposed_sl < pos["stop_loss"]:
-                        pos["stop_loss"] = proposed_sl
+                    floor_sl = round(entry_price - (r_pts * 0.5), 2)
+                    target_sl = min(proposed_sl, floor_sl)
+                    if target_sl < pos["stop_loss"]:
+                        pos["stop_loss"] = target_sl
                         pos["ratcheted"] = True
                         pos["trailed_profit"] = True
-                        logger.info(f"[cme_futures] 📈 Trailed stop into PROFIT for {sym} @ {proposed_sl}")
+                        logger.info(f"[cme_futures] 📈 Trailed stop into PROFIT for {sym} @ {target_sl:.2f} (peak: {peak_p:.2f})")
 
         for sym, exit_px, reason, pnl in to_close:
             self._close_position(sym, exit_px, reason, pnl)
@@ -292,6 +298,27 @@ class CMEFuturesAutopilot:
         }
         self.state["closed_trades"].append(trade_record)
         logger.info(f"[cme_futures] CLOSED {sym} @ {exit_price:.2f} | PnL: ${pnl:+.2f} ({reason})")
+
+        # Record trade into Self-Improving Expectancy Tracker
+        try:
+            entry_p = float(pos["entry_price"])
+            sl_p = float(pos.get("orig_stop_loss", pos["stop_loss"]))
+            r_dist = max(abs(entry_p - sl_p), entry_p * 0.005)
+            pt_val = float(pos.get("point_value", 50.0))
+            ctrs = float(pos.get("contracts", 1))
+            r_dollar = r_dist * ctrs * pt_val
+            r_mult = pnl / max(r_dollar, 0.01)
+            strat = pos.get("strategy", "VWAP_RECLAIM")
+            cme_strategy.learner.record_trade(
+                strategy_type=strat,
+                pnl=pnl,
+                r_multiple=r_mult,
+                entry_price=entry_p,
+                exit_price=exit_price,
+                symbol=sym,
+            )
+        except Exception as e:
+            logger.debug(f"[cme_futures] self-learning recording error: {e}")
 
         try:
             compliance_checker.audit_closed_trade(
@@ -369,7 +396,13 @@ class CMEFuturesAutopilot:
                 )
                 continue
 
-            safe_contracts = max(1, int(p_audit.allowed_position_size))
+            strat_name = getattr(sig, "strategy_type", getattr(sig, "setup_name", "VWAP_RECLAIM"))
+            learner_mult = cme_strategy.learner.get_multiplier(strat_name)
+            if learner_mult <= 0.0:
+                logger.info(f"[cme_futures] 🛑 Vetoed by Self-Learning Engine: {strat_name} multiplier is 0.00x")
+                continue
+
+            safe_contracts = max(1, int(round(p_audit.allowed_position_size * learner_mult)))
             margin_per_contract = 1000.0  # commodity demo margin per contract
             total_margin = safe_contracts * margin_per_contract
             if total_margin > self.state["cash"]:
@@ -382,17 +415,18 @@ class CMEFuturesAutopilot:
                 "entry_price": curr_price,
                 "current_price": curr_price,
                 "stop_loss": sig.stop_loss,
+                "orig_stop_loss": sig.stop_loss,
                 "take_profit": sig.take_profit,
                 "contracts": safe_contracts,
                 "point_value": pt_val,
                 "margin_held": total_margin,
-                "strategy": getattr(sig, "strategy_type", getattr(sig, "setup_name", "COMMODITY_MOMENTUM")),
+                "strategy": strat_name,
                 "score": round(float(sig.confidence_score), 1),
                 "opened_at": time.time(),
             }
             logger.info(
                 f"[cme_futures] ⚡ ENTERED {sig.side} {safe_contracts}x {sym} @ {curr_price:.2f} "
-                f"(Stop: {sig.stop_loss:.2f}, TP: {sig.take_profit:.2f}, R:R: {p_audit.calculated_rr}:1) | {sig.rationale}"
+                f"(Stop: {sig.stop_loss:.2f}, TP: {sig.take_profit:.2f}, R:R: {p_audit.calculated_rr}:1, LearnerMult: {learner_mult:.2f}x) | {sig.rationale}"
             )
             self._save_state()
 

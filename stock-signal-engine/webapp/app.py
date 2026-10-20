@@ -1275,6 +1275,8 @@ def api_self_learning() -> Dict[str, Any]:
     """🧠 Returns empirical win rates, profit factors, and dynamic position multipliers for all desks."""
     eq_summary = {}
     crypto_summary = {}
+    cme_summary = {}
+    forex_summary = {}
     try:
         from strategy.equities_strategy import equities_strategy
         eq_summary = equities_strategy.learner.get_performance_summary()
@@ -1287,10 +1289,24 @@ def api_self_learning() -> Dict[str, Any]:
     except Exception as e:
         crypto_summary = {"error": str(e)}
 
+    try:
+        from strategy.cme_futures_strategy import cme_strategy
+        cme_summary = cme_strategy.learner.get_performance_summary()
+    except Exception as e:
+        cme_summary = {"error": str(e)}
+
+    try:
+        from strategy.forex_strategy import forex_strategy
+        forex_summary = forex_strategy.learner.get_performance_summary()
+    except Exception as e:
+        forex_summary = {"error": str(e)}
+
     return {
         "timestamp": time.time(),
         "equities": eq_summary,
         "crypto_perp": crypto_summary,
+        "cme_futures": cme_summary,
+        "forex": forex_summary,
     }
 
 
@@ -1661,6 +1677,11 @@ def api_desks_status() -> Dict[str, Any]:
         "total_realized_pnl": cme_state.get("total_realized_pnl", 0.0),
         "lifetime_realized_pnl": cme_state.get("total_realized_pnl", 0.0),
     }
+    try:
+        from strategy.cme_futures_strategy import cme_strategy
+        cme_data["self_learning"] = cme_strategy.learner.get_performance_summary()
+    except Exception:
+        cme_data["self_learning"] = {}
 
     # 4. Forex 24/5 Macro Desk
     forex_pid = _read_pid(root_dir / ".run" / "forex.pid", module_name="execution.forex_autopilot")
@@ -1703,6 +1724,11 @@ def api_desks_status() -> Dict[str, Any]:
         "total_pips_won": forex_state.get("total_pips_won", 0.0),
         "feed_status": forex_state.get("feed_status", {"status": "ONLINE", "label": "🟢 Feed Online"}),
     }
+    try:
+        from strategy.forex_strategy import forex_strategy
+        forex_data["self_learning"] = forex_strategy.learner.get_performance_summary()
+    except Exception:
+        forex_data["self_learning"] = {}
 
     total_equity = stocks_data["equity"] + crypto_data["equity"] + cme_data["equity"] + forex_data["equity"]
     running_count = sum(1 for d in [stocks_status, crypto_status, cme_status, forex_status] if d == "RUNNING")
@@ -1726,6 +1752,8 @@ def api_desks_status() -> Dict[str, Any]:
             "self_learning": {
                 "equities": stocks_data.get("self_learning", {}),
                 "crypto_perp": crypto_data.get("self_learning", {}),
+                "cme_futures": cme_data.get("self_learning", {}),
+                "forex": forex_data.get("self_learning", {}),
             },
         },
         "desks": {

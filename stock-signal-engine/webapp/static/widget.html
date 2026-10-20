@@ -554,7 +554,38 @@
         <div style="font-size: 9px; color: var(--text-muted);">Avg R-Multiple</div>
       </div>
     </div>
+    <div style="height: 1px; background: rgba(255,255,255,0.06); margin: 6px 0;"></div>
+    <!-- Desk 3 Learning -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size: 11px; font-weight: 600; color: #a78bfa; display: flex; align-items: center; gap: 5px;">
+          <span>📈 D3 CME Futures</span>
+          <span class="badge" id="d3LearnerBadge" style="background: rgba(167, 139, 250, 0.15); color: #a78bfa; font-size: 9px; padding: 2px 5px;">1.00x BASELINE</span>
+        </div>
+        <div class="pos-details" id="d3LearnerStats" style="font-size: 10px;">Win Rate: --% · Profit Factor: -- · Trades: 0</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 12px; font-weight: 700; color: #10b981;" id="d3AvgR">-- R</div>
+        <div style="font-size: 9px; color: var(--text-muted);">Avg R-Multiple</div>
+      </div>
+    </div>
+    <div style="height: 1px; background: rgba(255,255,255,0.06); margin: 6px 0;"></div>
+    <!-- Desk 4 Learning -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size: 11px; font-weight: 600; color: #2dd4bf; display: flex; align-items: center; gap: 5px;">
+          <span>💱 D4 Forex Macro</span>
+          <span class="badge" id="d4LearnerBadge" style="background: rgba(45, 212, 191, 0.15); color: #2dd4bf; font-size: 9px; padding: 2px 5px;">1.00x BASELINE</span>
+        </div>
+        <div class="pos-details" id="d4LearnerStats" style="font-size: 10px;">Win Rate: --% · Profit Factor: -- · Trades: 0</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 12px; font-weight: 700; color: #10b981;" id="d4AvgR">-- R</div>
+        <div style="font-size: 9px; color: var(--text-muted);">Avg R-Multiple</div>
+      </div>
+    </div>
   </div>
+
 
   <!-- Equity Hero Card -->
   <div class="card">
@@ -1039,7 +1070,68 @@
         const r2 = document.getElementById('d2AvgR');
         if (r2) r2.innerText = `${avgR >= 0 ? '+' : ''}${avgR.toFixed(2)}R`;
       }
+
+      if (d.cme_futures && d.cme_futures.self_learning) {
+        const sl3 = d.cme_futures.self_learning.VWAP_RECLAIM || d.cme_futures.self_learning.RANGE_BREAKOUT || (Object.values(d.cme_futures.self_learning)[0] || {});
+        const trades = sl3.trades || 0;
+        const wr = sl3.win_rate_pct || 0;
+        const pf = sl3.profit_factor || 1.0;
+        const mult = sl3.multiplier !== undefined ? sl3.multiplier : 1.0;
+        const avgR = sl3.avg_r_multiple || 0.0;
+
+        const b3 = document.getElementById('d3LearnerBadge');
+        if (b3) {
+          if (mult > 1.0) {
+            b3.innerText = `${mult.toFixed(2)}x BOOST`;
+            b3.style.background = 'rgba(16, 185, 129, 0.2)';
+            b3.style.color = '#10b981';
+          } else if (mult === 0.0) {
+            b3.innerText = '0.00x VETO';
+            b3.style.background = 'rgba(244, 63, 94, 0.2)';
+            b3.style.color = '#f43f5e';
+          } else {
+            b3.innerText = `${mult.toFixed(2)}x BASELINE`;
+            b3.style.background = 'rgba(167, 139, 250, 0.15)';
+            b3.style.color = '#a78bfa';
+          }
+        }
+        const s3 = document.getElementById('d3LearnerStats');
+        if (s3) s3.innerText = `Win Rate: ${wr}% · Profit Factor: ${pf.toFixed(2)} · Trades: ${trades}`;
+        const r3 = document.getElementById('d3AvgR');
+        if (r3) r3.innerText = `${avgR >= 0 ? '+' : ''}${avgR.toFixed(2)}R`;
+      }
+
+      if (d.forex && d.forex.self_learning) {
+        const sl4 = d.forex.self_learning.LONDON_NY_BREAKOUT || d.forex.self_learning.EMA_TREND_CONTINUATION || (Object.values(d.forex.self_learning)[0] || {});
+        const trades = sl4.trades || 0;
+        const wr = sl4.win_rate_pct || 0;
+        const pf = sl4.profit_factor || 1.0;
+        const mult = sl4.multiplier !== undefined ? sl4.multiplier : 1.0;
+        const avgR = sl4.avg_r_multiple || 0.0;
+
+        const b4 = document.getElementById('d4LearnerBadge');
+        if (b4) {
+          if (mult > 1.0) {
+            b4.innerText = `${mult.toFixed(2)}x BOOST`;
+            b4.style.background = 'rgba(16, 185, 129, 0.2)';
+            b4.style.color = '#10b981';
+          } else if (mult === 0.0) {
+            b4.innerText = '0.00x VETO';
+            b4.style.background = 'rgba(244, 63, 94, 0.2)';
+            b4.style.color = '#f43f5e';
+          } else {
+            b4.innerText = `${mult.toFixed(2)}x BASELINE`;
+            b4.style.background = 'rgba(45, 212, 191, 0.15)';
+            b4.style.color = '#2dd4bf';
+          }
+        }
+        const s4 = document.getElementById('d4LearnerStats');
+        if (s4) s4.innerText = `Win Rate: ${wr}% · Profit Factor: ${pf.toFixed(2)} · Trades: ${trades}`;
+        const r4 = document.getElementById('d4AvgR');
+        if (r4) r4.innerText = `${avgR >= 0 ? '+' : ''}${avgR.toFixed(2)}R`;
+      }
     }
+
 
     function refreshAll() {
       if (!_isUnlocked) return;

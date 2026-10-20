@@ -21,12 +21,14 @@ Key Alpha Setups:
 
 from __future__ import annotations
 
+import json
 import logging
 import math
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -37,6 +39,8 @@ logger = logging.getLogger(__name__)
 NY_TZ = ZoneInfo("America/New_York")
 FX_SESSION = requests.Session()
 FX_SESSION.headers.update({"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"})
+
+FX_LEARNING_STATE_PATH = Path("data/forex_strategy_learning.json")
 
 
 @dataclass
@@ -58,9 +62,137 @@ class ForexSignal:
     rationale: str = ""
 
 
+class ForexSelfLearningTracker:
+    """
+    Self-Improving Expectancy Tracker for Forex 24/5 Macro Currencies.
+    Maintains rolling win rate, profit factor, and dynamic position multipliers per setup type.
+    """
+
+    def __init__(self, state_path: Path = FX_LEARNING_STATE_PATH):
+        self.state_path = state_path
+        self.history: Dict[str, List[Dict[str, Any]]] = self._load_state()
+
+    def _load_state(self) -> Dict[str, List[Dict[str, Any]]]:
+        if self.state_path.exists() and self.state_path.stat().st_size > 0:
+            try:
+                with open(self.state_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        return data
+            except Exception as e:
+                logger.warning(f"[forex_learner] Could not load state: {e}")
+        return {}
+
+    def _save_state(self) -> None:
+        try:
+            self.state_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.state_path, "w", encoding="utf-8") as f:
+                json.dump(self.history, f, indent=2)
+        except Exception as e:
+            logger.warning(f"[forex_learner] Could not save state: {e}")
+
+    def record_trade(
+        self,
+        strategy_type: str,
+        pnl: float,
+        r_multiple: float,
+        entry_price: float,
+        exit_price: float,
+        pair: str = "EUR/USD",
+    ) -> None:
+        """Records a closed Forex trade into the self-learning memory."""
+        strat = strategy_type.strip().upper()
+        if strat not in self.history:
+            self.history[strat] = []
+
+        record = {
+            "pair": pair,
+            "pnl": round(float(pnl), 2),
+            "r_multiple": round(float(r_multiple), 2),
+            "win": bool(pnl > 0),
+            "entry_price": round(float(entry_price), 5),
+            "exit_price": round(float(exit_price), 5),
+            "timestamp": time.time(),
+        }
+        self.history[strat].append(record)
+        if len(self.history[strat]) > 50:
+            self.history[strat] = self.history[strat][-50:]
+        self._save_state()
+        logger.info(
+            f"[forex_learner] Logged trade for {strat} ({pair}): "
+            f"PnL ${pnl:+.2f} ({r_multiple:+.2f}R). Total records: {len(self.history[strat])}"
+        )
+
+    def get_multiplier(self, strategy_type: str) -> float:
+        """
+        Dynamically adjusts strategy size (0.0x to 1.20x) based on rolling empirical expectancy.
+        - High Expectancy (PF >= 1.40, Expectancy > 0): 1.20x boost
+        - Moderate Edge (1.10 <= PF < 1.40): 1.05x boost
+        - Neutral (0.85 <= PF < 1.10): 0.90x
+        - Negative Drift (0.65 <= PF < 0.85): 0.70x
+        - Persistent Loss (PF < 0.65 over >= 5 trades): 0.0x VETO
+        """
+        strat = strategy_type.strip().upper()
+        trades = self.history.get(strat, [])
+        if len(trades) < 4:
+            return 1.0  # Cold start baseline
+
+        recent = trades[-20:]
+        wins = [t["pnl"] for t in recent if t["win"]]
+        losses = [abs(t["pnl"]) for t in recent if not t["win"]]
+        win_count = len(wins)
+        loss_count = len(losses)
+        total = win_count + loss_count
+
+        if total == 0:
+            return 1.0
+
+        win_rate = win_count / total
+        sum_wins = sum(wins)
+        sum_losses = sum(losses)
+
+        profit_factor = (sum_wins / max(sum_losses, 0.01)) if sum_losses > 0 else (2.5 if sum_wins > 0 else 1.0)
+        avg_win = (sum_wins / win_count) if win_count > 0 else 0.0
+        avg_loss = (sum_losses / loss_count) if loss_count > 0 else 0.0
+        expectancy = (win_rate * avg_win) - ((1.0 - win_rate) * avg_loss)
+
+        if profit_factor >= 1.40 and expectancy > 0:
+            return 1.20
+        elif profit_factor >= 1.10 and expectancy > 0:
+            return 1.05
+        elif profit_factor >= 0.85:
+            return 0.90
+        elif profit_factor >= 0.65:
+            return 0.70
+        else:
+            return 0.0  # Veto underperforming pattern
+
+    def get_performance_summary(self) -> Dict[str, Any]:
+        summary = {}
+        for strat, trades in self.history.items():
+            wins = [t["pnl"] for t in trades if t["win"]]
+            losses = [abs(t["pnl"]) for t in trades if not t["win"]]
+            win_cnt = len(wins)
+            loss_cnt = len(losses)
+            tot = win_cnt + loss_cnt
+            wr = (win_cnt / tot * 100) if tot > 0 else 0.0
+            sum_w = sum(wins)
+            sum_l = sum(losses)
+            pf = (sum_w / max(sum_l, 0.01)) if sum_l > 0 else (2.5 if sum_w > 0 else 1.0)
+            avg_r = np.mean([t["r_multiple"] for t in trades]) if trades else 0.0
+            summary[strat] = {
+                "trades": tot,
+                "win_rate_pct": round(wr, 1),
+                "profit_factor": round(pf, 2),
+                "avg_r_multiple": round(float(avg_r), 2),
+                "multiplier": self.get_multiplier(strat),
+            }
+        return summary
+
+
 class ForexStrategyEngine:
     """
-    Evaluates institutional Forex setups 24/5 (Sunday 17:00 to Friday 17:00 ET).
+    Evaluates institutional Forex setups 24/5 (Sunday 17:00 to Friday 17:00 ET) with >= 2.2:1 R:R.
     """
 
     PAIR_CONFIG: Dict[str, Dict[str, Any]] = {
@@ -73,8 +205,8 @@ class ForexStrategyEngine:
         "NZD/USD": {"yahoo": "NZDUSD=X", "pip": 0.0001, "name": "New Zealand Dollar / US Dollar", "pip_val_usd": 10.0},
     }
 
-    def __init__(self):
-        pass
+    def __init__(self, learner: Optional[ForexSelfLearningTracker] = None):
+        self.learner = learner or ForexSelfLearningTracker()
 
     @classmethod
     def normalize_symbol(cls, symbol: str) -> str:
@@ -157,6 +289,7 @@ class ForexStrategyEngine:
         })
         yahoo_ticker = cfg["yahoo"]
         pip_size = cfg["pip"]
+        decimals = 5 if pip_size == 0.0001 else 3
         now = time.time()
         current_session = self.detect_session()
 
@@ -206,7 +339,9 @@ class ForexStrategyEngine:
 
         if is_breakout_long:
             sl_pips = max(round(atr_pips * 1.2, 1), 15.0)
-            tp_pips = round(sl_pips * 2.0, 1)
+            tp_pips = round(sl_pips * 2.25, 1)
+            while (tp_pips / sl_pips) < 2.20:
+                tp_pips = round(tp_pips + 0.1, 1)
             sl = curr_p - (sl_pips * pip_size)
             tp = curr_p + (tp_pips * pip_size)
             conf = 88.0 if current_session == "LONDON_NY_OVERLAP" else 81.0
@@ -216,20 +351,22 @@ class ForexStrategyEngine:
                 timestamp=now,
                 side="LONG",
                 confidence_score=conf,
-                entry_price=round(curr_p, 5 if pip_size == 0.0001 else 3),
-                stop_loss=round(sl, 5 if pip_size == 0.0001 else 3),
-                take_profit=round(tp, 5 if pip_size == 0.0001 else 3),
+                entry_price=round(curr_p, decimals),
+                stop_loss=round(sl, decimals),
+                take_profit=round(tp, decimals),
                 pip_size=pip_size,
                 pips_sl=sl_pips,
                 pips_tp=tp_pips,
                 strategy_type="LONDON_NY_BREAKOUT",
                 session=current_session,
-                rationale=f"High-liquidity channel breakout above {prior_high_20:.4f} during {current_session} with {sl_pips:.1f} pips SL / {tp_pips:.1f} pips TP."
+                rationale=f"High-liquidity channel breakout above {prior_high_20:.4f} during {current_session} with {sl_pips:.1f} pips SL / {tp_pips:.1f} pips TP ({tp_pips/sl_pips:.2f}:1 R:R)."
             )
 
         if is_breakout_short:
             sl_pips = max(round(atr_pips * 1.2, 1), 15.0)
-            tp_pips = round(sl_pips * 2.0, 1)
+            tp_pips = round(sl_pips * 2.25, 1)
+            while (tp_pips / sl_pips) < 2.20:
+                tp_pips = round(tp_pips + 0.1, 1)
             sl = curr_p + (sl_pips * pip_size)
             tp = curr_p - (tp_pips * pip_size)
             conf = 86.0 if current_session == "LONDON_NY_OVERLAP" else 80.0
@@ -239,21 +376,23 @@ class ForexStrategyEngine:
                 timestamp=now,
                 side="SHORT",
                 confidence_score=conf,
-                entry_price=round(curr_p, 5 if pip_size == 0.0001 else 3),
-                stop_loss=round(sl, 5 if pip_size == 0.0001 else 3),
-                take_profit=round(tp, 5 if pip_size == 0.0001 else 3),
+                entry_price=round(curr_p, decimals),
+                stop_loss=round(sl, decimals),
+                take_profit=round(tp, decimals),
                 pip_size=pip_size,
                 pips_sl=sl_pips,
                 pips_tp=tp_pips,
                 strategy_type="LONDON_NY_BREAKOUT",
                 session=current_session,
-                rationale=f"Bearish breakdown below {prior_low_20:.4f} during {current_session}. Structured 2:1 R:R short."
+                rationale=f"Bearish breakdown below {prior_low_20:.4f} during {current_session}. Structured {tp_pips/sl_pips:.2f}:1 R:R short."
             )
 
         # Setup 2: EMA Trend Continuation (Pullback into EMA20 value)
         if ema20 > ema50 and curr_p >= (ema20 * 0.998) and -1.0 < z_score < 1.5:
             sl_pips = max(round(atr_pips * 1.5, 1), 18.0)
-            tp_pips = round(sl_pips * 2.2, 1)
+            tp_pips = round(sl_pips * 2.25, 1)
+            while (tp_pips / sl_pips) < 2.20:
+                tp_pips = round(tp_pips + 0.1, 1)
             sl = curr_p - (sl_pips * pip_size)
             tp = curr_p + (tp_pips * pip_size)
             return ForexSignal(
@@ -262,20 +401,22 @@ class ForexStrategyEngine:
                 timestamp=now,
                 side="LONG",
                 confidence_score=83.5,
-                entry_price=round(curr_p, 5 if pip_size == 0.0001 else 3),
-                stop_loss=round(sl, 5 if pip_size == 0.0001 else 3),
-                take_profit=round(tp, 5 if pip_size == 0.0001 else 3),
+                entry_price=round(curr_p, decimals),
+                stop_loss=round(sl, decimals),
+                take_profit=round(tp, decimals),
                 pip_size=pip_size,
                 pips_sl=sl_pips,
                 pips_tp=tp_pips,
                 strategy_type="EMA_TREND_CONTINUATION",
                 session=current_session,
-                rationale=f"Macro bullish trend alignment (EMA20 > EMA50) pullback bounce. 2.2:1 R:R (+{tp_pips:.1f} pips TP)."
+                rationale=f"Macro bullish trend alignment (EMA20 > EMA50) pullback bounce. {tp_pips/sl_pips:.2f}:1 R:R (+{tp_pips:.1f} pips TP)."
             )
 
         if ema20 < ema50 and curr_p <= (ema20 * 1.002) and -1.5 < z_score < 1.0:
             sl_pips = max(round(atr_pips * 1.5, 1), 18.0)
-            tp_pips = round(sl_pips * 2.2, 1)
+            tp_pips = round(sl_pips * 2.25, 1)
+            while (tp_pips / sl_pips) < 2.20:
+                tp_pips = round(tp_pips + 0.1, 1)
             sl = curr_p + (sl_pips * pip_size)
             tp = curr_p - (tp_pips * pip_size)
             return ForexSignal(
@@ -284,21 +425,23 @@ class ForexStrategyEngine:
                 timestamp=now,
                 side="SHORT",
                 confidence_score=83.5,
-                entry_price=round(curr_p, 5 if pip_size == 0.0001 else 3),
-                stop_loss=round(sl, 5 if pip_size == 0.0001 else 3),
-                take_profit=round(tp, 5 if pip_size == 0.0001 else 3),
+                entry_price=round(curr_p, decimals),
+                stop_loss=round(sl, decimals),
+                take_profit=round(tp, decimals),
                 pip_size=pip_size,
                 pips_sl=sl_pips,
                 pips_tp=tp_pips,
                 strategy_type="EMA_TREND_CONTINUATION",
                 session=current_session,
-                rationale=f"Macro bearish trend alignment (EMA20 < EMA50) pullback rally fade into resistance. 2.2:1 R:R (+{tp_pips:.1f} pips TP short)."
+                rationale=f"Macro bearish trend alignment (EMA20 < EMA50) pullback rally fade into resistance. {tp_pips/sl_pips:.2f}:1 R:R (+{tp_pips:.1f} pips TP short)."
             )
 
         # Setup 3: Asian Session / Over-extended Mean Reversion
         if z_score <= -1.8:
             sl_pips = max(round(atr_pips * 1.3, 1), 16.0)
-            tp_pips = round(sl_pips * 2.0, 1)
+            tp_pips = round(sl_pips * 2.25, 1)
+            while (tp_pips / sl_pips) < 2.20:
+                tp_pips = round(tp_pips + 0.1, 1)
             sl = curr_p - (sl_pips * pip_size)
             tp = curr_p + (tp_pips * pip_size)
             return ForexSignal(
@@ -307,20 +450,22 @@ class ForexStrategyEngine:
                 timestamp=now,
                 side="LONG",
                 confidence_score=79.0,
-                entry_price=round(curr_p, 5 if pip_size == 0.0001 else 3),
-                stop_loss=round(sl, 5 if pip_size == 0.0001 else 3),
-                take_profit=round(tp, 5 if pip_size == 0.0001 else 3),
+                entry_price=round(curr_p, decimals),
+                stop_loss=round(sl, decimals),
+                take_profit=round(tp, decimals),
                 pip_size=pip_size,
                 pips_sl=sl_pips,
                 pips_tp=tp_pips,
                 strategy_type="ASIAN_MEAN_REVERSION",
                 session=current_session,
-                rationale=f"Oversold exhaustion wick (Z={z_score:.2f}). Mean-reversion scoop to mean with {tp_pips:.1f} pips TP."
+                rationale=f"Oversold exhaustion wick (Z={z_score:.2f}). Mean-reversion scoop to mean with {tp_pips:.1f} pips TP ({tp_pips/sl_pips:.2f}:1 R:R)."
             )
 
         if z_score >= 1.8:
             sl_pips = max(round(atr_pips * 1.3, 1), 16.0)
-            tp_pips = round(sl_pips * 2.0, 1)
+            tp_pips = round(sl_pips * 2.25, 1)
+            while (tp_pips / sl_pips) < 2.20:
+                tp_pips = round(tp_pips + 0.1, 1)
             sl = curr_p + (sl_pips * pip_size)
             tp = curr_p - (tp_pips * pip_size)
             return ForexSignal(
@@ -329,15 +474,15 @@ class ForexStrategyEngine:
                 timestamp=now,
                 side="SHORT",
                 confidence_score=79.0,
-                entry_price=round(curr_p, 5 if pip_size == 0.0001 else 3),
-                stop_loss=round(sl, 5 if pip_size == 0.0001 else 3),
-                take_profit=round(tp, 5 if pip_size == 0.0001 else 3),
+                entry_price=round(curr_p, decimals),
+                stop_loss=round(sl, decimals),
+                take_profit=round(tp, decimals),
                 pip_size=pip_size,
                 pips_sl=sl_pips,
                 pips_tp=tp_pips,
                 strategy_type="ASIAN_MEAN_REVERSION",
                 session=current_session,
-                rationale=f"Overbought exhaustion wick (Z={z_score:+.2f}). Mean-reversion fade to mean with {tp_pips:.1f} pips TP short."
+                rationale=f"Overbought exhaustion wick (Z={z_score:+.2f}). Mean-reversion fade to mean with {tp_pips:.1f} pips TP short ({tp_pips/sl_pips:.2f}:1 R:R)."
             )
 
         # Default Neutral
