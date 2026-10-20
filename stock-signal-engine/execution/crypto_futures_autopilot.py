@@ -139,6 +139,26 @@ class CryptoFuturesAutopilot:
         logger.warning(f"[crypto_futures] ⚠️ All live crypto feeds unavailable for {symbol}. Holding state safely.")
         return pd.DataFrame()
 
+    def fetch_live_order_book(self, symbol: str) -> Optional[Dict[str, Any]]:
+        """
+        Fetches live L2 order book depth for Smart Money Liquidity Wall & Imbalance detection.
+        """
+        import ccxt
+        exchanges = [
+            ("binance", ccxt.binance),
+            ("bybit", ccxt.bybit),
+            ("okx", ccxt.okx),
+        ]
+        for name, cls in exchanges:
+            try:
+                ex = cls({"enableRateLimit": True, "timeout": 4000})
+                ob = ex.fetch_order_book(symbol, limit=20)
+                if ob and "bids" in ob and "asks" in ob and len(ob["bids"]) > 0:
+                    return ob
+            except Exception:
+                continue
+        return None
+
     def manage_open_positions(self) -> None:
         """
         Active 4-Tier Profit Harvesting & Trailing Ratchet Engine for Crypto Perps:
@@ -205,8 +225,9 @@ class CryptoFuturesAutopilot:
                 to_close.append((sym, curr_price, f"Near-Target Profit Harvest (+${pnl:.2f})", pnl))
                 continue
 
+
             # ---------------- TIER 4: STAGED 50% SCALE-OUT AT +0.8R ----------------
-            # Bank 50% at +0.8R, lock remaining stop into solid profit floor at +0.5R
+            # Bank 50% cash at +0.8R, lock remaining stop into solid profit floor at +0.5R
             if gain_dist >= (r_dist * 0.8) and not pos.get("scaled_out_50") and contracts > 0.001:
                 half_contracts = round(contracts * 0.5, 4)
                 partial_pnl = round(gain_dist * half_contracts, 2)
@@ -221,28 +242,34 @@ class CryptoFuturesAutopilot:
                 pos["ratcheted"] = True
                 pos["trailed_profit"] = True
                 logger.info(
-                    f"[crypto_futures] 💰 SCALED OUT 50% on {sym} AT +1.5R: Banked +${partial_pnl:.2f}. "
+                    f"[crypto_futures] 💰 SCALED OUT 50% on {sym} AT +0.8R: Banked +${partial_pnl:.2f}. "
                     f"Remaining {pos['contracts']}x locked at +0.5R profit floor ${pos['stop_loss']}"
                 )
                 self._save_state()
 
-            # ---------------- TIER 5: CONTINUOUS TRAILING PROFIT RATCHET ----------------
-            # Once in solid profit (>= 1.0R), trail stop 0.4R behind peak price
-            if gain_dist >= (r_dist * 1.0):
-                trail_dist = max(r_dist * 0.4, entry_price * 0.003)
+            # ---------------- TIER 5: UNCHOKED TRAILING PROFIT RATCHET ----------------
+            # Once in solid profit (>= 1.5R), trail stop with generous 0.6R cushion behind peak price
+            # This eliminates premature choking while safeguarding the green profit floor
+            if gain_dist >= (r_dist * 1.5):
+                trail_dist = max(r_dist * 0.6, entry_price * 0.005)
                 if side == "LONG":
                     proposed_sl = round(peak_p - trail_dist, 2)
-                    if proposed_sl > pos["stop_loss"]:
-                        pos["stop_loss"] = proposed_sl
+                    floor_sl = round(entry_price + (r_dist * 0.5), 2)
+                    target_sl = max(proposed_sl, floor_sl)
+                    if target_sl > pos["stop_loss"]:
+                        pos["stop_loss"] = target_sl
                         pos["ratcheted"] = True
                         pos["trailed_profit"] = True
-                        logger.info(f"[crypto_futures] 📈 Trailed stop into PROFIT for {sym} @ ${proposed_sl}")
+                        logger.info(f"[crypto_futures] 📈 Trailed stop into PROFIT for {sym} @ ${target_sl:.2f} (peak: ${peak_p:.2f})")
                 elif side == "SHORT":
                     proposed_sl = round(peak_p + trail_dist, 2)
-                    if proposed_sl < pos["stop_loss"]:
-                        pos["stop_loss"] = proposed_sl
+                    floor_sl = round(entry_price - (r_dist * 0.5), 2)
+                    target_sl = min(proposed_sl, floor_sl)
+                    if target_sl < pos["stop_loss"]:
+                        pos["stop_loss"] = target_sl
                         pos["ratcheted"] = True
                         pos["trailed_profit"] = True
+                        logger.info(f"[crypto_futures] 📈 Trailed stop into PROFIT for {sym} @ ${target_sl:.2f} (peak: ${peak_p:.2f})")
         for sym, exit_px, reason, pnl in to_close:
             self._close_position(sym, exit_px, reason, pnl)
 
@@ -270,6 +297,35 @@ class CryptoFuturesAutopilot:
         self.state["closed_trades"].append(trade_record)
         logger.info(f"[crypto_futures] CLOSED {sym} @ {exit_price} | PnL: ${pnl:+.2f} ({reason})")
 
+        # Record trade into Self-Improving Expectancy Tracker (Reel 2: Out-of-Sample Empirical Learning)
+        try:
+            entry_p = float(pos["entry_price"])
+            sl_p = float(pos.get("orig_stop_loss", pos["stop_loss"]))
+            r_unit = max(abs(entry_p - sl_p), entry_p * 0.005)
+            r_mult = pnl / max(r_unit * pos["contracts"], 0.01)
+            strat = pos.get("strategy", "LIQUIDATION_SCOOP")
+            crypto_strategy.learner.record_trade(
+                strategy_type=strat,
+                pnl=pnl,
+                r_multiple=r_mult,
+                entry_price=entry_p,
+                exit_price=exit_price,
+                symbol=sym,
+            )
+        except Exception as e:
+            logger.debug(f"[crypto_futures] learner record trade warning: {e}")
+
+        # Update Cooldown (30m) & Daily Trade Counter
+        if "last_trade_exits" not in self.state:
+            self.state["last_trade_exits"] = {}
+        self.state["last_trade_exits"][sym] = time.time()
+
+        today_str = datetime.now(NY_TZ).strftime("%Y-%m-%d")
+        daily_key = f"{sym}:{today_str}"
+        if "daily_trade_counts" not in self.state:
+            self.state["daily_trade_counts"] = {}
+        self.state["daily_trade_counts"][daily_key] = self.state["daily_trade_counts"].get(daily_key, 0) + 1
+
         # Praise or Punish reinforcement
         try:
             compliance_checker.audit_closed_trade(
@@ -292,16 +348,32 @@ class CryptoFuturesAutopilot:
         if len(self.state.get("positions", {})) >= 3:
             return  # Max 3 concurrent positions
 
+        now_t = time.time()
+        today_str = datetime.now(NY_TZ).strftime("%Y-%m-%d")
+
         for sym in self.symbols:
             if sym in self.state.get("positions", {}):
+                continue
+
+            # Anti-Chop Guard 1: Post-trade Cooldown (30 minutes between trades on same coin)
+            last_exit = self.state.get("last_trade_exits", {}).get(sym, 0)
+            if (now_t - last_exit) < 1800:
+                continue
+
+            # Anti-Chop Guard 2: Daily trade limit (max 5 trades per day per coin)
+            daily_key = f"{sym}:{today_str}"
+            if self.state.get("daily_trade_counts", {}).get(daily_key, 0) >= 5:
                 continue
 
             df = self.fetch_live_bars(sym)
             if df.empty or len(df) < 20:
                 continue
 
+            # Ingest live Order Book depth (Reel 1: Liquidity Walls & Imbalance)
+            order_book = self.fetch_live_order_book(sym)
+
             curr_price = float(df["Close"].iloc[-1])
-            sig = crypto_strategy.evaluate(sym, df)
+            sig = crypto_strategy.evaluate(sym, df, order_book=order_book)
 
             if sig.whale_trap_blocked:
                 self.state["traps_avoided"] = self.state.get("traps_avoided", 0) + 1
@@ -323,7 +395,7 @@ class CryptoFuturesAutopilot:
             z_score = (curr_price - ema20) / std20
 
             # Strict Pre-Trade Institutional Compliance Verification
-            strat_cand = "jev_scooper" if "SCOOP" in sig.strategy_type else "core_swing"
+            strat_cand = "jev_scooper" if ("SCOOP" in sig.strategy_type or "SWEEP" in sig.strategy_type) else "core_swing"
             cert = compliance_checker.audit_pre_trade_setup(
                 ticker=sym.replace("/", "_"),
                 price=curr_price,
@@ -343,7 +415,10 @@ class CryptoFuturesAutopilot:
                 continue
 
             # AstraQuant Fail-Closed Physical Risk Pipeline (R:R Floor & Max Dollar Risk Cap)
-            macro_trend = "BULL" if curr_price >= ema20 else "BEAR"
+            if "MOMENTUM" in sig.strategy_type:
+                macro_trend = "BULL" if curr_price >= ema20 else "BEAR"
+            else:
+                macro_trend = "BULL" if sig.side == "LONG" else "BEAR"
             verdict = physical_risk_pipeline.audit_order_intent(
                 symbol=sym,
                 side=sig.side,
@@ -383,12 +458,18 @@ class CryptoFuturesAutopilot:
                 "side": sig.side,
                 "entry_price": curr_price,
                 "stop_loss": sig.stop_loss,
+                "orig_stop_loss": sig.stop_loss,
                 "take_profit": sig.take_profit,
                 "contracts": contracts,
                 "notional_margin": margin_required,
                 "leverage": self.leverage,
                 "strategy": sig.strategy_type,
                 "score": round(float(sig.confidence_score), 1),
+                "order_flow_delta": sig.order_flow_delta,
+                "order_book_imbalance": sig.order_book_imbalance,
+                "bid_wall": sig.bid_wall,
+                "ask_wall": sig.ask_wall,
+                "risk_reward_ratio": sig.risk_reward_ratio,
                 "opened_at": time.time(),
                 "ratcheted": False,
             }

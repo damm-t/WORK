@@ -1,17 +1,17 @@
-# Graph Report - stock-signal-engine  (2026-10-19)
+# Graph Report - stock-signal-engine  (2026-10-20)
 
 ## Corpus Check
-- 227 files · ~607,893 words
+- 230 files · ~611,565 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 20 file(s) not represented in the graph (top: .csv 9, (none) 6, .bat 2)
 
 ## Summary
-- 2340 nodes · 5132 edges · 133 communities (106 shown, 27 thin omitted)
+- 2357 nodes · 5187 edges · 134 communities (97 shown, 37 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 157 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `37d1b772`
+- Built from commit: `11658a3b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -23,55 +23,55 @@
 - financial_modeling.py
 - AppDelegate
 - TradeReviewPacket
-- SubscriberProfile
-- stock_analysis.py
+- mirror_dispatcher.py
+- TechnicalIndicators
 - factor_dag.py
-- app.py
+- post
 - BayesianConfidenceEngine
-- get
+- FileResponse
 - quant
 - get_book_allocations
 - council.py
 - core.py
+- AgentCouncil
 - atomic_json_read
-- argparse
 - CryptoFuturesAutopilot
 - tunnel_manager.py
 - test_units.py
 - FactorDAG
 - os
-- sentiment_hedged_vs_unhedged.py
+- services.py
 - scenario_small.sh
 - 🏗️ Stock Signal Engine — Full Project Visualization & Financial Model Improvement Plan
 - .filter_series
 - mcp_server.py
 - scenario_sniper.sh
 - daily_routine.py
-- cost_model.py
+- hedging_engine.py
 - TestPhysicalRiskPipeline
 - InstitutionalBenchmarkEngine
 - package.json
 - pipeline.py
 - [...path]/route.ts
 - dashboard/page.tsx
-- hedging_engine.py
-- market_scanner.py
-- jev_execution.py
+- risk/__init__.py
+- Profile
+- run_ross_momentum_sim
 - compilerOptions
 - TestProjectOmega
 - analyze_exit
-- external_alpha_bridge.py
-- numpy
+- argparse
+- TestArchitectureFixes
 - pandas
 - 📈 Stock Signal Engine — Personal Quant Desk
 - tp1_scale_plan
 - test_jev_scooper.py
 - align_timestamp_point_in_time
-- Any
+- get
 - iOS Mobile App & Home Screen Widget Blueprint
 - iOS Mobile App & Home Screen Widget Blueprint
 - news_fetcher.py
-- nlp/__init__.py
+- analyze_sentiment
 - dashboard.py
 - FailureMemoryEngine
 - process_trade_execution
@@ -81,16 +81,16 @@
 - scenario_c.sh
 - ForexStrategyEngine
 - web_server.py
-- model/__init__.py
+- sentiment_hedged_vs_unhedged.py
 - get_market_features
 - calculate_exit_levels
 - .test_defensive_scaling_on_losing_streak
-- services.py
-- news_memory.py
-- pick_best_article
+- main.py
+- unified_four_desk_simulation.py
+- main
 - manifest.json
 - RiskPanel.tsx
-- _leaderboard
+- _start_port_8081_forwarder
 - Win-Rate Optimization & Diagnostic Report
 - ConvexTailEngine
 - dependencies
@@ -101,10 +101,10 @@
 - Crisis-Tested Financial Model
 - Crisis-Tested Financial Model
 - Crisis-Tested Financial Model
-- banned_ticker
-- TestTechnicalIndicators
+- validate_anti_leakage
+- calculate_dynamic_hedge_ratio
 - run_multi_asset_benchmark
-- time_to_goal.py
+- numpy
 - check_trading_window
 - Article
 - run_autopilot.sh
@@ -112,10 +112,10 @@
 - deadmans_switch.py
 - 🔌 Universal MCP Server Setup Guide for All AI Builders
 - QuantDesk Project & Deployment Architecture
-- detect_market_regime
-- scanner.py
+- _simulate_bars
+- Candle
 - CryptoPerpStrategyEngine
-- autopilot_run_once
+- generate_triple_barrier_labels
 - scripts
 - Five-Year Market Statistics
 - Five-Year Market Statistics
@@ -123,7 +123,7 @@
 - CMEFuturesStrategyEngine
 - watchdog.sh
 - dashboard/README.md
-- domain_not_found_handler
+- TestJournalV3
 - Pre-Market Plan — 2026-08-26
 - Pre-Market Plan — 2026-08-27
 - Pre-Market Plan — 2026-09-05
@@ -132,7 +132,7 @@
 - Pre-Market Plan — 2026-09-14
 - Pre-Market Plan — 2026-09-19
 - Pre-Market Plan — 2026-09-21
-- api_desks_status
+- app.py
 - host_architecture.md
 - AGENTS.md
 - postcss.config.mjs
@@ -140,10 +140,10 @@
 - time_to_goal_2026-09-21.md
 - run_instagram_extractor.sh
 - remote_setup.sh
-- TestShockDetector
+- shock_detector.py
 
 ## God Nodes (most connected - your core abstractions)
-1. `fetch_prices()` - 79 edges
+1. `fetch_prices()` - 81 edges
 2. `TechnicalIndicators` - 42 edges
 3. `atomic_json_read()` - 38 edges
 4. `atomic_json_write()` - 32 edges
@@ -163,33 +163,29 @@
   backtest/hedging_backtester.py → market/technicals.py
 - `rank_market()` --uses--> `TechnicalIndicators`  [INFERRED]
   backtest/market_scanner.py → market/technicals.py
-- `TwentyYearStrategyEngine` --uses--> `TechnicalIndicators`  [INFERRED]
-  backtest/twenty_year_strategy.py → market/technicals.py
+- `run_ross_momentum_sim()` --uses--> `TradeJournal`  [INFERRED]
+  backtest/ross_momentum_sim.py → execution/trade_journal.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (133 total, 27 thin omitted)
-
-### Community 0 - "TradeJournal"
-Cohesion: 0.06
-Nodes (9): Candle, generate_synthetic_candles(), mock_ross_session(), RossSessionManager, RossTrade, run_ross_momentum_sim(), TradeJournal, evaluate_five_pillars() (+1 more)
+## Communities (134 total, 37 thin omitted)
 
 ### Community 1 - "five_year_stats.py"
-Cohesion: 0.08
-Nodes (19): buy_and_hold_stats(), collect_tickers(), _console_summary(), _fmt(), _load(), main(), _report(), _row_str() (+11 more)
+Cohesion: 0.06
+Nodes (29): buy_and_hold_stats(), collect_tickers(), _console_summary(), _fmt(), _load(), main(), _report(), _row_str() (+21 more)
 
 ### Community 2 - "TestMultiDeskArchitecture"
 Cohesion: 0.05
 Nodes (4): CMEFuturesAutopilot, main(), ForexAutopilot, TestMultiDeskArchitecture
 
 ### Community 3 - "time"
-Cohesion: 0.11
+Cohesion: 0.10
 Nodes (4): FailureEpisode, backfill_historical_purchases(), StrategyItem, ForexSignal
 
 ### Community 4 - "financial_modeling.py"
-Cohesion: 0.05
-Nodes (26): baseline_profile(), build_bundle(), Bundle, crisis_pool(), load_ohlcv(), main(), monte_carlo(), per_year_stats() (+18 more)
+Cohesion: 0.15
+Nodes (11): crisis_pool(), load_ohlcv(), main(), monte_carlo(), per_year_stats(), pick_best(), rank_candidates(), refine_grid() (+3 more)
 
 ### Community 5 - "AppDelegate"
 Cohesion: 0.08
@@ -199,73 +195,65 @@ Nodes (20): Cocoa, Foundation, AccountResponse, AIReviewItem, AppDelegate, Compl
 Cohesion: 0.06
 Nodes (7): AIReviewResult, AIRevisionChecker, TradeReviewPacket, AuditFeedback, AutonomousComplianceChecker, ComplianceCertificate, TestAutonomousComplianceChecker
 
-### Community 7 - "SubscriberProfile"
+### Community 7 - "mirror_dispatcher.py"
 Cohesion: 0.08
 Nodes (7): BrokerClientFactory, MirrorDispatcher, MirrorTradeSignal, ReplicationSummary, SubscriberProfile, SubscriberRegistry, TestMirrorGateway
 
-### Community 8 - "stock_analysis.py"
-Cohesion: 0.18
-Nodes (7): analyze_stock(), _analyze_trend(), add(), _assess_entry(), _fmt_pct(), _project_1m(), _verdict()
+### Community 8 - "TechnicalIndicators"
+Cohesion: 0.07
+Nodes (14): main(), save_report(), TwentyYearStrategyEngine, TechnicalIndicators, expected_move_pct(), analyze_stock(), _analyze_trend(), add() (+6 more)
 
 ### Community 9 - "factor_dag.py"
 Cohesion: 0.11
 Nodes (9): generate_realistic_news_stream(), run_experiment(), AlphaCompositeNode, NewsSourceNode, Node, PointInTimeAlignmentNode, PriceSourceNode, SentimentAggregatorNode (+1 more)
 
-### Community 10 - "app.py"
-Cohesion: 0.07
-Nodes (26): get_purchase_logs(), AIReviewRequest, api_compliance_ai_review(), api_council_decision(), api_farm_demote(), api_farm_promote(), api_flatten(), api_gateway_register_subscriber() (+18 more)
+### Community 10 - "post"
+Cohesion: 0.06
+Nodes (21): AIReviewRequest, api_compliance_ai_review(), api_council_convene(), api_council_decision(), api_farm_demote(), api_farm_promote(), api_gateway_register_subscriber(), api_gateway_replicate() (+13 more)
 
 ### Community 11 - "BayesianConfidenceEngine"
 Cohesion: 0.08
 Nodes (6): BayesianConfidenceEngine, DailyEvidenceBundle, InformationHarvester, LearnedRule, ThesisStatement, TestBayesianConfidence
 
-### Community 12 - "get"
-Cohesion: 0.06
-Nodes (22): api_account(), api_advisor_exit(), api_book_allocation(), api_equity_curve(), api_evaluate(), api_health(), api_jev_opportunities(), api_journal_exits() (+14 more)
+### Community 12 - "FileResponse"
+Cohesion: 0.17
+Nodes (6): index(), manifest(), office_view(), overview(), terminal(), widget()
 
 ### Community 14 - "get_book_allocations"
-Cohesion: 0.14
-Nodes (6): get_settings(), Settings, execute_ross_bracket_trade(), get_book_allocations(), get_split_ratios(), TestBookSplitArchitecture
+Cohesion: 0.11
+Nodes (9): get_settings(), Settings, execute_jev_scoop_trade(), execute_ross_bracket_trade(), classify_position_book(), get_book_allocations(), get_split_ratios(), TestBookSplitArchitecture (+1 more)
 
 ### Community 15 - "council.py"
-Cohesion: 0.12
-Nodes (7): convene_council_meeting(), CouncilMeetingResult, DeskAgent, get_floor_status(), get_recent_meetings(), resolve_council_decision(), TestAgentCouncilArchitecture
+Cohesion: 0.09
+Nodes (10): convene_council_meeting(), CouncilMeetingResult, DeskAgent, get_floor_status(), get_recent_meetings(), resolve_council_decision(), convene_agent_council_meeting(), get_virtual_office_status() (+2 more)
 
 ### Community 16 - "core.py"
 Cohesion: 0.09
 Nodes (14): cmd_demo(), cmd_extract(), cmd_process(), main(), abstract_quant_content(), download_file(), encrypt_url_token(), extract_audio_tracks() (+6 more)
 
-### Community 17 - "atomic_json_read"
-Cohesion: 0.05
-Nodes (5): AgentCouncil, CouncilTurn, atomic_json_read(), StrategyFarmManager, TestArchitectureFixes
-
-### Community 18 - "argparse"
-Cohesion: 0.16
-Nodes (11): main(), _print_report(), run_comparison(), _trim(), _window(), main(), month_folds(), _policy_summary() (+3 more)
+### Community 18 - "atomic_json_read"
+Cohesion: 0.15
+Nodes (3): atomic_json_read(), atomic_json_write(), StrategyFarmManager
 
 ### Community 19 - "CryptoFuturesAutopilot"
 Cohesion: 0.09
 Nodes (3): CryptoFuturesAutopilot, main(), TestCryptoPerpFixes
 
 ### Community 20 - "tunnel_manager.py"
-Cohesion: 0.10
-Nodes (15): api_remote_access(), api_remote_qr_svg(), get_active_tunnel_url(), get_local_ip(), get_qr_png_bytes(), get_qr_svg(), get_remote_status(), is_caffeinate_running() (+7 more)
+Cohesion: 0.09
+Nodes (16): api_remote_access(), api_remote_qr_svg(), _tunnel(), get_active_tunnel_url(), get_local_ip(), get_qr_png_bytes(), get_qr_svg(), get_remote_status() (+8 more)
 
 ### Community 21 - "test_units.py"
-Cohesion: 0.07
-Nodes (11): generate_triple_barrier_labels(), calculate_compounder_size(), check_tail_risk(), TestDatasetGenerator, TestJournalV2, TestJournalV3, TestNewsMemory, TestPurchaseLogger (+3 more)
-
-### Community 22 - "FactorDAG"
-Cohesion: 0.20
-Nodes (3): FactorDAG, evaluate_factor_dag(), TestFactorDAG
+Cohesion: 0.09
+Nodes (8): evaluate_five_pillars(), check_tail_risk(), TestDatasetGenerator, TestJournalV2, TestNewsMemory, TestPurchaseLogger, TestRiskManager, TestScannerQualityGate
 
 ### Community 23 - "os"
-Cohesion: 0.12
-Nodes (16): auto_select(), _await_fill(), _day_guard(), load_state(), main(), manage_open_positions(), market_is_open(), post_market_belief_cycle() (+8 more)
+Cohesion: 0.11
+Nodes (17): submit_market_order(), auto_select(), _await_fill(), _day_guard(), load_state(), main(), manage_open_positions(), market_is_open() (+9 more)
 
-### Community 24 - "sentiment_hedged_vs_unhedged.py"
-Cohesion: 0.18
-Nodes (10): build_books(), main(), print_comparison(), run_signal_pipeline(), stress_test(), add_label(), build_feature_vector(), build_features() (+2 more)
+### Community 24 - "services.py"
+Cohesion: 0.16
+Nodes (11): EngineException, MarketDataNotFoundError, NLPAnalysisError, NoArticlesFoundError, get_hedge_evaluation(), get_processed_signal(), get_regime(), add_label() (+3 more)
 
 ### Community 25 - "scenario_small.sh"
 Cohesion: 0.07
@@ -280,20 +268,20 @@ Cohesion: 0.11
 Nodes (3): AntiVolatilityModel, StabilizationResult, TestAntiVolatilityModel
 
 ### Community 28 - "mcp_server.py"
-Cohesion: 0.11
-Nodes (15): align_event_point_in_time(), analyze_financial_sentiment(), check_alpaca_account(), convene_agent_council_meeting(), fetch_stock_prices(), find_codebase_path(), get_codebase_graph_summary(), get_engine_health() (+7 more)
+Cohesion: 0.13
+Nodes (14): get_client(), align_event_point_in_time(), analyze_financial_sentiment(), check_alpaca_account(), evaluate_factor_dag(), fetch_stock_prices(), find_codebase_path(), get_codebase_graph_summary() (+6 more)
 
 ### Community 29 - "scenario_sniper.sh"
 Cohesion: 0.08
 Nodes (24): HF_HUB_OFFLINE, MAX_PORTFOLIO_HEAT, MAX_POSITION_NOTIONAL_PCT, MIN_AUTO_SCORE, MIN_TRADE_SCORE, NEWS_MEMORY, OMP_NUM_THREADS, PYTHONUNBUFFERED (+16 more)
 
 ### Community 30 - "daily_routine.py"
-Cohesion: 0.20
-Nodes (10): _briefing_path(), load_today_briefing(), main(), _plan_path(), run_analyze(), run_morning(), scrape_ticker(), flat_universe() (+2 more)
+Cohesion: 0.05
+Nodes (32): _briefing_path(), load_today_briefing(), main(), _plan_path(), run_analyze(), run_morning(), scrape_ticker(), flat_universe() (+24 more)
 
-### Community 31 - "cost_model.py"
-Cohesion: 0.17
-Nodes (6): breakeven_move_pct(), days_to_target(), expected_move_pct(), is_trade_viable(), round_trip_cost(), TestCostModel
+### Community 31 - "hedging_engine.py"
+Cohesion: 0.12
+Nodes (7): breakeven_move_pct(), days_to_target(), is_trade_viable(), round_trip_cost(), is_hot_banned(), _latest_close(), TestCostModel
 
 ### Community 32 - "TestPhysicalRiskPipeline"
 Cohesion: 0.22
@@ -308,8 +296,8 @@ Cohesion: 0.10
 Nodes (18): eslintConfig, name, private, version, auth, authOptions, config, axios (+10 more)
 
 ### Community 35 - "pipeline.py"
-Cohesion: 0.15
-Nodes (10): submit_bracket_buy(), format_purchase_log(), log_purchase(), build_candidate(), composite_score(), main(), news_deep_dive(), phase_night() (+2 more)
+Cohesion: 0.13
+Nodes (12): submit_bracket_buy(), format_purchase_log(), log_purchase(), fetch_prev_close(), build_candidate(), composite_score(), main(), news_deep_dive() (+4 more)
 
 ### Community 36 - "[...path]/route.ts"
 Cohesion: 0.12
@@ -319,33 +307,29 @@ Nodes (12): nextConfig, buildHeaders(), createBackendUrl(), DELETE(), GET(), POS
 Cohesion: 0.22
 Nodes (14): DashboardPage(), IndicatorPanel(), PortfolioBar(), sentColor(), SentimentFeed(), SignalCard(), TickerSearch(), useMarket() (+6 more)
 
-### Community 38 - "hedging_engine.py"
-Cohesion: 0.10
-Nodes (11): _env_float(), get_adaptive_exit_geometry(), get_exit_geometry(), is_hot_banned(), _latest_close(), resolve_hedge_instrument(), calculate_position_size(), calculate_regime_risk_pct() (+3 more)
+### Community 38 - "risk/__init__.py"
+Cohesion: 0.09
+Nodes (11): _env_float(), get_adaptive_exit_geometry(), get_exit_geometry(), evaluate_trade(), calculate_compounder_size(), calculate_position_size(), calculate_regime_risk_pct(), calculate_streak_compounding_factor() (+3 more)
 
-### Community 39 - "market_scanner.py"
-Cohesion: 0.27
-Nodes (5): main(), mass_backtest(), print_mass_report(), rank_market(), scan_dip_opportunities()
+### Community 39 - "Profile"
+Cohesion: 0.15
+Nodes (5): baseline_profile(), Profile, profile_from_row(), sensitivity_grid(), TestFinancialModelingAdaptive
 
-### Community 40 - "jev_execution.py"
-Cohesion: 0.25
-Nodes (3): execute_jev_scoop_trade(), classify_position_book(), _account_snapshot()
+### Community 40 - "run_ross_momentum_sim"
+Cohesion: 0.22
+Nodes (6): generate_synthetic_candles(), mock_ross_session(), RossSessionManager, RossTrade, run_ross_momentum_sim(), TestRossMomentumStrategy
 
 ### Community 41 - "compilerOptions"
 Cohesion: 0.11
 Nodes (18): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+10 more)
 
-### Community 44 - "external_alpha_bridge.py"
-Cohesion: 0.52
-Nodes (4): cross_reference_batch(), evaluate_ticker(), main(), print_alpha_report()
-
-### Community 45 - "numpy"
-Cohesion: 0.10
-Nodes (5): main(), simulate_night(), run_test(), run_mean_reversion(), TechnicalIndicators
+### Community 44 - "argparse"
+Cohesion: 0.11
+Nodes (11): get_sniper_setup(), main(), clamp(), main(), score_row(), calculate_asset_beta(), cross_reference_batch(), evaluate_ticker() (+3 more)
 
 ### Community 46 - "pandas"
-Cohesion: 0.12
-Nodes (15): get_sniper_setup(), main(), build_historical_dataset(), calculate_asset_beta(), fetch_latest_price(), fetch_prices(), _fetch_with_yahoo_chart(), _fetch_with_yfinance() (+7 more)
+Cohesion: 0.21
+Nodes (9): run_test(), run_mean_reversion(), fetch_latest_price(), fetch_prices(), _fetch_with_yahoo_chart(), _fetch_with_yfinance(), _get_cache_path(), _load_cache() (+1 more)
 
 ### Community 47 - "📈 Stock Signal Engine — Personal Quant Desk"
 Cohesion: 0.12
@@ -360,12 +344,12 @@ Cohesion: 0.14
 Nodes (3): JEVLiquidityScooper, ScoopOpportunity, TestJEVLiquidityScooper
 
 ### Community 50 - "align_timestamp_point_in_time"
-Cohesion: 0.10
-Nodes (8): align_timestamp_point_in_time(), enrich_article_point_in_time(), get_next_trading_day(), is_trading_day(), parse_timestamp(), SessionInfo, validate_anti_leakage(), TestPointInTimeAlignment
+Cohesion: 0.16
+Nodes (6): align_timestamp_point_in_time(), get_next_trading_day(), is_trading_day(), parse_timestamp(), SessionInfo, TestPointInTimeAlignment
 
-### Community 51 - "Any"
-Cohesion: 0.07
-Nodes (13): api_benchmark_summary(), api_compliance_report(), api_confluence_evaluate(), api_council_convene(), api_council_recent(), api_council_status(), api_desks_benchmark(), api_farm_status() (+5 more)
+### Community 51 - "get"
+Cohesion: 0.06
+Nodes (21): api_account(), api_advisor_exit(), api_benchmark_summary(), api_book_allocation(), api_compliance_report(), api_confluence_evaluate(), api_council_recent(), api_council_status() (+13 more)
 
 ### Community 52 - "iOS Mobile App & Home Screen Widget Blueprint"
 Cohesion: 0.12
@@ -379,21 +363,17 @@ Nodes (15): 1. Executive Summary & Value Proposition, 2. System Architecture & C
 Cohesion: 0.07
 Nodes (27): fetch_earnings(), _normalize(), fetch_all(), fetch_alpaca_news(), fetch_news(), _fetch_with_yahoo_search(), _fetch_with_yfinance(), fetch_yfinance_news() (+19 more)
 
-### Community 55 - "nlp/__init__.py"
-Cohesion: 0.18
-Nodes (9): evaluate_news_catalyst(), analyze_sentiment(), _get_finbert(), analyze(), analyze_sentiment_only(), compute_time_decay(), extract_entities(), _get_nlp() (+1 more)
-
 ### Community 56 - "dashboard.py"
-Cohesion: 0.18
-Nodes (9): _esc(), _fmt_ts(), load_account(), load_journal(), load_leaderboard(), generate_once(), render_page(), seed_demo() (+1 more)
+Cohesion: 0.21
+Nodes (8): _esc(), _fmt_ts(), load_account(), load_journal(), generate_once(), render_page(), seed_demo(), _wr_color()
 
 ### Community 58 - "process_trade_execution"
-Cohesion: 0.20
-Nodes (7): process_trade_execution(), get_client(), submit_market_order(), submit_order(), submit_pair_orders(), execute_hedged_trade(), execute_trade()
+Cohesion: 0.17
+Nodes (10): portfolio_endpoint(), signal_endpoint(), get_portfolio_summary(), process_trade_execution(), get_current_exposure(), get_portfolio_value(), submit_order(), submit_pair_orders() (+2 more)
 
 ### Community 59 - "train.py"
-Cohesion: 0.21
-Nodes (4): train(), build_bootstrap_dataframe(), load_or_build_training_dataframe(), main()
+Cohesion: 0.17
+Nodes (5): build_historical_dataset(), train(), build_bootstrap_dataframe(), load_or_build_training_dataframe(), main()
 
 ### Community 60 - "types.ts"
 Cohesion: 0.33
@@ -411,29 +391,29 @@ Nodes (13): HF_HUB_OFFLINE, MAX_PORTFOLIO_HEAT, MAX_POSITION_NOTIONAL_PCT, MIN_A
 Cohesion: 0.18
 Nodes (3): get_preset(), serve_index(), serve_media()
 
-### Community 65 - "model/__init__.py"
-Cohesion: 0.21
-Nodes (5): ensemble_signal(), _fallback_prediction(), get_signal(), load_model(), predict()
+### Community 65 - "sentiment_hedged_vs_unhedged.py"
+Cohesion: 0.11
+Nodes (12): build_books(), main(), print_comparison(), run_signal_pipeline(), stress_test(), ensemble_signal(), _fallback_prediction(), get_signal() (+4 more)
 
 ### Community 66 - "get_market_features"
 Cohesion: 0.31
 Nodes (3): add_indicators(), get_latest(), get_market_features()
 
 ### Community 67 - "calculate_exit_levels"
-Cohesion: 0.15
-Nodes (4): calculate_exit_levels(), compute_book_exposure(), TestAdaptiveExitGeometry, TestExitEngine
+Cohesion: 0.18
+Nodes (4): banned_ticker(), calculate_exit_levels(), compute_book_exposure(), TestExitEngine
 
-### Community 69 - "services.py"
-Cohesion: 0.17
-Nodes (15): health(), market_endpoint(), portfolio_endpoint(), purchases_endpoint(), sentiment_endpoint(), signal_endpoint(), EngineException, MarketDataNotFoundError (+7 more)
+### Community 69 - "main.py"
+Cohesion: 0.12
+Nodes (13): autopilot_run_once(), domain_not_found_handler(), engine_logic_handler(), execute_endpoint(), global_crash_handler(), health(), hedge_evaluate_endpoint(), market_endpoint() (+5 more)
 
-### Community 70 - "news_memory.py"
-Cohesion: 0.29
-Nodes (7): _conn(), _main(), remember(), similar(), stats(), _tokens(), _vec()
+### Community 70 - "unified_four_desk_simulation.py"
+Cohesion: 0.24
+Nodes (6): run_comprehensive_simulation(), simulate_crypto_desk(), simulate_forex_desk(), simulate_futures_desk(), simulate_stock_desk(), TradeRecord
 
-### Community 71 - "pick_best_article"
-Cohesion: 0.21
-Nodes (4): directional_sentiment(), pick_best_article(), TestArticleSelection, TestTimeDecay
+### Community 71 - "main"
+Cohesion: 0.18
+Nodes (4): build_bundle(), build_hunt_grid(), main(), run_diagnostic()
 
 ### Community 72 - "manifest.json"
 Cohesion: 0.18
@@ -443,9 +423,9 @@ Nodes (10): background_color, description, display, icons, name, orientation, sc
 Cohesion: 0.22
 Nodes (5): PriceChartProps, formatValue(), RiskPanel(), RiskPanelProps, recharts
 
-### Community 74 - "_leaderboard"
-Cohesion: 0.18
-Nodes (9): api_desks_scan(), api_scan(), _leaderboard(), _start_port_8081_forwarder(), accept_loop(), forward_stream(), warm_cache(), _tunnel() (+1 more)
+### Community 74 - "_start_port_8081_forwarder"
+Cohesion: 0.38
+Nodes (4): _start_port_8081_forwarder(), accept_loop(), forward_stream(), warm_cache()
 
 ### Community 75 - "Win-Rate Optimization & Diagnostic Report"
 Cohesion: 0.20
@@ -467,10 +447,6 @@ Nodes (7): MessagePayload, useWebSocket(), AppState, Article, Signal, useAppStor
 Cohesion: 0.22
 Nodes (3): ConfluenceDecision, TriConfluenceMatrix, TestTriConfluenceMatrix
 
-### Community 81 - "score_trade"
-Cohesion: 0.20
-Nodes (4): hedge_evaluate_endpoint(), get_hedge_evaluation(), score_trade(), TestScorer
-
 ### Community 82 - "Crisis-Tested Financial Model"
 Cohesion: 0.22
 Nodes (8): Assumptions & limits, Crisis-Tested Financial Model, Per-year win rate (tuned), Stage 3 — Crisis stress tests, Stage 3 — Out-of-sample test (2024 → today), Stage 4 — Monte Carlo (one-year horizon), Stage 5 — Capital scenarios (out-of-sample), Validation (2021-2023) — candidate stability
@@ -483,13 +459,9 @@ Nodes (8): Assumptions & limits, Crisis-Tested Financial Model, Per-year win rat
 Cohesion: 0.22
 Nodes (8): Assumptions & limits, Crisis-Tested Financial Model, Per-year win rate (tuned), Stage 3 — Crisis stress tests, Stage 3 — Out-of-sample test (2024 → today), Stage 4 — Monte Carlo (one-year horizon), Stage 5 — Capital scenarios (out-of-sample), Validation (2021-2023) — candidate stability
 
-### Community 85 - "banned_ticker"
-Cohesion: 0.23
-Nodes (4): main(), save_report(), TwentyYearStrategyEngine, banned_ticker()
-
-### Community 88 - "time_to_goal.py"
-Cohesion: 0.29
-Nodes (7): growth_optimal_f(), main(), mc_time_to_goal(), oos_r_pool(), pool_stats(), savings_months(), tuned_profile()
+### Community 88 - "numpy"
+Cohesion: 0.21
+Nodes (9): main(), simulate_night(), growth_optimal_f(), main(), mc_time_to_goal(), oos_r_pool(), pool_stats(), savings_months() (+1 more)
 
 ### Community 89 - "check_trading_window"
 Cohesion: 0.25
@@ -508,7 +480,7 @@ Cohesion: 0.25
 Nodes (7): HF_HUB_OFFLINE, OMP_NUM_THREADS, PYTHONUNBUFFERED, run_webapp.sh script, TOKENIZERS_PARALLELISM, TRANSFORMERS_OFFLINE, USE_LGBM_RUNTIME
 
 ### Community 93 - "deadmans_switch.py"
-Cohesion: 0.11
+Cohesion: 0.13
 Nodes (5): check_liveness(), get_autopilot_heartbeat(), is_us_equity_market_open(), main(), run_daemon()
 
 ### Community 94 - "🔌 Universal MCP Server Setup Guide for All AI Builders"
@@ -519,17 +491,9 @@ Nodes (6): 1. Claude Desktop (macOS), 2. Claude Code CLI, 3. Cursor IDE, 4. Wind
 Cohesion: 0.33
 Nodes (5): 1. Executive Summary & Host Topography, 2. Remote Access & Tailscale Networking Rules, 3. Core Desks & Automation Components, Critical Infrastructure Topology, QuantDesk Project & Deployment Architecture
 
-### Community 97 - "detect_market_regime"
-Cohesion: 0.29
-Nodes (3): regime_endpoint(), get_regime(), detect_market_regime()
-
-### Community 98 - "scanner.py"
-Cohesion: 0.53
-Nodes (3): clamp(), main(), score_row()
-
-### Community 100 - "autopilot_run_once"
-Cohesion: 0.40
-Nodes (3): autopilot_run_once(), execute_endpoint(), ExecuteRequest
+### Community 97 - "_simulate_bars"
+Cohesion: 0.32
+Nodes (4): Bundle, run_profile(), _simulate_bars(), window_run()
 
 ### Community 101 - "scripts"
 Cohesion: 0.40
@@ -554,10 +518,6 @@ Nodes (4): alive(), heal_via_terminal(), log(), watchdog.sh script
 ### Community 107 - "dashboard/README.md"
 Cohesion: 0.50
 Nodes (3): Deploy on Vercel, Getting Started, Learn More
-
-### Community 108 - "domain_not_found_handler"
-Cohesion: 0.53
-Nodes (3): domain_not_found_handler(), engine_logic_handler(), global_crash_handler()
 
 ### Community 109 - "Pre-Market Plan — 2026-08-26"
 Cohesion: 0.50
@@ -591,29 +551,33 @@ Nodes (3): Candidate detail, Launch tonight, Pre-Market Plan — 2026-09-19
 Cohesion: 0.50
 Nodes (3): Candidate detail, Launch tonight, Pre-Market Plan — 2026-09-21
 
-### Community 117 - "api_desks_status"
-Cohesion: 0.40
-Nodes (4): api_desks_status(), _find_process_pid(), _is_pid_alive(), _read_pid()
+### Community 117 - "app.py"
+Cohesion: 0.09
+Nodes (19): get_purchase_logs(), api_desks_scan(), api_desks_status(), api_equity_curve(), api_health(), api_journal_summary(), api_journal_trades(), api_model_stabilized_price() (+11 more)
+
+### Community 132 - "shock_detector.py"
+Cohesion: 0.19
+Nodes (6): detect_intraday_shock(), earnings_blackout(), _env_float(), gap_shock_threshold(), velocity_shock_threshold(), TestShockDetector
 
 ## Knowledge Gaps
 - **83 isolated node(s):** `axios`, `react-dom`, `@tailwindcss/postcss`, `@types/node`, `@types/react` (+78 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1045 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **27 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1051 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `fetch_prices()` connect `pandas` to `TradeJournal`, `five_year_stats.py`, `TestMultiDeskArchitecture`, `time`, `financial_modeling.py`, `stock_analysis.py`, `factor_dag.py`, `app.py`, `BayesianConfidenceEngine`, `get`, `get_book_allocations`, `council.py`, `atomic_json_read`, `argparse`, `os`, `.filter_series`, `mcp_server.py`, `daily_routine.py`, `InstitutionalBenchmarkEngine`, `pipeline.py`, `hedging_engine.py`, `market_scanner.py`, `analyze_exit`, `external_alpha_bridge.py`, `numpy`, `get_market_features`, `_leaderboard`, `ConvexTailEngine`, `TriConfluenceMatrix`, `banned_ticker`, `run_multi_asset_benchmark`, `Any`, `detect_market_regime`?**
-  _High betweenness centrality (0.068) - this node is a cross-community bridge._
+- **Why does `fetch_prices()` connect `pandas` to `five_year_stats.py`, `TestMultiDeskArchitecture`, `time`, `financial_modeling.py`, `shock_detector.py`, `TechnicalIndicators`, `factor_dag.py`, `BayesianConfidenceEngine`, `get_book_allocations`, `council.py`, `AgentCouncil`, `test_units.py`, `services.py`, `.filter_series`, `mcp_server.py`, `daily_routine.py`, `hedging_engine.py`, `InstitutionalBenchmarkEngine`, `pipeline.py`, `analyze_exit`, `argparse`, `get`, `train.py`, `get_market_features`, `unified_four_desk_simulation.py`, `ConvexTailEngine`, `TriConfluenceMatrix`, `run_multi_asset_benchmark`, `Any`, `app.py`?**
+  _High betweenness centrality (0.070) - this node is a cross-community bridge._
 - **What connects `axios`, `react-dom`, `@tailwindcss/postcss` to the rest of the system?**
   _83 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `TradeJournal` be split into smaller, more focused modules?**
-  _Cohesion score 0.05654761904761905 - nodes in this community are weakly interconnected._
-- **Why does `TechnicalIndicators` connect `numpy` to `five_year_stats.py`, `time`, `financial_modeling.py`, `market_scanner.py`, `stock_analysis.py`, `factor_dag.py`, `BayesianConfidenceEngine`, `external_alpha_bridge.py`, `pandas`, `TriConfluenceMatrix`, `test_jev_scooper.py`, `argparse`, `banned_ticker`, `test_units.py`, `TestTechnicalIndicators`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+  _Cohesion score 0.10873440285204991 - nodes in this community are weakly interconnected._
+- **Why does `TechnicalIndicators` connect `TechnicalIndicators` to `five_year_stats.py`, `time`, `financial_modeling.py`, `main`, `factor_dag.py`, `BayesianConfidenceEngine`, `argparse`, `pandas`, `TriConfluenceMatrix`, `test_jev_scooper.py`, `test_units.py`, `daily_routine.py`, `hedging_engine.py`?**
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
 - **Should `five_year_stats.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.0797979797979798 - nodes in this community are weakly interconnected._
-- **Why does `calculate_streak_compounding_factor()` connect `hedging_engine.py` to `.test_defensive_scaling_on_losing_streak`?**
-  _High betweenness centrality (0.025) - this node is a cross-community bridge._
+  _Cohesion score 0.05853174603174603 - nodes in this community are weakly interconnected._
 - **Should `TestMultiDeskArchitecture` be split into smaller, more focused modules?**
   _Cohesion score 0.05182443151771549 - nodes in this community are weakly interconnected._
+- **Should `time` be split into smaller, more focused modules?**
+  _Cohesion score 0.10218253968253968 - nodes in this community are weakly interconnected._
