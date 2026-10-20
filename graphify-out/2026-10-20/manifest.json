@@ -492,9 +492,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/autopilot.py": {
-    "mtime": 1792465937.329681,
-    "seen": 1792465999.4597929,
-    "ast_hash": "dc02d0220d9abc2b07a900cd878c6c79",
+    "mtime": 1792472986.7657518,
+    "seen": 1792473101.0967522,
+    "ast_hash": "9850ec10fdcef7a5e1cb5204527fa727",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/autopilot_state.json": {
@@ -504,33 +504,33 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/cme_futures_autopilot.py": {
-    "mtime": 1792469510.4917862,
-    "seen": 1792469755.57784,
-    "ast_hash": "663e72e938e9ba9bfbdb856c37c94fb4",
+    "mtime": 1792471166.2873492,
+    "seen": 1792473101.0967731,
+    "ast_hash": "4cb04b572a550dab45a6eb2a054f9483",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/cme_futures_state.json": {
-    "mtime": 1792391906.0314493,
-    "seen": 1792400218.956964,
-    "ast_hash": "6b11ab30c15eabcab2cf1579489efc72",
+    "mtime": 1792471141.2470636,
+    "seen": 1792473101.0967739,
+    "ast_hash": "f27b6e15c7f0fceacc1f54046d5a36fd",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_archive.json": {
     "mtime": 1792391906.0384393,
     "seen": 1792400218.956964,
-    "ast_hash": "4f4f6b09314d0ff1dd9e47c62c70a244",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_autopilot.py": {
-    "mtime": 1792469522.2630675,
-    "seen": 1792469755.577842,
-    "ast_hash": "63d4625056164fb44acf227bc92ee591",
+    "mtime": 1792471154.072878,
+    "seen": 1792473101.0967748,
+    "ast_hash": "dd0d244769be93e458bba8fd0cf316da",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_state.json": {
-    "mtime": 1792391906.0400991,
-    "seen": 1792400218.956966,
-    "ast_hash": "920a3268b9903acdd6148149fa9cb182",
+    "mtime": 1792471141.2458556,
+    "seen": 1792473101.096777,
+    "ast_hash": "13d2f37ff4d73460f5342529f17eba1c",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/deadmans_switch.py": {
@@ -540,15 +540,15 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/forex_autopilot.py": {
-    "mtime": 1792469315.0605392,
-    "seen": 1792469755.577846,
-    "ast_hash": "4b9730f1cacb58b410582b949c25a434",
+    "mtime": 1792471197.6028397,
+    "seen": 1792473101.096836,
+    "ast_hash": "4d9dfcd86c36231c1231d48996a34667",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/forex_state.json": {
-    "mtime": 1792391906.043264,
-    "seen": 1792400218.95697,
-    "ast_hash": "0eaac61786433e8e1d7532d62606526d",
+    "mtime": 1792471141.2490444,
+    "seen": 1792473101.096837,
+    "ast_hash": "d5ceafdc548e9698dc75fcc09c5a5a10",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/jev_execution.py": {
@@ -792,9 +792,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/quant": {
-    "mtime": 1792469411.1876185,
-    "seen": 1792469755.577882,
-    "ast_hash": "3a6df24dbe4e14075d2501ca47fa095f",
+    "mtime": 1792472552.6439116,
+    "seen": 1792473101.0977988,
+    "ast_hash": "7261273521a3a186d5cb9438e4094286",
     "semantic_hash": ""
   },
   "stock-signal-engine/reports/__init__.py": {
@@ -1080,9 +1080,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/webapp/app.py": {
-    "mtime": 1792469360.7104602,
-    "seen": 1792469755.5779252,
-    "ast_hash": "984ee26e0bc119f6570f26f626870094",
+    "mtime": 1792472973.021696,
+    "seen": 1792473101.098922,
+    "ast_hash": "a4bc1ad4560ff0b861af1ed1b5edaa99",
     "semantic_hash": ""
   },
   "stock-signal-engine/webapp/static/manifest.json": {
@@ -1302,15 +1302,15 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/webapp/static/overview.html": {
-    "mtime": 1791808443.4283497,
-    "seen": 1791864065.510127,
-    "ast_hash": "8c77dfeb9db556c671ea31cc665a5bd1",
+    "mtime": 1792471491.2592282,
+    "seen": 1792473101.099817,
+    "ast_hash": "91cdd50b370c50f60a03801aa9330678",
     "semantic_hash": ""
   },
   "stock-signal-engine/webapp/static/widget.html": {
-    "mtime": 1792469443.1819372,
-    "seen": 1792469755.5779588,
-    "ast_hash": "78891b3c170fb5a6f28524a0cb5afd5c",
+    "mtime": 1792471321.5139241,
+    "seen": 1792473101.099817,
+    "ast_hash": "889209a574a7d70e613d954288c8a1d3",
     "semantic_hash": ""
   },
   "Quant/image.png": {
@@ -1877,376 +1877,16 @@
     "ast_hash": "06f01e465bd7da3bfa928b2b9b1f9ca9",
     "semantic_hash": ""
   },
-  "stock-signal-engine/scratch/analyze_pnl.py": {
-    "mtime": 1792400423.5332828,
-    "seen": 1792459738.30945,
-    "ast_hash": "88628e7e711fb4819383243254cbc5fc",
-    "semantic_hash": ""
-  },
   "stock-signal-engine/data/crypto_strategy_learning.json": {
     "mtime": 1792469571.8675122,
     "seen": 1792469755.577831,
     "ast_hash": "e63ea9b399b4d504ce49cd8429712bc5",
     "semantic_hash": ""
   },
-  "stock-signal-engine/instagram_extractor/output/DeCKLXJgTs3_metadata.json": {
-    "mtime": 1792460260.0912325,
-    "seen": 1792461318.91091,
-    "ast_hash": "340074e0e68f030c2da105d1117cee20",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/Deq1cPvIdJi_metadata.json": {
-    "mtime": 1792460223.3036983,
-    "seen": 1792461318.910912,
-    "ast_hash": "7bd1e879ca3aef4230a59bba346dc982",
-    "semantic_hash": ""
-  },
   "stock-signal-engine/tests/test_smc_crypto_strategy.py": {
     "mtime": 1792461165.5625863,
     "seen": 1792461318.910969,
     "ast_hash": "1a8077374db327ef65cf96bb0010b647",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/DeCKLXJgTs3_transcript.txt": {
-    "mtime": 1792460260.0897598,
-    "seen": 1792461318.910989,
-    "ast_hash": "25ac5d08b71d0bafdcd27c295db218b3",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/Deq1cPvIdJi_transcript.txt": {
-    "mtime": 1792460223.3023822,
-    "seen": 1792461318.9109912,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/DeCKLXJgTs3.jpg": {
-    "mtime": 1792460253.37392,
-    "seen": 1792461318.9110599,
-    "ast_hash": "f4fb806c524bee5834c343db5bd0549f",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/Deq1cPvIdJi.jpg": {
-    "mtime": 1792460221.4531426,
-    "seen": 1792461318.911063,
-    "ast_hash": "3c353abd140a6662d5b42de4f0c27092",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_001.jpg": {
-    "mtime": 1792460272.922066,
-    "seen": 1792461318.9110641,
-    "ast_hash": "c8056367771b3b4f34ed49c1b79697a6",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_002.jpg": {
-    "mtime": 1792460272.9309988,
-    "seen": 1792461318.911065,
-    "ast_hash": "b48e642031f646a4a50eaf7410582900",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_003.jpg": {
-    "mtime": 1792460272.941959,
-    "seen": 1792461318.911066,
-    "ast_hash": "e2891d6e4e8fb1f17225f2ece23abdf4",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_004.jpg": {
-    "mtime": 1792460272.952543,
-    "seen": 1792461318.9110668,
-    "ast_hash": "2c655dac1f1c3f1df484c1ab8fd9d9aa",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_005.jpg": {
-    "mtime": 1792460272.9637976,
-    "seen": 1792461318.9110668,
-    "ast_hash": "8abcea04e254e7106b42e8db5196bbde",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_006.jpg": {
-    "mtime": 1792460272.9722834,
-    "seen": 1792461318.911068,
-    "ast_hash": "6a52660b61bd4f60d12b7dc26ff922af",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_007.jpg": {
-    "mtime": 1792460272.9813237,
-    "seen": 1792461318.911069,
-    "ast_hash": "3529eb7746fdd945b20dfc0d297a5db9",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_008.jpg": {
-    "mtime": 1792460272.9938066,
-    "seen": 1792461318.9110699,
-    "ast_hash": "7fe64ab6edddf70ea07b989ea61f418e",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_009.jpg": {
-    "mtime": 1792460273.0026994,
-    "seen": 1792461318.911071,
-    "ast_hash": "a31bead294753ac1a665b294fc02745a",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_010.jpg": {
-    "mtime": 1792460273.013263,
-    "seen": 1792461318.911071,
-    "ast_hash": "6eeaa2fbbe3184e75ff29d70478d7b76",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_011.jpg": {
-    "mtime": 1792460273.02187,
-    "seen": 1792461318.911072,
-    "ast_hash": "68f711538919729cf46ec5d419ff4897",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_012.jpg": {
-    "mtime": 1792460273.0316825,
-    "seen": 1792461318.911073,
-    "ast_hash": "91a56e5d650bd47db1589a07c93b96f7",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_013.jpg": {
-    "mtime": 1792460273.0432763,
-    "seen": 1792461318.9110742,
-    "ast_hash": "03ef60a0986c5ca300a50daedcb3c642",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_014.jpg": {
-    "mtime": 1792460273.0526426,
-    "seen": 1792461318.911075,
-    "ast_hash": "a791f385e5f59cae7c204dd0edad0509",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_015.jpg": {
-    "mtime": 1792460273.065079,
-    "seen": 1792461318.911076,
-    "ast_hash": "3b436aea917cf584aa39b0befb2852e4",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_016.jpg": {
-    "mtime": 1792460273.0742323,
-    "seen": 1792461318.911077,
-    "ast_hash": "cd2bd82ce03510b8a2a292fb108c53ab",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_017.jpg": {
-    "mtime": 1792460273.084214,
-    "seen": 1792461318.911078,
-    "ast_hash": "208ea0baa4613e49818c11e95188880f",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_018.jpg": {
-    "mtime": 1792460273.0965428,
-    "seen": 1792461318.911078,
-    "ast_hash": "dbf61cd67ff2486318bd370e73db7201",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_019.jpg": {
-    "mtime": 1792460273.1080968,
-    "seen": 1792461318.911079,
-    "ast_hash": "3b06f043bff4fba2972bc687d84fecd7",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_020.jpg": {
-    "mtime": 1792460273.1183524,
-    "seen": 1792461318.911082,
-    "ast_hash": "e168bd39a086b1c0e368ba51d94a2214",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_021.jpg": {
-    "mtime": 1792460273.1282394,
-    "seen": 1792461318.911083,
-    "ast_hash": "4fb28c64527b4393acd5e4750bf4f05b",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_022.jpg": {
-    "mtime": 1792460273.1388974,
-    "seen": 1792461318.911084,
-    "ast_hash": "2d593da3e2cf9b9803d31b4a5954710a",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_023.jpg": {
-    "mtime": 1792460273.1522903,
-    "seen": 1792461318.9110851,
-    "ast_hash": "6d667375c44e74ee0e5cbdaeb1130932",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_024.jpg": {
-    "mtime": 1792460273.1630886,
-    "seen": 1792461318.9110851,
-    "ast_hash": "2522b5b88e3106e66de19e0f407051e4",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_025.jpg": {
-    "mtime": 1792460273.1771946,
-    "seen": 1792461318.911086,
-    "ast_hash": "d01ebe7803c4b88ee82b588d1138359a",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_026.jpg": {
-    "mtime": 1792460273.1868238,
-    "seen": 1792461318.911087,
-    "ast_hash": "d266ba4699fdea9d29f586e3d871ccdf",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deck_027.jpg": {
-    "mtime": 1792460273.1898963,
-    "seen": 1792461318.911087,
-    "ast_hash": "85bac4127434211fb03f95d6771261ff",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_001.jpg": {
-    "mtime": 1792460233.5257034,
-    "seen": 1792461318.9110882,
-    "ast_hash": "8bcb98b5a4c0cf1ade283e56c56f0c76",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_002.jpg": {
-    "mtime": 1792460233.5388384,
-    "seen": 1792461318.9110882,
-    "ast_hash": "80c029058f614056d46a3c3cccfba49c",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_003.jpg": {
-    "mtime": 1792460233.5520725,
-    "seen": 1792461318.911089,
-    "ast_hash": "2e0cfdbcea5457a50cf3c06a107cd15b",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_004.jpg": {
-    "mtime": 1792460233.5658731,
-    "seen": 1792461318.91109,
-    "ast_hash": "202cac29dd29084d3b2f0303fd66b9c9",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_005.jpg": {
-    "mtime": 1792460233.583164,
-    "seen": 1792461318.91109,
-    "ast_hash": "9006a56d82e7de49b65caedf525bc2da",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_006.jpg": {
-    "mtime": 1792460233.6008096,
-    "seen": 1792461318.9110909,
-    "ast_hash": "46fa688a8632939b4a20e6d09d5175ed",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_007.jpg": {
-    "mtime": 1792460233.6227374,
-    "seen": 1792461318.9110909,
-    "ast_hash": "32ba982deedd0b2fd62f8d4197a768a2",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_008.jpg": {
-    "mtime": 1792460233.6369202,
-    "seen": 1792461318.911092,
-    "ast_hash": "84811ac9d14302b491ea4a1aa4042a72",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_009.jpg": {
-    "mtime": 1792460233.6558216,
-    "seen": 1792461318.911092,
-    "ast_hash": "7dbf56304cd07e76c87ab05911310396",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_010.jpg": {
-    "mtime": 1792460233.6710699,
-    "seen": 1792461318.911093,
-    "ast_hash": "bde92a7bf90c1bb16359823597b088f5",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_011.jpg": {
-    "mtime": 1792460233.6826274,
-    "seen": 1792461318.911094,
-    "ast_hash": "15b3def85996334f1a8aadafbe074ec7",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_012.jpg": {
-    "mtime": 1792460233.6970105,
-    "seen": 1792461318.911094,
-    "ast_hash": "9b5f15e356f7d81b1f4ce9c363e5ea98",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_013.jpg": {
-    "mtime": 1792460233.7097301,
-    "seen": 1792461318.9110951,
-    "ast_hash": "53f24dd655ccee4c00cbdaca3befa47a",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_014.jpg": {
-    "mtime": 1792460233.726626,
-    "seen": 1792461318.911096,
-    "ast_hash": "9ed23fe996e9a765b789808374e5b6e1",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_015.jpg": {
-    "mtime": 1792460233.7449057,
-    "seen": 1792461318.911096,
-    "ast_hash": "2bc20d656f3e1cb1899a5079ca5a7c7b",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_016.jpg": {
-    "mtime": 1792460233.7646534,
-    "seen": 1792461318.911097,
-    "ast_hash": "a7b055e7c69f8930d0e3d4cbca1e645a",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_017.jpg": {
-    "mtime": 1792460233.7863624,
-    "seen": 1792461318.911097,
-    "ast_hash": "88536bf118bf7c95a6a1e9adf8bb1fbb",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_018.jpg": {
-    "mtime": 1792460233.8028438,
-    "seen": 1792461318.911098,
-    "ast_hash": "674c1ba3b21fa28ea6438aa95694acbc",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_019.jpg": {
-    "mtime": 1792460233.8163342,
-    "seen": 1792461318.911098,
-    "ast_hash": "538f49804cacc11738eeabb323b1b44a",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/frame_deq_020.jpg": {
-    "mtime": 1792460233.8247375,
-    "seen": 1792461318.911099,
-    "ast_hash": "666c9f7743946c6cb08bbb1632eedc96",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/DeCKLXJgTs3.mp3": {
-    "mtime": 1792460253.950081,
-    "seen": 1792461318.9111118,
-    "ast_hash": "1d1009b5373bbcab9a86e16e590e47c8",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/DeCKLXJgTs3.mp4": {
-    "mtime": 1792460251.7520726,
-    "seen": 1792461318.9111118,
-    "ast_hash": "a8b93bf8ef7f4007cfada990e9db58fc",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/DeCKLXJgTs3.wav": {
-    "mtime": 1792460254.092238,
-    "seen": 1792461318.911113,
-    "ast_hash": "b3909ad072978b98bcf8701885f3770a",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/Deq1cPvIdJi.mp3": {
-    "mtime": 1792460222.3242226,
-    "seen": 1792461318.911118,
-    "ast_hash": "f480794685abd91ffbd98e62957964bf",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/Deq1cPvIdJi.mp4": {
-    "mtime": 1792460219.9510539,
-    "seen": 1792461318.9111192,
-    "ast_hash": "6f00874f978ba527b5d1aeebf69d9b12",
-    "semantic_hash": ""
-  },
-  "stock-signal-engine/instagram_extractor/output/Deq1cPvIdJi.wav": {
-    "mtime": 1792460222.4018674,
-    "seen": 1792461318.9111192,
-    "ast_hash": "d76938d278a89874572f7a574ceb05c3",
     "semantic_hash": ""
   },
   "stock-signal-engine/scripts/audit_desk1.py": {
@@ -2289,6 +1929,30 @@
     "mtime": 1792469475.0578573,
     "seen": 1792469755.577912,
     "ast_hash": "80d5729a208c44b2be978fd81087df2d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/cme_futures_pre_upgrade_archive.json": {
+    "mtime": 1792471141.2467685,
+    "seen": 1792473101.0967739,
+    "ast_hash": "6379ae5a30ec20cb54db0b7401285158",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/crypto_futures_pre_upgrade_archive.json": {
+    "mtime": 1792471141.2454336,
+    "seen": 1792473101.096776,
+    "ast_hash": "4163a3760357a34e73cd498e2b25561c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/forex_pre_upgrade_archive.json": {
+    "mtime": 1792471141.2485926,
+    "seen": 1792473101.096837,
+    "ast_hash": "dcf4e5727c7faf96058f901f943c3b8f",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/scripts/archive_pre_upgrade_trades.py": {
+    "mtime": 1792471544.1482441,
+    "seen": 1792473101.098251,
+    "ast_hash": "ff738104516d9bc3ee6d5e6b66f27846",
     "semantic_hash": ""
   }
 }
