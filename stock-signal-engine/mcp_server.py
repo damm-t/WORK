@@ -266,7 +266,33 @@ def get_multi_desk_status() -> Dict[str, Any]:
             "total_realized_pnl": st.get("total_realized_pnl", 0.0),
         }
 
-    return {"status": "success", "desks": desks}
+    try:
+        from execution.alpha_client import get_client
+        c = get_client()
+        acc = c.get_account()
+        pos = c.get_all_positions()
+        desks["stocks"] = {
+            "equity": float(acc.equity),
+            "cash": float(acc.cash),
+            "open_positions_count": len(pos),
+            "positions": {p.symbol: {"qty": float(p.qty), "entry_price": float(p.avg_entry_price), "current_price": float(p.current_price), "unrealized_pnl": float(p.unrealized_pl or 0.0)} for p in pos},
+        }
+    except Exception as e:
+        desks["stocks"] = {"error": str(e)}
+
+    self_learning = {}
+    try:
+        from strategy.equities_strategy import equities_strategy
+        self_learning["equities"] = equities_strategy.learner.get_performance_summary()
+    except Exception:
+        pass
+    try:
+        from strategy.crypto_perp_strategy import crypto_strategy
+        self_learning["crypto_perp"] = crypto_strategy.learner.get_performance_summary()
+    except Exception:
+        pass
+
+    return {"status": "success", "desks": desks, "self_learning": self_learning}
 
 
 @mcp.tool()

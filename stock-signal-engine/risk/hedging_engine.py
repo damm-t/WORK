@@ -68,11 +68,6 @@ def banned_ticker(ticker: str, include_all_hot: bool = False) -> bool:
     return sym in NVDA_BAN
 
 
-def is_hot_banned(ticker: str) -> bool:
-    """True when a symbol is excluded under the strict no-hot-stocks constraint."""
-    return str(ticker or "").strip().upper() in HOT_STOCKS_BAN
-
-
 def without_banned(tickers) -> list:
     """Drop banned symbols while preserving order."""
     return [t for t in (tickers or []) if not banned_ticker(t)]

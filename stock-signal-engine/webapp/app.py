@@ -1270,6 +1270,30 @@ def api_model_learning_log(limit: int = 25) -> dict:
     return {"rules": [r.__dict__ for r in rules]}
 
 
+@app.get("/api/self_learning")
+def api_self_learning() -> Dict[str, Any]:
+    """🧠 Returns empirical win rates, profit factors, and dynamic position multipliers for all desks."""
+    eq_summary = {}
+    crypto_summary = {}
+    try:
+        from strategy.equities_strategy import equities_strategy
+        eq_summary = equities_strategy.learner.get_performance_summary()
+    except Exception as e:
+        eq_summary = {"error": str(e)}
+
+    try:
+        from strategy.crypto_perp_strategy import crypto_strategy
+        crypto_summary = crypto_strategy.learner.get_performance_summary()
+    except Exception as e:
+        crypto_summary = {"error": str(e)}
+
+    return {
+        "timestamp": time.time(),
+        "equities": eq_summary,
+        "crypto_perp": crypto_summary,
+    }
+
+
 # --------------------------------------------------------- jev liquidity scooper --
 class JevExecuteRequest(BaseModel):
     ticker: str
@@ -1544,6 +1568,12 @@ def api_desks_status() -> Dict[str, Any]:
     except Exception as e:
         stocks_data["error"] = str(e)
 
+    try:
+        from strategy.equities_strategy import equities_strategy
+        stocks_data["self_learning"] = equities_strategy.learner.get_performance_summary()
+    except Exception:
+        stocks_data["self_learning"] = {}
+
     # 2. Crypto Perpetual Futures Desk (24/7 CCXT)
     crypto_pid = _read_pid(root_dir / ".run" / "crypto_futures.pid", module_name="execution.crypto_futures_autopilot")
     crypto_status = "RUNNING" if crypto_pid else "STOPPED"
@@ -1585,6 +1615,12 @@ def api_desks_status() -> Dict[str, Any]:
         "total_realized_pnl": crypto_state.get("total_realized_pnl", 0.0),
         "lifetime_realized_pnl": crypto_state.get("total_realized_pnl", 0.0),
     }
+
+    try:
+        from strategy.crypto_perp_strategy import crypto_strategy
+        crypto_data["self_learning"] = crypto_strategy.learner.get_performance_summary()
+    except Exception:
+        crypto_data["self_learning"] = {}
 
     # 3. CME Micro Index Futures Desk (23h)
     cme_pid = _read_pid(root_dir / ".run" / "cme_futures.pid", module_name="execution.cme_futures_autopilot")
@@ -1687,6 +1723,10 @@ def api_desks_status() -> Dict[str, Any]:
                 + float(forex_data.get("total_realized_pnl", 0.0)),
                 2,
             ),
+            "self_learning": {
+                "equities": stocks_data.get("self_learning", {}),
+                "crypto_perp": crypto_data.get("self_learning", {}),
+            },
         },
         "desks": {
             "stocks": stocks_data,

@@ -225,6 +225,9 @@ except Exception:
   echo ""
   echo "--- 🏛️ DESK 1: US EQUITIES (ALPACA LIVE PAPER) ---"
   "$PY" -c '
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 from execution import client
 try:
     acc = client.get_account()
@@ -240,6 +243,22 @@ try:
             print(f"    • {p.symbol:<6} {side_tag} {abs(float(p.qty)):>6.1f} shs @ ${float(p.avg_entry_price):>7.2f} (curr: ${float(p.current_price):>7.2f}, PnL: ${pl:+,.2f})")
     else:
         print("  Active Positions: None (100% Cash)")
+
+    try:
+        from strategy.equities_strategy import equities_strategy
+        stats = equities_strategy.learner.get_performance_summary()
+        if stats:
+            print("  🧠 Self-Learning Edge:")
+            for strat, s in stats.items():
+                mult = s.get("multiplier", 1.0)
+                tag = f"{mult:.2f}x BOOST" if mult > 1.0 else ("0.00x VETO" if mult == 0.0 else f"{mult:.2f}x")
+                wr = s.get("win_rate_pct", 0)
+                pf = s.get("profit_factor", 0.0)
+                print(f"    • {strat:<22} WR: {wr}% | PF: {pf:.2f} | Multiplier: {tag}")
+        else:
+            print("  🧠 Self-Learning Edge: Initializing (Cold start baseline 1.00x)")
+    except Exception:
+        pass
 except Exception as e:
     print(f"  Offline or error: {e}")
 '
@@ -247,7 +266,10 @@ except Exception as e:
   echo ""
   echo "--- ⚡ DESK 2: CRYPTO PERPETUAL FUTURES (24/7 CCXT DEMO) ---"
   "$PY" -c '
+import sys
 import json
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 from pathlib import Path
 p = Path("execution/crypto_futures_state.json")
 if p.exists():
@@ -260,6 +282,21 @@ if p.exists():
     print(f"  Cash         : ${cash:,.2f}")
     print(f"  Realized PnL : ${pnl:+,.2f}")
     print(f"  Traps Avoided: {traps}")
+    try:
+        from strategy.crypto_perp_strategy import crypto_strategy
+        c_stats = crypto_strategy.learner.get_performance_summary()
+        if c_stats:
+            print("  🧠 Self-Learning Edge:")
+            for strat, s in c_stats.items():
+                mult = s.get("multiplier", 1.0)
+                tag = f"{mult:.2f}x BOOST" if mult > 1.0 else ("0.00x VETO" if mult == 0.0 else f"{mult:.2f}x")
+                wr = s.get("win_rate_pct", 0)
+                pf = s.get("profit_factor", 0.0)
+                print(f"    • {strat:<22} WR: {wr}% | PF: {pf:.2f} | Multiplier: {tag}")
+        else:
+            print("  🧠 Self-Learning Edge: Initializing (Cold start baseline 1.00x)")
+    except Exception:
+        pass
     pos = d.get("positions", {})
     if pos:
         print("  Active Contracts:")

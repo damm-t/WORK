@@ -519,6 +519,43 @@
     </div>
   </div>
 
+  <!-- Adaptive Self-Learning Expectancy Card -->
+  <div class="section-title">
+    <span>🧠 Self-Learning Expectancy</span>
+    <span style="font-size: 9px; color: #10b981;" id="selfLearningStatusBadge">ROLLING EMPIRICAL EDGE</span>
+  </div>
+  <div class="card" style="padding: 10px;">
+    <!-- Desk 1 Learning -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+      <div>
+        <div style="font-size: 11px; font-weight: 600; color: #8ab4ff; display: flex; align-items: center; gap: 5px;">
+          <span>🏛️ D1 Equities SMC</span>
+          <span class="badge" id="d1LearnerBadge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-size: 9px; padding: 2px 5px;">1.00x BASELINE</span>
+        </div>
+        <div class="pos-details" id="d1LearnerStats" style="font-size: 10px;">Win Rate: --% · Profit Factor: -- · Trades: 0</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 12px; font-weight: 700; color: #10b981;" id="d1AvgR">-- R</div>
+        <div style="font-size: 9px; color: var(--text-muted);">Avg R-Multiple</div>
+      </div>
+    </div>
+    <div style="height: 1px; background: rgba(255,255,255,0.06); margin: 6px 0;"></div>
+    <!-- Desk 2 Learning -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size: 11px; font-weight: 600; color: #f59e0b; display: flex; align-items: center; gap: 5px;">
+          <span>⚡ D2 Crypto Perp</span>
+          <span class="badge" id="d2LearnerBadge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; font-size: 9px; padding: 2px 5px;">1.00x BASELINE</span>
+        </div>
+        <div class="pos-details" id="d2LearnerStats" style="font-size: 10px;">Win Rate: --% · Profit Factor: -- · Trades: 0</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 12px; font-weight: 700; color: #10b981;" id="d2AvgR">-- R</div>
+        <div style="font-size: 9px; color: var(--text-muted);">Avg R-Multiple</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Equity Hero Card -->
   <div class="card">
     <div class="equity-hero">
@@ -940,6 +977,67 @@
         document.getElementById('d3EquityVal').innerText = '$' + d3Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         const pidBadge = document.getElementById('d3StatusBadge');
         if (pidBadge) pidBadge.innerText = d.cme_futures.status === 'RUNNING' ? `PID ${d.cme_futures.pid}` : 'OFFLINE';
+      }
+
+      // Render Adaptive Self-Learning Intelligence
+      if (d.stocks && d.stocks.self_learning) {
+        const sl1 = d.stocks.self_learning.SMC_SWEEP_LONG || d.stocks.self_learning.QUALITY_MOMENTUM_PULLBACK || (Object.values(d.stocks.self_learning)[0] || {});
+        const trades = sl1.trades || 0;
+        const wr = sl1.win_rate_pct || 0;
+        const pf = sl1.profit_factor || 1.0;
+        const mult = sl1.multiplier !== undefined ? sl1.multiplier : 1.0;
+        const avgR = sl1.avg_r_multiple || 0.0;
+
+        const b1 = document.getElementById('d1LearnerBadge');
+        if (b1) {
+          if (mult > 1.0) {
+            b1.innerText = `${mult.toFixed(2)}x BOOST`;
+            b1.style.background = 'rgba(16, 185, 129, 0.2)';
+            b1.style.color = '#10b981';
+          } else if (mult === 0.0) {
+            b1.innerText = '0.00x VETO';
+            b1.style.background = 'rgba(244, 63, 94, 0.2)';
+            b1.style.color = '#f43f5e';
+          } else {
+            b1.innerText = `${mult.toFixed(2)}x BASELINE`;
+            b1.style.background = 'rgba(56, 189, 248, 0.15)';
+            b1.style.color = '#38bdf8';
+          }
+        }
+        const s1 = document.getElementById('d1LearnerStats');
+        if (s1) s1.innerText = `Win Rate: ${wr}% · Profit Factor: ${pf.toFixed(2)} · Trades: ${trades}`;
+        const r1 = document.getElementById('d1AvgR');
+        if (r1) r1.innerText = `${avgR >= 0 ? '+' : ''}${avgR.toFixed(2)}R`;
+      }
+
+      if (d.crypto_perp && d.crypto_perp.self_learning) {
+        const sl2 = d.crypto_perp.self_learning.SMC_SWEEP_LONG || (Object.values(d.crypto_perp.self_learning)[0] || {});
+        const trades = sl2.trades || 0;
+        const wr = sl2.win_rate_pct || 0;
+        const pf = sl2.profit_factor || 1.0;
+        const mult = sl2.multiplier !== undefined ? sl2.multiplier : 1.0;
+        const avgR = sl2.avg_r_multiple || 0.0;
+
+        const b2 = document.getElementById('d2LearnerBadge');
+        if (b2) {
+          if (mult > 1.0) {
+            b2.innerText = `${mult.toFixed(2)}x BOOST`;
+            b2.style.background = 'rgba(16, 185, 129, 0.2)';
+            b2.style.color = '#10b981';
+          } else if (mult === 0.0) {
+            b2.innerText = '0.00x VETO';
+            b2.style.background = 'rgba(244, 63, 94, 0.2)';
+            b2.style.color = '#f43f5e';
+          } else {
+            b2.innerText = `${mult.toFixed(2)}x BASELINE`;
+            b2.style.background = 'rgba(245, 158, 11, 0.15)';
+            b2.style.color = '#f59e0b';
+          }
+        }
+        const s2 = document.getElementById('d2LearnerStats');
+        if (s2) s2.innerText = `Win Rate: ${wr}% · Profit Factor: ${pf.toFixed(2)} · Trades: ${trades}`;
+        const r2 = document.getElementById('d2AvgR');
+        if (r2) r2.innerText = `${avgR >= 0 ? '+' : ''}${avgR.toFixed(2)}R`;
       }
     }
 
