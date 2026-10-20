@@ -38,10 +38,10 @@ NVDA_BAN = frozenset({"NVDA"})
 # Tuned small-account strategy preset (crisis-tested, 2026-09-19):
 # 49.11% OOS win rate · +16.15% return · +0.247 expectancy.
 TUNED_EXIT_GEOMETRY = {
-    "STOP_ATR_MULT": 1.5,
-    "TP1_ATR_MULT": 2.0,
-    "TP2_TRIGGER_ATR_MULT": 3.0,
-    "TRAIL_ATR_MULT": 2.5,
+    "STOP_ATR_MULT": 1.2,
+    "TP1_ATR_MULT": 2.8,
+    "TP2_TRIGGER_ATR_MULT": 4.0,
+    "TRAIL_ATR_MULT": 2.0,
     "TP1_SCALE_OUT_PCT": 0.50,
 }
 TUNED_ENTRY_RULES = {
@@ -146,36 +146,36 @@ def get_adaptive_exit_geometry(
     regime_upper = (regime or "").upper()
     psi_val = float(psi) if psi is not None else 50.0
 
-    # LAMINAR_TREND: high stability, clean directional flow -> let winners run (R:R 2.5:1)
+    # LAMINAR_TREND: high stability, clean directional flow -> let winners run (R:R 2.67:1)
     if regime_upper in ("LAMINAR_TREND", "BULL", "BULL_EXPANSION") or psi_val >= 65.0:
         return {
             "stop_mult": 1.2,
-            "tp1_mult": 3.0,
+            "tp1_mult": 3.2,
             "trail_mult": 1.5,
             "tp2_mult": 5.0,
             "trail_arm_mult": 2.5,
             "tp1_scale": 0.35,
             "regime_applied": "LAMINAR_TREND",
         }
-    # ERRATIC_NOISE: high chop, low stability -> tight stop (1.0 ATR), 2.0 ATR target (2.0:1 R:R floor)
+    # ERRATIC_NOISE: high chop, low stability -> tight stop (1.0 ATR), 2.3 ATR target (2.3:1 R:R floor)
     # Never widen stops in noise; that creates negative asymmetry!
     elif regime_upper in ("ERRATIC_NOISE", "BEAR_VOLATILITY") or psi_val < 45.0:
         return {
             "stop_mult": 1.0,
-            "tp1_mult": 2.0,
+            "tp1_mult": 2.3,
             "trail_mult": 1.0,
-            "tp2_mult": 3.0,
-            "trail_arm_mult": 1.5,
+            "tp2_mult": 3.5,
+            "trail_arm_mult": 1.8,
             "tp1_scale": 0.35,
             "regime_applied": "ERRATIC_NOISE",
         }
-    # CALM_RANGING: standard mean reversion (R:R 2.0:1)
+    # CALM_RANGING: standard mean reversion (R:R 2.33:1)
     else:
         return {
             "stop_mult": 1.2,
-            "tp1_mult": 2.4,
+            "tp1_mult": 2.8,
             "trail_mult": 1.2,
-            "tp2_mult": 4.0,
+            "tp2_mult": 4.5,
             "trail_arm_mult": 2.0,
             "tp1_scale": 0.35,
             "regime_applied": "CALM_RANGING",

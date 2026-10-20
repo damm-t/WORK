@@ -28,6 +28,17 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 from compliance.autonomous_checker import compliance_checker
 from strategy.crypto_perp_strategy import crypto_strategy
 from execution.json_state import atomic_json_read, atomic_json_write

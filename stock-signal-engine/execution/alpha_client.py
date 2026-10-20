@@ -47,20 +47,20 @@ def submit_order(client: TradingClient, ticker: str, shares: int, stop_loss_pric
 
 def submit_bracket_buy(client, ticker: str, qty: int, limit_price: float,
                        take_profit: float, stop_price: float,
-                       tif: str = "day") -> dict:
+                       tif: str = "gtc") -> dict:
     """
     Pre-placed BRACKET entry: limit buy + attached TP + attached SL in ONE
     atomic order — can be queued BEFORE the market opens (fills at/better
     than limit at open, children arm automatically).
 
-    This is how TP/SL exist *before* the trading session begins.
+    Defaults to GTC so stop loss survives multi-day holds and overnight sessions.
     """
     from alpaca.trading.enums import OrderClass                    # noqa: E402
     from alpaca.trading.requests import (LimitOrderRequest,         # noqa: E402
                                          TakeProfitRequest,
                                          StopLossRequest)
 
-    tif_final = TimeInForce.DAY if str(tif).lower() == "day" else TimeInForce.GTC
+    tif_final = TimeInForce.GTC if str(tif).lower() == "gtc" else TimeInForce.DAY
     req = LimitOrderRequest(
         symbol=ticker.upper(),
         qty=int(qty),

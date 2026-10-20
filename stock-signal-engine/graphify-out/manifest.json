@@ -444,16 +444,16 @@
     "semantic_hash": "748a7bc5b727aa7cb41f5fe3635db86d"
   },
   "execution/alpha_client.py": {
-    "mtime": 1791795520.5112042,
-    "seen": 1792050888.435905,
-    "ast_hash": "5b34ae553fb2f3df0948ef9f40f1a547",
-    "semantic_hash": "5b34ae553fb2f3df0948ef9f40f1a547"
+    "mtime": 1792464932.6865098,
+    "seen": 1792465862.0305479,
+    "ast_hash": "04e9f8d5ff1ff9d0ffd467f091ed4d09",
+    "semantic_hash": ""
   },
   "execution/autopilot.py": {
-    "mtime": 1792062369.4357836,
-    "seen": 1792078572.02432,
-    "ast_hash": "2b94863ed45d24fdfe7c93aa9f38870a",
-    "semantic_hash": "2b94863ed45d24fdfe7c93aa9f38870a"
+    "mtime": 1792465228.0347235,
+    "seen": 1792465862.030549,
+    "ast_hash": "184407e866876ac653df804688f4679d",
+    "semantic_hash": ""
   },
   "execution/autopilot_state.json": {
     "mtime": 1792081701.4572423,
@@ -462,10 +462,10 @@
     "semantic_hash": ""
   },
   "execution/cme_futures_autopilot.py": {
-    "mtime": 1792055964.2305076,
-    "seen": 1792078572.024322,
-    "ast_hash": "7671e833775cfdd95750464e213407e5",
-    "semantic_hash": "7671e833775cfdd95750464e213407e5"
+    "mtime": 1792461703.5175757,
+    "seen": 1792461766.8089752,
+    "ast_hash": "bc3c5720550897ae2b73d78a2663ba3a",
+    "semantic_hash": ""
   },
   "execution/cme_futures_state.json": {
     "mtime": 1792391906.0314493,
@@ -474,9 +474,9 @@
     "semantic_hash": ""
   },
   "execution/crypto_futures_autopilot.py": {
-    "mtime": 1792461285.4762058,
-    "seen": 1792461307.3625312,
-    "ast_hash": "f9638f343d3c95d87a9c945c2e99f89e",
+    "mtime": 1792461961.1644201,
+    "seen": 1792465862.0306098,
+    "ast_hash": "31729464b79a6e73099e8a08fdfc6497",
     "semantic_hash": ""
   },
   "execution/crypto_futures_state.json": {
@@ -492,10 +492,10 @@
     "semantic_hash": "aadba679ab03d8707730989eb49f289c"
   },
   "execution/forex_autopilot.py": {
-    "mtime": 1792055958.344437,
-    "seen": 1792078572.024364,
-    "ast_hash": "6023b028ef47b92b77fa6f5611029849",
-    "semantic_hash": "6023b028ef47b92b77fa6f5611029849"
+    "mtime": 1792461714.7711136,
+    "seen": 1792461766.809077,
+    "ast_hash": "275968c3785776ed74df3925cae5e68f",
+    "semantic_hash": ""
   },
   "execution/forex_state.json": {
     "mtime": 1792391906.043264,
@@ -522,10 +522,10 @@
     "semantic_hash": "c7d656b96fde40a4e6c73ff5514b6fc0"
   },
   "execution/ross_execution.py": {
-    "mtime": 1791560877.6436236,
-    "seen": 1791789463.468765,
-    "ast_hash": "163d0336908adc91daf0d66c3036881c",
-    "semantic_hash": "163d0336908adc91daf0d66c3036881c"
+    "mtime": 1792464944.7335296,
+    "seen": 1792465862.030796,
+    "ast_hash": "85eeae5f9f307943a090dabeee0e8cc7",
+    "semantic_hash": ""
   },
   "execution/trade_journal.py": {
     "mtime": 1792049725.0186663,
@@ -816,10 +816,10 @@
     "semantic_hash": "085f86a029f2eb4b4649e64053ec2edf"
   },
   "risk/hedging_engine.py": {
-    "mtime": 1792056028.6636646,
-    "seen": 1792078572.026612,
-    "ast_hash": "62bad3223c94cf784aa591a0a7b28ded",
-    "semantic_hash": "62bad3223c94cf784aa591a0a7b28ded"
+    "mtime": 1792465083.6763237,
+    "seen": 1792465862.0320609,
+    "ast_hash": "1f216846930f715c9007abde7426920b",
+    "semantic_hash": ""
   },
   "risk/risk_manager.py": {
     "mtime": 1791863438.1628566,
@@ -906,10 +906,10 @@
     "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "tests/test_adaptive_hedging.py": {
-    "mtime": 1792049208.3722024,
-    "seen": 1792050888.4386911,
-    "ast_hash": "3201bf84d3741e0a3a2a979b10e3d017",
-    "semantic_hash": "3201bf84d3741e0a3a2a979b10e3d017"
+    "mtime": 1792465570.0281274,
+    "seen": 1792465862.0324311,
+    "ast_hash": "36fe512e5c2de922866a6f385cb3d3aa",
+    "semantic_hash": ""
   },
   "tests/test_agent_council.py": {
     "mtime": 1791653184.3071876,
@@ -2217,6 +2217,30 @@
     "mtime": 1792460222.4018674,
     "seen": 1792461307.367402,
     "ast_hash": "d76938d278a89874572f7a574ceb05c3",
+    "semantic_hash": ""
+  },
+  "scripts/audit_desk1.py": {
+    "mtime": 1792462665.7606568,
+    "seen": 1792465862.032268,
+    "ast_hash": "64c8854881385f296533c1b204a9debd",
+    "semantic_hash": ""
+  },
+  "scripts/cleanup_orphan_qqq.py": {
+    "mtime": 1792465721.6439984,
+    "seen": 1792465862.032269,
+    "ast_hash": "19f4b38869a8ceb0f26293b2eb6ba664",
+    "semantic_hash": ""
+  },
+  "strategy/equities_strategy.py": {
+    "mtime": 1792465538.7883449,
+    "seen": 1792465862.0323699,
+    "ast_hash": "e361743e8b35a58a4dd51bf94072e764",
+    "semantic_hash": ""
+  },
+  "tests/test_equities_desk1_fixes.py": {
+    "mtime": 1792465299.8982272,
+    "seen": 1792465862.032587,
+    "ast_hash": "9817a16580dcfbbfcda0a38ec1e57e8b",
     "semantic_hash": ""
   }
 }

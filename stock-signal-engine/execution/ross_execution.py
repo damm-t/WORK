@@ -165,7 +165,7 @@ def execute_ross_bracket_trade(
             limit_price=entry_price,
             take_profit=hod_target,
             stop_price=stop_loss,
-            tif="day",
+            tif="gtc",
         )
         order_id = str(order_result.get("order_id") or "")
     except Exception as e:

@@ -17,9 +17,21 @@ import argparse
 import json
 import logging
 import os
+import sys
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 # --- Runtime stability defaults (must be set BEFORE heavy imports) ---
 # USE_LGBM_RUNTIME=0 : LightGBM/OpenMP deadlocks on macOS -> use rule ensemble
@@ -44,6 +56,7 @@ from market.shock_detector import (          # unexpected-data reflexes
     detect_intraday_shock, earnings_blackout, fetch_prev_close,
 )
 from execution import submit_market_order    # order placement
+from strategy.equities_strategy import equities_strategy, INSTITUTIONAL_EQUITY_CORE
 
 logger = logging.getLogger(__name__)
 
@@ -204,15 +217,22 @@ def manage_open_positions(dry_run: bool = False) -> list:
             unwind_paired_hedge(tracked_sym, services.client, state, dry_run=dry_run)
             state.pop(tracked_sym, None)
 
+    # Active hedge legs currently protecting open alpha positions
+    active_hedge_symbols = set()
+    for tracked_sym, tracked_data in state.items():
+        if not str(tracked_sym).startswith("_") and isinstance(tracked_data, dict):
+            h_sym = str(tracked_data.get("hedge_symbol") or "").upper()
+            if h_sym:
+                active_hedge_symbols.add(h_sym)
+
     for pos in positions:
         try:
             symbol = str(pos.symbol).upper()
-            if symbol in INDEX_AND_HEDGE_SYMBOLS:
-                continue
 
-            from risk.book_allocator import classify_position_book
-            if classify_position_book(symbol) == "momentum":
-                actions.append({"symbol": symbol, "action": "bracket_managed", "book": "momentum"})
+            # If this is an inverse ETF actively hedging an open alpha position (e.g. SH hedging AAPL),
+            # it is managed implicitly when the paired alpha leg closes.
+            if symbol in active_hedge_symbols and symbol in INDEX_AND_HEDGE_SYMBOLS:
+                logger.debug(f"[autopilot] {symbol} is an active paired hedge leg — managed via alpha leg.")
                 continue
 
             qty = int(abs(float(pos.qty)))
@@ -227,40 +247,27 @@ def manage_open_positions(dry_run: bool = False) -> list:
             if price <= 0 or atr <= 0:
                 continue
 
-            # --- unexpected-move reflex: check for shock BEFORE managing ---
-            try:
-                _pc = fetch_prev_close(symbol)
-                _shock = detect_intraday_shock(symbol, prev_close=_pc)
-            except Exception as sd_err:
-                logger.debug(f"[autopilot] shock detect {symbol}: {sd_err}")
-                _shock = {"shocked": False}
-
-            if (_shock.get("shocked")
-                    and _shock.get("direction") == "down"):
-                _ep = float(getattr(pos, "avg_entry_price", price) or price)
-                # Safeguard: do not panic-dump profitable positions during minor intraday noise
-                if price > _ep and abs(float(_shock.get("velocity_pct", 0.0) or 0.0)) < 3.5:
-                    logger.info(f"[autopilot] Holding {symbol}: price ${price:.2f} > entry ${_ep:.2f} despite noise")
-                else:
-                    logger.warning(f"[autopilot] SHOCK EXIT {symbol}: "
-                                   f"{_shock.get('detail')}")
-                    actions.append({"symbol": symbol, "action": "SHOCK_EXIT",
-                                    "price": round(price, 2),
-                                    "detail": _shock.get("detail")})
-                    if not dry_run:
-                        submit_market_order(services.client, symbol, qty, side="SELL")
-                        try:
-                            from execution.trade_journal import journal
-                            journal.record_close(symbol, float(price), "shock_exit",
-                                                 pnl=(price - _ep) * qty)
-                        except Exception as j_err:
-                            logger.debug(f"[autopilot] journal shock-close: {j_err}")
-                    unwind_paired_hedge(symbol, services.client, state, dry_run=dry_run)
-                    state.pop(symbol, None)              # clear ratchet memory
-                    continue
-
             entry = float(getattr(pos, "avg_entry_price", price) or price)
             record = state.get(symbol, {})
+
+            # 🛡️ Orphan Position Resolution: If symbol is in positions but untracked in state,
+            # initialize an active protective stop immediately so it never sits naked or unmanaged.
+            if symbol not in state:
+                orphan_stop = round(entry - (1.5 * atr), 2)
+                record = {
+                    "stop_price": orphan_stop,
+                    "initial_stop": orphan_stop,
+                    "highest_price": max(price, entry),
+                    "tp1_done": False,
+                    "be_armed": False,
+                    "strategy": "ORPHAN_MANAGED",
+                }
+                state[symbol] = record
+                logger.warning(
+                    f"[autopilot] 🛡️ INITIALIZED PROTECTIVE STOP FOR UNTRACKED/ORPHAN {symbol} "
+                    f"({qty} shs @ ${entry:.2f}): stop at ${orphan_stop:.2f}"
+                )
+
             highest_seen = max(price, float(record.get("highest_price", entry) or entry))
             current_stop = float(record.get("stop_price", 0.0) or 0.0)
 
@@ -275,127 +282,122 @@ def manage_open_positions(dry_run: bool = False) -> list:
             except Exception as av_err:
                 logger.debug(f"[autopilot] anti-volatility eval error {symbol}: {av_err}")
 
-            # Bayesian conviction reflex: handle invalidations and scale-outs (Upgrade 3)
+            # Bayesian conviction reflex: handle thesis invalidations
             try:
                 from model.bayesian_confidence import belief_engine
                 stmt = belief_engine.get_latest_statement(symbol)
-                if stmt:
-                    if stmt.recommendation == "EXIT_INVALIDATED":
-                        logger.warning(
-                            f"[autopilot] BAYESIAN THESIS INVALIDATED for {symbol} "
-                            f"(conf={stmt.confidence_pointer:.1f}%): liquidating position"
-                        )
-                        actions.append({"symbol": symbol, "action": "BAYESIAN_INVALIDATED_EXIT",
-                                        "price": round(price, 2),
-                                        "confidence": stmt.confidence_pointer})
-                        if not dry_run:
-                            submit_market_order(services.client, symbol, qty, side="SELL")
-                            try:
-                                from execution.trade_journal import journal
-                                _ep = float(getattr(pos, "avg_entry_price", price) or price)
-                                journal.record_close(symbol, float(price), "bayesian_invalidated",
-                                                     pnl=(price - _ep) * qty)
-                            except Exception as j_err:
-                                logger.debug(f"[autopilot] journal bayesian close: {j_err}")
-                        unwind_paired_hedge(symbol, services.client, state, dry_run=dry_run)
-                        state.pop(symbol, None)
-                        continue
-                    elif stmt.recommendation == "SCALE_OUT" and not record.get("tp1_done"):
-                        bayes_sell_qty = max(1, qty // 2)
-                        logger.info(
-                            f"[autopilot] BAYESIAN SCALE-OUT for {symbol}: sell {bayes_sell_qty} "
-                            f"of {qty} @ {price:.2f} (conf={stmt.confidence_pointer:.1f}%)"
-                        )
-                        actions.append({"symbol": symbol, "action": "bayesian_scale_out",
-                                        "price": round(price, 2), "qty": bayes_sell_qty})
-                        if not dry_run:
-                            submit_market_order(services.client, symbol, bayes_sell_qty, side="SELL")
-                            try:
-                                from execution.trade_journal import journal
-                                _ep = float(getattr(pos, "avg_entry_price", price) or price)
-                                journal.record_partial(symbol, float(price), bayes_sell_qty,
-                                                       pnl=(price - _ep) * bayes_sell_qty,
-                                                       reason="bayesian_scale_out")
-                            except Exception as j_err:
-                                logger.debug(f"[autopilot] journal bayesian partial: {j_err}")
-                        record["tp1_done"] = True
-                        qty -= bayes_sell_qty
+                if stmt and stmt.recommendation == "EXIT_INVALIDATED":
+                    logger.warning(
+                        f"[autopilot] BAYESIAN THESIS INVALIDATED for {symbol} "
+                        f"(conf={stmt.confidence_pointer:.1f}%): liquidating position"
+                    )
+                    actions.append({"symbol": symbol, "action": "BAYESIAN_INVALIDATED_EXIT",
+                                    "price": round(price, 2),
+                                    "confidence": stmt.confidence_pointer})
+                    if not dry_run:
+                        submit_market_order(services.client, symbol, qty, side="SELL")
+                        try:
+                            from execution.trade_journal import journal
+                            _ep = float(getattr(pos, "avg_entry_price", price) or price)
+                            journal.record_close(symbol, float(price), "bayesian_invalidated",
+                                                 pnl=(price - _ep) * qty)
+                        except Exception as j_err:
+                            logger.debug(f"[autopilot] journal bayesian close: {j_err}")
+                    unwind_paired_hedge(symbol, services.client, state, dry_run=dry_run)
+                    state.pop(symbol, None)
+                    continue
             except Exception as b_err:
                 logger.debug(f"[autopilot] Bayesian position check error {symbol}: {b_err}")
 
-            # ---- tuned-profile TP1 scale-out with adaptive PSI geometry (Upgrade 1) --
-            if os.getenv("TP1_AUTOMATION", "1") == "1":
-                plan = tp1_scale_plan(price, entry, atr, qty,
-                                      tp1_done=bool(record.get("tp1_done")),
-                                      psi=pos_psi, regime=pos_regime)
-                if plan.get("action") == "scale_out":
-                    sell_qty = int(plan["sell_qty"])
-                    logger.info(
-                        f"[autopilot] TP1 SCALE-OUT {symbol}: sell {sell_qty} "
-                        f"of {qty} @ {price:.2f} (TP1 ${plan['tp1_price']}) "
-                        f"[regime: {plan.get('regime_applied', 'STATIC')}]")
-                    actions.append({"symbol": symbol, "action": "tp1_scale_out",
-                                    "price": round(price, 2),
-                                    "qty": sell_qty,
-                                    "regime": plan.get("regime_applied")})
-                    if not dry_run:
-                        submit_market_order(services.client, symbol,
-                                            sell_qty, side="SELL")
-                        try:
-                            from execution.trade_journal import journal
-                            journal.record_partial(
-                                symbol, float(price), sell_qty,
-                                pnl=(price - entry) * sell_qty,
-                                reason="tp1_scale_out")
-                        except Exception as j_err:
-                            logger.debug(f"[autopilot] journal partial: {j_err}")
-                    record["tp1_done"] = True
-                    qty -= sell_qty                      # runner remainder
+            # --- UNCHOKED TRAILING RATCHET & ASYMMETRIC TARGET PROFIT ---
+            # Risk unit R: derived from initial stop distance (or 1.5*ATR floor)
+            init_stop = float(record.get("initial_stop", 0.0) or (entry - (1.5 * atr)))
+            risk_unit = max(entry - init_stop, atr * 1.5, entry * 0.015)
 
-            # Early Breakeven Ratchet: if price reaches entry + 1.0*ATR, ratchet stop floor
-            # to breakeven + buffer (entry + 0.10*ATR) so winning trades never become losses
-            be_trig_mult = float(os.getenv("BE_TRIGGER_MULT", "1.0"))
-            be_off_mult = float(os.getenv("BE_OFFSET_MULT", "0.10"))
-            be_trigger = entry + (be_trig_mult * atr)
-            be_armed = bool(record.get("be_armed"))
+            profit_r = (highest_seen - entry) / max(risk_unit, 1e-4)
+            current_r = (price - entry) / max(risk_unit, 1e-4)
 
-            if highest_seen >= be_trigger:
-                be_floor = round(entry + (be_off_mult * atr), 2)
-                if current_stop < be_floor:
-                    logger.info(f"[autopilot] BREAKEVEN RATCHET {symbol}: high ${highest_seen:.2f} >= trig ${be_trigger:.2f} -> stop floor raised to ${be_floor:.2f}")
-                    current_stop = be_floor
-                be_armed = True
-
-            # Guaranteed profit floor once TP1 has fired (AstraQuant +0.50 ATR profit floor lock).
-            if record.get("tp1_done"):
-                current_stop = max(current_stop, round(entry + (0.50 * atr), 2))
-
-            ratchet = ratchet_trailing_stop(entry, atr, highest_seen, current_stop,
-                                            psi=pos_psi, regime=pos_regime)
-            new_stop = float(ratchet.get("stop_price", current_stop) or current_stop)
-
-            state[symbol] = {
-                "stop_price": new_stop,
-                "highest_price": round(highest_seen, 2),
-                "tp1_done": bool(record.get("tp1_done")),
-                "be_armed": be_armed,
-            }
-
-            if new_stop > 0 and price <= new_stop:
-                logger.warning(
-                    f"[autopilot] STOP HIT {symbol}: price {price:.2f} <= stop "
-                    f"{new_stop:.2f} -> closing {qty} shares"
+            # 🎯 Asymmetric Target Profit Harvest at >= 2.2:1 R:R ($+350 to $+500 win)
+            tp_price = round(entry + (2.2 * risk_unit), 2)
+            if price >= tp_price:
+                logger.info(
+                    f"[autopilot] 🎯 TARGET PROFIT HARVEST {symbol}: price ${price:.2f} reached "
+                    f"2.2:1 TP (${tp_price:.2f}, +{current_r:.2f}R) -> closing {qty} shares"
                 )
-                actions.append({"symbol": symbol, "action": "close_at_stop",
-                                "price": round(price, 2), "stop": round(new_stop, 2)})
+                actions.append({"symbol": symbol, "action": "take_profit",
+                                "price": round(price, 2), "tp": tp_price})
                 if not dry_run:
                     submit_market_order(services.client, symbol, qty, side="SELL")
                     try:
                         from execution.trade_journal import journal
-                        _entry_px = float(getattr(pos, "avg_entry_price", price)
-                                          or price)
-                        journal.record_close(symbol, float(price), "stop",
-                                             pnl=(price - _entry_px) * qty)
+                        _ep = float(getattr(pos, "avg_entry_price", price) or price)
+                        pnl_val = (price - _ep) * qty
+                        journal.record_close(symbol, float(price), "target_profit_harvest", pnl=pnl_val)
+                        equities_strategy.learner.record_trade(
+                            strategy_type=record.get("strategy", "SMC_SWEEP_LONG"),
+                            pnl=pnl_val,
+                            r_multiple=current_r,
+                            entry_price=_ep,
+                            exit_price=price,
+                            ticker=symbol
+                        )
+                    except Exception as j_err:
+                        logger.debug(f"[autopilot] journal TP close: {j_err}")
+                unwind_paired_hedge(symbol, services.client, state, dry_run=dry_run)
+                state.pop(symbol, None)
+                continue
+
+            # 🚀 Unchoked Trailing Ratchet: arms only when profit reaches >= +1.5R
+            # Maintains a 0.6R breathing cushion so normal 5m noise doesn't choke winners,
+            # while guaranteeing at least +0.5R profit floor once armed.
+            be_armed = bool(record.get("be_armed"))
+            if profit_r >= 1.5:
+                cushion = 0.60 * risk_unit
+                ratchet_floor = round(highest_seen - cushion, 2)
+                guaranteed_floor = round(entry + (0.50 * risk_unit), 2)
+                target_stop = max(current_stop, ratchet_floor, guaranteed_floor)
+                if target_stop > current_stop:
+                    logger.info(
+                        f"[autopilot] 🚀 UNCHOKED RATCHET {symbol}: high ${highest_seen:.2f} (+{profit_r:.2f}R) "
+                        f"-> stop raised to ${target_stop:.2f} (0.6R cushion, +0.5R floor locked)"
+                    )
+                    current_stop = target_stop
+                be_armed = True
+
+            state[symbol] = {
+                "stop_price": current_stop,
+                "initial_stop": init_stop,
+                "highest_price": round(highest_seen, 2),
+                "tp1_done": bool(record.get("tp1_done")),
+                "be_armed": be_armed,
+                "strategy": record.get("strategy", "SMC_SWEEP_LONG"),
+                "hedge_symbol": record.get("hedge_symbol", ""),
+                "hedge_shares": record.get("hedge_shares", 0),
+            }
+
+            # Protective Stop Execution
+            if current_stop > 0 and price <= current_stop:
+                logger.warning(
+                    f"[autopilot] STOP HIT {symbol}: price {price:.2f} <= stop "
+                    f"{current_stop:.2f} -> closing {qty} shares"
+                )
+                actions.append({"symbol": symbol, "action": "close_at_stop",
+                                "price": round(price, 2), "stop": round(current_stop, 2)})
+                if not dry_run:
+                    submit_market_order(services.client, symbol, qty, side="SELL")
+                    try:
+                        from execution.trade_journal import journal
+                        _entry_px = float(getattr(pos, "avg_entry_price", price) or price)
+                        pnl_val = (price - _entry_px) * qty
+                        journal.record_close(symbol, float(price), "stop", pnl=pnl_val)
+                        equities_strategy.learner.record_trade(
+                            strategy_type=record.get("strategy", "SMC_SWEEP_LONG"),
+                            pnl=pnl_val,
+                            r_multiple=(price - _entry_px) / max(risk_unit, 1e-4),
+                            entry_price=_entry_px,
+                            exit_price=price,
+                            ticker=symbol
+                        )
                     except Exception as j_err:
                         logger.debug(f"[autopilot] journal close: {j_err}")
                 unwind_paired_hedge(symbol, services.client, state, dry_run=dry_run)
@@ -403,10 +405,10 @@ def manage_open_positions(dry_run: bool = False) -> list:
             else:
                 actions.append({
                     "symbol": symbol,
-                    "action": "raise_stop" if ratchet.get("trailing_armed") else "hold",
+                    "action": "raise_stop" if be_armed else "hold",
                     "price": round(price, 2),
-                    "stop": round(new_stop, 2),
-                    "trailing_armed": bool(ratchet.get("trailing_armed")),
+                    "stop": round(current_stop, 2),
+                    "trailing_armed": be_armed,
                 })
         except Exception as e:
             logger.error(f"[autopilot] Error managing position: {e}")
@@ -455,32 +457,29 @@ def _await_fill(order_id: str, tries: int = 5, delay: float = 1.5):
 def run_scan(watchlist: list, dry_run: bool = False) -> list:
     """Evaluates each watchlist name and executes approved PAIRED trades."""
     results = []
+    
+    # 🛡️ Anti-Churn Duplicate Guard: Fetch open portfolio positions to strictly prevent re-buying
+    held_symbols = set()
+    try:
+        if services.client:
+            open_pos = services.client.get_all_positions()
+            held_symbols = {str(p.symbol).upper() for p in open_pos if float(p.qty) != 0}
+    except Exception as pos_err:
+        logger.debug(f"[autopilot] Could not fetch positions for duplicate guard: {pos_err}")
+
     for ticker in watchlist:
         ticker = str(ticker).strip().upper()
         if not ticker or ticker in INDEX_AND_HEDGE_SYMBOLS:
             continue
+
+        # Prevent duplicate buying of symbols already held in portfolio
+        if ticker in held_symbols:
+            logger.info(f"[autopilot] 🛡️ DUPLICATE GUARD: {ticker} is already held in portfolio. Skipping duplicate entry.")
+            results.append({"ticker": ticker, "status": "skipped", "reason": f"Already held in portfolio ({ticker})"})
+            continue
         try:
             from risk.book_allocator import classify_position_book
             book = classify_position_book(ticker)
-
-            # 1. JEV Liquidity Scooper execution (prioritized if dislocated)
-            try:
-                from strategy.jev_scooper import jev_scooper
-                opp = jev_scooper.evaluate_ticker(ticker)
-                if opp.status == "QUALIFIED_SCOOP":
-                    from execution.jev_execution import execute_jev_scoop_trade
-                    res = execute_jev_scoop_trade(ticker, dry_run=dry_run)
-                    results.append({"ticker": ticker, "status": res.get("status", "executed"), "book": book, "details": res})
-                    continue
-            except Exception as je:
-                logger.debug(f"[autopilot] jev_scooper error for {ticker}: {je}")
-
-            # 2. Ross Momentum Execution (for momentum names)
-            if book == "momentum":
-                from execution.ross_execution import execute_ross_bracket_trade
-                res = execute_ross_bracket_trade(ticker, dry_run=dry_run)
-                results.append({"ticker": ticker, "status": res.get("status", "executed"), "book": "momentum", "details": res})
-                continue
             # ---- unexpected-data defenses BEFORE burning NLP cycles --------
             blackout = earnings_blackout(ticker)
             if blackout.get("blackout"):
@@ -698,11 +697,14 @@ def run_scan(watchlist: list, dry_run: bool = False) -> list:
                     _h_sym = str(_hedge.get('hedge_instrument', '') or '')
                     _h_shares = int(_hedge.get('hedge_shares', 0) or 0)
                     _curr_st = load_state()
+                    _sl_val = float((_dec.get("exit_levels") or {}).get("stop_loss", 0.0) or 0.0)
                     _curr_st[ticker] = {
-                        "stop_price": float((_dec.get("exit_levels") or {}).get("stop_loss", 0.0) or 0.0),
+                        "stop_price": _sl_val,
+                        "initial_stop": _sl_val,
                         "highest_price": float(_entry_px),
                         "tp1_done": False,
                         "be_armed": False,
+                        "strategy": str(_dec.get("strategy_type", "SMC_SWEEP_LONG")),
                         "hedge_symbol": _h_sym,
                         "hedge_shares": _h_shares,
                     }
@@ -784,48 +786,63 @@ def _day_guard() -> tuple:
 
 def auto_select(min_auto_score: float = None, top_picks: int = 3) -> list:
     """
-    Unified multi-strategy market scanner:
-      1. Morning Window (07:00-10:00 ET): Scans whole market for Ross Cameron Grade A Low-Float Runners.
-      2. Regular Session: Scans for High-Volume Dips & Quality Breakouts across Core Universe.
+    Institutional SMC & Quality Market Scanner for Desk 1:
+      1. Institutional Core: Scans liquid Large/Mid-Cap leaders for SMC Liquidity Sweeps
+         and 20 EMA pullbacks (strictly Point-in-Time).
+      2. High-JEV Dislocation Scooper: Scans for oversold capitulation wicks.
+      3. Quality Momentum Universe: Ranks broad market for Grade A setups.
+      Filters out already held positions to prevent duplicate entries.
     """
     if min_auto_score is None:
         min_auto_score = float(os.getenv("MIN_AUTO_SCORE", "75.0"))
 
     picks = []
-    try:
-        # Check if inside Ross Cameron morning momentum window
-        from market.low_float_scanner import check_trading_window, scan_momentum_market
-        win = check_trading_window()
-        
-        logger.info("[autopilot] Scanning whole market for Grade A low-float momentum runners...")
-        runners = scan_momentum_market(whole_market=True, top_n=top_picks)
-        for r in runners:
-            # Sniper quality: only take Grade A runners
-            if r.get("grade") == "A" and r["ticker"] not in picks:
-                picks.append(r["ticker"])
-    except Exception as e:
-        logger.debug(f"[autopilot] low-float morning scan note: {e}")
 
+    # Fetch currently held tickers to avoid suggesting existing positions
+    held_tickers = set()
     try:
-        from strategy.jev_scooper import jev_scooper
-        logger.info("[autopilot] Scanning for high-JEV liquidity scoops...")
-        jev_opps = jev_scooper.scan_market(top_n=top_picks)
-        for opp in jev_opps:
-            if opp.status == "QUALIFIED_SCOOP" and opp.ticker not in picks:
-                picks.append(opp.ticker)
-    except Exception as e:
-        logger.debug(f"[autopilot] JEV scan note: {e}")
+        if services.client:
+            held_tickers = {str(p.symbol).upper() for p in services.client.get_all_positions() if float(p.qty) != 0}
+    except Exception:
+        pass
 
+    # 1. Institutional Large/Mid-Cap SMC & PIT Scanner
     try:
-        from backtest.market_scanner import rank_market
-        rows = rank_market(top_n=max(top_picks * 4, 10), filter_junk=True, show_callout=False)
-        for r in rows:
-            if float(r.get("score", 0.0)) >= min_auto_score and r["ticker"] not in picks:
-                picks.append(r["ticker"])
-                if len(picks) >= top_picks:
-                    break
+        from market.price_fetcher import fetch_prices
+        logger.info("[autopilot] Scanning Institutional Core universe for SMC Liquidity Sweeps...")
+        for sym in INSTITUTIONAL_EQUITY_CORE:
+            if sym in held_tickers or sym in picks:
+                continue
+            try:
+                df = fetch_prices(sym, period="1mo", interval="1d")
+                if df is not None and not df.empty:
+                    sig = equities_strategy.evaluate_equity_ticker(sym, df)
+                    if sig and sig.confidence_score >= min_auto_score:
+                        logger.info(
+                            f"[autopilot] 🎯 QUALIFIED SMC SETUP: {sym} ({sig.strategy_type}, "
+                            f"Score {sig.confidence_score:.1f}, R:R {sig.risk_reward_ratio:.1f}:1)"
+                        )
+                        picks.append(sym)
+                        if len(picks) >= top_picks:
+                            break
+            except Exception as smc_e:
+                logger.debug(f"[autopilot] SMC scan error for {sym}: {smc_e}")
     except Exception as e:
-        logger.error(f"[autopilot] auto-select rank_market failed: {e}")
+        logger.debug(f"[autopilot] Institutional SMC scan note: {e}")
+
+    # 2. Quality Core Scanner (rank_market on large/mid-cap liquid names)
+    if len(picks) < top_picks:
+        try:
+            from backtest.market_scanner import rank_market
+            rows = rank_market(top_n=max(top_picks * 4, 10), filter_junk=True, show_callout=False)
+            for r in rows:
+                t = str(r.get("ticker", "")).upper().strip()
+                if float(r.get("score", 0.0)) >= min_auto_score and t not in picks and t not in held_tickers:
+                    picks.append(t)
+                    if len(picks) >= top_picks:
+                        break
+        except Exception as e:
+            logger.error(f"[autopilot] auto-select rank_market failed: {e}")
 
     return picks[:top_picks]
 
