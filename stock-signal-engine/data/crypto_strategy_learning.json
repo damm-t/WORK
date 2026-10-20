@@ -1,0 +1,40 @@
+{
+  "LIQUIDATION_SCOOP": [
+    {
+      "symbol": "BTC/USDT",
+      "pnl": 460.0,
+      "r_multiple": 0.92,
+      "win": true,
+      "entry_price": 80000.0,
+      "exit_price": 80920.0,
+      "timestamp": 1792461002.700688
+    },
+    {
+      "symbol": "BTC/USDT",
+      "pnl": 460.0,
+      "r_multiple": 0.92,
+      "win": true,
+      "entry_price": 80000.0,
+      "exit_price": 80920.0,
+      "timestamp": 1792461250.226751
+    },
+    {
+      "symbol": "BTC/USDT",
+      "pnl": 460.0,
+      "r_multiple": 0.92,
+      "win": true,
+      "entry_price": 80000.0,
+      "exit_price": 80920.0,
+      "timestamp": 1792461291.176384
+    },
+    {
+      "symbol": "BTC/USDT",
+      "pnl": 462.5,
+      "r_multiple": 3.7,
+      "win": true,
+      "entry_price": 60000.0,
+      "exit_price": 61850.0,
+      "timestamp": 1792461293.71232
+    }
+  ]
+}
