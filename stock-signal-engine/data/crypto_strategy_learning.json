@@ -35,6 +35,42 @@
       "entry_price": 60000.0,
       "exit_price": 61850.0,
       "timestamp": 1792461293.71232
+    },
+    {
+      "symbol": "BTC/USDT",
+      "pnl": 460.0,
+      "r_multiple": 0.92,
+      "win": true,
+      "entry_price": 80000.0,
+      "exit_price": 80920.0,
+      "timestamp": 1792469537.162644
+    },
+    {
+      "symbol": "BTC/USDT",
+      "pnl": 462.5,
+      "r_multiple": 3.7,
+      "win": true,
+      "entry_price": 60000.0,
+      "exit_price": 61850.0,
+      "timestamp": 1792469537.958747
+    },
+    {
+      "symbol": "BTC/USDT",
+      "pnl": 460.0,
+      "r_multiple": 0.92,
+      "win": true,
+      "entry_price": 80000.0,
+      "exit_price": 80920.0,
+      "timestamp": 1792469570.954724
+    },
+    {
+      "symbol": "BTC/USDT",
+      "pnl": 462.5,
+      "r_multiple": 3.7,
+      "win": true,
+      "entry_price": 60000.0,
+      "exit_price": 61850.0,
+      "timestamp": 1792469571.867309
     }
   ]
 }

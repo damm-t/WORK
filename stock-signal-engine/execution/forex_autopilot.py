@@ -109,6 +109,22 @@ class ForexAutopilot:
         self._trim_and_archive_closed_trades()
         atomic_json_write(self.state_path, self.state)
 
+    def _record_closed_trade(self, record: dict) -> None:
+        """Appends closed trade, tagging post_upgrade and updating after_change PnL and win rate."""
+        record["post_upgrade"] = True
+        self.state["closed_trades"].append(record)
+        pnl = float(record.get("pnl", 0.0) or 0.0)
+        self.state["after_change_pnl"] = round(self.state.get("after_change_pnl", 0.0) + pnl, 2)
+        self.state["after_change_trades_count"] = self.state.get("after_change_trades_count", 0) + 1
+        if pnl > 0:
+            self.state["after_change_wins"] = self.state.get("after_change_wins", 0) + 1
+        self.state["after_change_win_rate"] = round(
+            self.state.get("after_change_wins", 0) / max(1, self.state["after_change_trades_count"]) * 100, 1
+        )
+        self.state["post_upgrade_pnl"] = self.state["after_change_pnl"]
+        self.state["post_upgrade_win_rate"] = self.state["after_change_win_rate"]
+        self.state["post_upgrade_trades_count"] = self.state["after_change_trades_count"]
+
     def fetch_live_bars(self, symbol: str) -> pd.DataFrame:
         """Fetches live quotes for currency pairs, overlaying real-time interbank rate."""
         yahoo_ticker = forex_strategy.get_yahoo_ticker(symbol)
@@ -357,7 +373,7 @@ class ForexAutopilot:
                     pos["stop_loss"] = tight_sl
                     pos["cushion_sl"] = None
                     pos["status_badge"] = "🛡️ 50% Loss Curbed (Tight Stop)"
-                    self.state["closed_trades"].append({
+                    self._record_closed_trade({
                         "symbol": sym,
                         "side": pos["side"],
                         "entry_price": pos["entry_price"],
@@ -420,7 +436,7 @@ class ForexAutopilot:
                     pos["stop_loss"] = tight_sl
                     pos["cushion_sl"] = None
                     pos["status_badge"] = "🛡️ 50% Loss Curbed (Tight Stop)"
-                    self.state["closed_trades"].append({
+                    self._record_closed_trade({
                         "symbol": sym,
                         "side": pos["side"],
                         "entry_price": pos["entry_price"],
@@ -532,7 +548,7 @@ class ForexAutopilot:
             "opened_at": float(pos.get("opened_at") or (time.time() - 3600)),
             "closed_at": time.time(),
         }
-        self.state["closed_trades"].append(trade_record)
+        self._record_closed_trade(trade_record)
         logger.info(f"[forex] CLOSED {sym} @ {exit_price} | PnL: ${pnl:+.2f} ({pips:+.1f} pips) [{reason}]")
 
         # Record trade into Self-Improving Expectancy Tracker

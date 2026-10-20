@@ -98,40 +98,56 @@ start_forex() {
   start_bg forex "$PY" -m execution.forex_autopilot --interval 60 --capital 50000.0 || true
 }
 
+kill_target() {
+  local pid="${1:-}"
+  [ -n "$pid" ] || return 0
+  if [[ "${OSTYPE:-}" == "msys"* ]] || [[ "${OSTYPE:-}" == "cygwin"* ]]; then
+    taskkill //F //PID "$pid" >/dev/null 2>&1 || true
+    kill "$pid" 2>/dev/null || true
+  else
+    kill "$pid" 2>/dev/null || kill -9 "$pid" 2>/dev/null || true
+  fi
+}
+
 stop_desk() {
   local target="${1:-all}"
   case "$target" in
     crypto|crypto_futures)
-      if is_up crypto_futures; then
-        kill "$(cat "$RUN/crypto_futures.pid")" 2>/dev/null && echo "• crypto_futures stopped"
+      if [ -f "$RUN/crypto_futures.pid" ]; then
+        kill_target "$(cat "$RUN/crypto_futures.pid")"
+        echo "• crypto_futures stopped"
       fi
       rm -f "$RUN/crypto_futures.pid"
       pkill -f 'execution.crypto_futures_autopilot' 2>/dev/null
       ;;
     futures|cme_futures|cme)
-      if is_up cme_futures; then
-        kill "$(cat "$RUN/cme_futures.pid")" 2>/dev/null && echo "• cme_futures stopped"
+      if [ -f "$RUN/cme_futures.pid" ]; then
+        kill_target "$(cat "$RUN/cme_futures.pid")"
+        echo "• cme_futures stopped"
       fi
       rm -f "$RUN/cme_futures.pid"
       pkill -f 'execution.cme_futures_autopilot' 2>/dev/null
       ;;
     forex)
-      if is_up forex; then
-        kill "$(cat "$RUN/forex.pid")" 2>/dev/null && echo "• forex stopped"
+      if [ -f "$RUN/forex.pid" ]; then
+        kill_target "$(cat "$RUN/forex.pid")"
+        echo "• forex stopped"
       fi
       rm -f "$RUN/forex.pid"
       pkill -f 'execution.forex_autopilot' 2>/dev/null
       ;;
     stocks|autopilot)
-      if is_up autopilot; then
-        kill "$(cat "$RUN/autopilot.pid")" 2>/dev/null && echo "• autopilot stopped"
+      if [ -f "$RUN/autopilot.pid" ]; then
+        kill_target "$(cat "$RUN/autopilot.pid")"
+        echo "• autopilot stopped"
       fi
       rm -f "$RUN/autopilot.pid"
       pkill -f 'execution.autopilot' 2>/dev/null
       ;;
     webapp)
-      if is_up webapp; then
-        kill "$(cat "$RUN/webapp.pid")" 2>/dev/null && echo "• webapp stopped"
+      if [ -f "$RUN/webapp.pid" ]; then
+        kill_target "$(cat "$RUN/webapp.pid")"
+        echo "• webapp stopped"
       fi
       rm -f "$RUN/webapp.pid"
       pkill -f 'uvicorn webapp.app' 2>/dev/null
@@ -139,8 +155,9 @@ stop_desk() {
     all|*)
       echo "=== 🛑 STOPPING QUANT DESK (ALL 4 DESKS & SERVICES) ==="
       for n in autopilot crypto_futures cme_futures forex webapp routine night; do
-        if is_up "$n"; then
-          kill "$(cat "$RUN/$n.pid")" 2>/dev/null && echo "• $n stopped"
+        if [ -f "$RUN/$n.pid" ]; then
+          kill_target "$(cat "$RUN/$n.pid")"
+          echo "• $n stopped"
         fi
         rm -f "$RUN/$n.pid"
       done

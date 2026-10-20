@@ -486,15 +486,15 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/alpha_client.py": {
-    "mtime": 1791795520.5112042,
-    "seen": 1791864065.510067,
-    "ast_hash": "5b34ae553fb2f3df0948ef9f40f1a547",
+    "mtime": 1792464932.6865098,
+    "seen": 1792465999.459792,
+    "ast_hash": "04e9f8d5ff1ff9d0ffd467f091ed4d09",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/autopilot.py": {
-    "mtime": 1792062369.4357836,
-    "seen": 1792386075.103245,
-    "ast_hash": "2b94863ed45d24fdfe7c93aa9f38870a",
+    "mtime": 1792472986.7657518,
+    "seen": 1792473101.0967522,
+    "ast_hash": "9850ec10fdcef7a5e1cb5204527fa727",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/autopilot_state.json": {
@@ -504,33 +504,33 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/cme_futures_autopilot.py": {
-    "mtime": 1792055964.2305076,
-    "seen": 1792386075.103246,
-    "ast_hash": "7671e833775cfdd95750464e213407e5",
+    "mtime": 1792471166.2873492,
+    "seen": 1792473101.0967731,
+    "ast_hash": "4cb04b572a550dab45a6eb2a054f9483",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/cme_futures_state.json": {
-    "mtime": 1792391906.0314493,
-    "seen": 1792400218.956964,
-    "ast_hash": "6b11ab30c15eabcab2cf1579489efc72",
+    "mtime": 1792471141.2470636,
+    "seen": 1792473101.0967739,
+    "ast_hash": "f27b6e15c7f0fceacc1f54046d5a36fd",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_archive.json": {
     "mtime": 1792391906.0384393,
     "seen": 1792400218.956964,
-    "ast_hash": "4f4f6b09314d0ff1dd9e47c62c70a244",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_autopilot.py": {
-    "mtime": 1792055970.1898386,
-    "seen": 1792386075.103248,
-    "ast_hash": "6427c5c84ddf0f57364f6b61211b36a5",
+    "mtime": 1792471154.072878,
+    "seen": 1792473101.0967748,
+    "ast_hash": "dd0d244769be93e458bba8fd0cf316da",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/crypto_futures_state.json": {
-    "mtime": 1792391906.0400991,
-    "seen": 1792400218.956966,
-    "ast_hash": "920a3268b9903acdd6148149fa9cb182",
+    "mtime": 1792471141.2458556,
+    "seen": 1792473101.096777,
+    "ast_hash": "13d2f37ff4d73460f5342529f17eba1c",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/deadmans_switch.py": {
@@ -540,15 +540,15 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/forex_autopilot.py": {
-    "mtime": 1792055958.344437,
-    "seen": 1792386075.103251,
-    "ast_hash": "6023b028ef47b92b77fa6f5611029849",
+    "mtime": 1792471197.6028397,
+    "seen": 1792473101.096836,
+    "ast_hash": "4d9dfcd86c36231c1231d48996a34667",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/forex_state.json": {
-    "mtime": 1792391906.043264,
-    "seen": 1792400218.95697,
-    "ast_hash": "0eaac61786433e8e1d7532d62606526d",
+    "mtime": 1792471141.2490444,
+    "seen": 1792473101.096837,
+    "ast_hash": "d5ceafdc548e9698dc75fcc09c5a5a10",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/jev_execution.py": {
@@ -570,9 +570,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/ross_execution.py": {
-    "mtime": 1791560877.6436236,
-    "seen": 1791864065.5100732,
-    "ast_hash": "163d0336908adc91daf0d66c3036881c",
+    "mtime": 1792464944.7335296,
+    "seen": 1792465999.4598038,
+    "ast_hash": "85eeae5f9f307943a090dabeee0e8cc7",
     "semantic_hash": ""
   },
   "stock-signal-engine/execution/trade_journal.py": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/mcp_server.py": {
-    "mtime": 1791789665.5667512,
-    "seen": 1791864065.5100842,
-    "ast_hash": "5b6911c3c2a9f1c7eb6b5440dd9407fe",
+    "mtime": 1792469381.1736274,
+    "seen": 1792469755.577874,
+    "ast_hash": "25d9cc94bb2241e1c0490c5e71b2963b",
     "semantic_hash": ""
   },
   "stock-signal-engine/model/__init__.py": {
@@ -785,12 +785,6 @@
     "ast_hash": "27568e1848bb406cc0e97d41a31fceea",
     "semantic_hash": ""
   },
-  "stock-signal-engine/nlp/topic_model.py": {
-    "mtime": 1778573088.1204548,
-    "seen": 1791864065.510089,
-    "ast_hash": "1b5d4e264de1856cae25aa349407cdcc",
-    "semantic_hash": ""
-  },
   "stock-signal-engine/pipeline.py": {
     "mtime": 1791604082.5727034,
     "seen": 1791864065.510089,
@@ -798,9 +792,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/quant": {
-    "mtime": 1792400186.5166178,
-    "seen": 1792400218.957005,
-    "ast_hash": "16b18eab91ed7877e85b829c7e76eab3",
+    "mtime": 1792472552.6439116,
+    "seen": 1792473101.0977988,
+    "ast_hash": "7261273521a3a186d5cb9438e4094286",
     "semantic_hash": ""
   },
   "stock-signal-engine/reports/__init__.py": {
@@ -876,9 +870,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/risk/hedging_engine.py": {
-    "mtime": 1792056028.6636646,
-    "seen": 1792386075.103296,
-    "ast_hash": "62bad3223c94cf784aa591a0a7b28ded",
+    "mtime": 1792468080.9198222,
+    "seen": 1792468605.139006,
+    "ast_hash": "b38160ea3a115b1d7de1d48dbdb607ec",
     "semantic_hash": ""
   },
   "stock-signal-engine/risk/risk_manager.py": {
@@ -930,9 +924,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/strategy/cme_futures_strategy.py": {
-    "mtime": 1791792234.3535445,
-    "seen": 1791864065.510099,
-    "ast_hash": "9d496e26fe58f26186c6a1144a31da5f",
+    "mtime": 1792469133.9993408,
+    "seen": 1792469755.577903,
+    "ast_hash": "a99fe31f1df82b9db4c3a2a910afb310",
     "semantic_hash": ""
   },
   "stock-signal-engine/strategy/confluence_matrix.py": {
@@ -942,15 +936,15 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/strategy/crypto_perp_strategy.py": {
-    "mtime": 1791769933.0191464,
-    "seen": 1791864065.5101,
-    "ast_hash": "3267fff75abc5ad447e48791c71d5f7a",
+    "mtime": 1792461139.0901756,
+    "seen": 1792461318.910954,
+    "ast_hash": "7e7ade52ce799133e053e520ad3c8e14",
     "semantic_hash": ""
   },
   "stock-signal-engine/strategy/forex_strategy.py": {
-    "mtime": 1791946012.0943582,
-    "seen": 1792386075.103308,
-    "ast_hash": "f9a0c554648587353044f0cecfceff07",
+    "mtime": 1792469259.0026298,
+    "seen": 1792469755.577906,
+    "ast_hash": "58b5c9841d47ca095a9dfdca68e94d24",
     "semantic_hash": ""
   },
   "stock-signal-engine/strategy/jev_scooper.py": {
@@ -966,9 +960,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/tests/test_adaptive_hedging.py": {
-    "mtime": 1792049208.3722024,
-    "seen": 1792386075.10331,
-    "ast_hash": "3201bf84d3741e0a3a2a979b10e3d017",
+    "mtime": 1792465570.0281274,
+    "seen": 1792465999.4598641,
+    "ast_hash": "36fe512e5c2de922866a6f385cb3d3aa",
     "semantic_hash": ""
   },
   "stock-signal-engine/tests/test_agent_council.py": {
@@ -1044,9 +1038,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/tests/test_multi_desk.py": {
-    "mtime": 1791604320.147183,
-    "seen": 1791864065.510108,
-    "ast_hash": "450932005bb68124c91690dcc3904449",
+    "mtime": 1792469558.8865542,
+    "seen": 1792469755.577919,
+    "ast_hash": "f40b27c5e76291511c933d39144e1206",
     "semantic_hash": ""
   },
   "stock-signal-engine/tests/test_point_in_time.py": {
@@ -1086,9 +1080,9 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/webapp/app.py": {
-    "mtime": 1792383429.4121265,
-    "seen": 1792386075.103325,
-    "ast_hash": "c8ec9f04ef8bfdb621a83c1e9589fed8",
+    "mtime": 1792472973.021696,
+    "seen": 1792473101.098922,
+    "ast_hash": "a4bc1ad4560ff0b861af1ed1b5edaa99",
     "semantic_hash": ""
   },
   "stock-signal-engine/webapp/static/manifest.json": {
@@ -1308,15 +1302,15 @@
     "semantic_hash": ""
   },
   "stock-signal-engine/webapp/static/overview.html": {
-    "mtime": 1791808443.4283497,
-    "seen": 1791864065.510127,
-    "ast_hash": "8c77dfeb9db556c671ea31cc665a5bd1",
+    "mtime": 1792471491.2592282,
+    "seen": 1792473101.099817,
+    "ast_hash": "91cdd50b370c50f60a03801aa9330678",
     "semantic_hash": ""
   },
   "stock-signal-engine/webapp/static/widget.html": {
-    "mtime": 1791808463.7886894,
-    "seen": 1791864065.510128,
-    "ast_hash": "a6cabd7e5afa691e24c3a2717869dc31",
+    "mtime": 1792471321.5139241,
+    "seen": 1792473101.099817,
+    "ast_hash": "889209a574a7d70e613d954288c8a1d3",
     "semantic_hash": ""
   },
   "Quant/image.png": {
@@ -1869,6 +1863,96 @@
     "mtime": 1791992146.8040395,
     "seen": 1792386075.1033988,
     "ast_hash": "d914bda856e224a3a39e43c6ca374342",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/backtest/unified_four_desk_simulation.py": {
+    "mtime": 1792459672.0840385,
+    "seen": 1792459738.309348,
+    "ast_hash": "91c8b8449f0cc55c82a5b992bd4077c8",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/reports/unified_simulation_report.json": {
+    "mtime": 1792459705.0659943,
+    "seen": 1792459738.309438,
+    "ast_hash": "06f01e465bd7da3bfa928b2b9b1f9ca9",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/crypto_strategy_learning.json": {
+    "mtime": 1792469571.8675122,
+    "seen": 1792469755.577831,
+    "ast_hash": "e63ea9b399b4d504ce49cd8429712bc5",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_smc_crypto_strategy.py": {
+    "mtime": 1792461165.5625863,
+    "seen": 1792461318.910969,
+    "ast_hash": "1a8077374db327ef65cf96bb0010b647",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/scripts/audit_desk1.py": {
+    "mtime": 1792462665.7606568,
+    "seen": 1792465999.459855,
+    "ast_hash": "64c8854881385f296533c1b204a9debd",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/scripts/cleanup_orphan_qqq.py": {
+    "mtime": 1792465721.6439984,
+    "seen": 1792465999.4598558,
+    "ast_hash": "19f4b38869a8ceb0f26293b2eb6ba664",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/strategy/equities_strategy.py": {
+    "mtime": 1792465538.7883449,
+    "seen": 1792465999.459861,
+    "ast_hash": "e361743e8b35a58a4dd51bf94072e764",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_equities_desk1_fixes.py": {
+    "mtime": 1792465299.8982272,
+    "seen": 1792465999.4598699,
+    "ast_hash": "9817a16580dcfbbfcda0a38ec1e57e8b",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/cme_strategy_learning.json": {
+    "mtime": 1792469571.8595865,
+    "seen": 1792469755.5778291,
+    "ast_hash": "ef9fcdad568adca4d46b1ceb7cba8742",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/data/forex_strategy_learning.json": {
+    "mtime": 1792469572.5487838,
+    "seen": 1792469755.577834,
+    "ast_hash": "80553a0274cc255ac822d5e6c1c130ac",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/tests/test_cme_forex_desk_fixes.py": {
+    "mtime": 1792469475.0578573,
+    "seen": 1792469755.577912,
+    "ast_hash": "80d5729a208c44b2be978fd81087df2d",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/cme_futures_pre_upgrade_archive.json": {
+    "mtime": 1792471141.2467685,
+    "seen": 1792473101.0967739,
+    "ast_hash": "6379ae5a30ec20cb54db0b7401285158",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/crypto_futures_pre_upgrade_archive.json": {
+    "mtime": 1792471141.2454336,
+    "seen": 1792473101.096776,
+    "ast_hash": "4163a3760357a34e73cd498e2b25561c",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/execution/forex_pre_upgrade_archive.json": {
+    "mtime": 1792471141.2485926,
+    "seen": 1792473101.096837,
+    "ast_hash": "dcf4e5727c7faf96058f901f943c3b8f",
+    "semantic_hash": ""
+  },
+  "stock-signal-engine/scripts/archive_pre_upgrade_trades.py": {
+    "mtime": 1792471544.1482441,
+    "seen": 1792473101.098251,
+    "ast_hash": "ff738104516d9bc3ee6d5e6b66f27846",
     "semantic_hash": ""
   }
 }

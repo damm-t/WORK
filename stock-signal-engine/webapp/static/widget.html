@@ -166,28 +166,41 @@
     }
 
     .hero-metrics {
-      display: flex;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
       margin-top: 10px;
       padding-top: 10px;
       border-top: 1px solid var(--card-border);
     }
 
+    @media (max-width: 380px) {
+      .hero-metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     .sub-metric {
-      flex: 1;
+      min-width: 0;
     }
 
     .sub-metric-label {
-      font-size: 10px;
+      font-size: 9.5px;
       color: var(--text-muted);
       margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .sub-metric-val {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: #cbd5e1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .section-title {
@@ -439,10 +452,10 @@
     <div class="equity-hero">
       <div>
         <div class="hero-label">Combined Multi-Desk Capital</div>
-        <div class="hero-val" id="combinedCapVal">$170,808.73</div>
+        <div class="hero-val" id="combinedCapVal">$220,808.73</div>
       </div>
       <div id="desksSummaryBadge" class="badge badge-core" style="padding: 4px 8px; font-size: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
-        3/3 DESKS ACTIVE
+        4/4 DESKS ACTIVE
       </div>
     </div>
     <div class="hero-metrics">
@@ -456,14 +469,18 @@
       </div>
       <div class="sub-metric">
         <div class="sub-metric-label">📈 CME Micro (D3)</div>
-        <div class="sub-metric-val" id="desk3CapVal" style="color: #10b981;">$25,000.00</div>
+        <div class="sub-metric-val" id="desk3CapVal" style="color: #a78bfa;">$25,000.00</div>
+      </div>
+      <div class="sub-metric">
+        <div class="sub-metric-label">💱 Forex Macro (D4)</div>
+        <div class="sub-metric-val" id="desk4CapVal" style="color: #2dd4bf;">$50,000.00</div>
       </div>
     </div>
   </div>
 
-  <!-- 3-Asset Multi-Desk Daemons Card -->
+  <!-- 4-Asset Multi-Desk Daemons Card -->
   <div class="section-title">
-    <span>Autonomous 3-Asset Desks</span>
+    <span>Autonomous 4-Asset Desks</span>
     <span style="font-size: 9px; color: #38bdf8;" id="totalDesksPill">ISOLATED LOCALHOST PIDS</span>
   </div>
   <div class="card" style="padding: 8px;">
@@ -502,12 +519,12 @@
     </div>
 
     <!-- Desk 3 -->
-    <div class="position-row" style="margin-bottom: 0px;">
+    <div class="position-row" style="margin-bottom: 5px;">
       <div class="pos-left">
         <div>
           <div style="display:flex; align-items:center; gap:6px;">
-            <span class="pos-ticker" style="color:#10b981; font-size:12px;">📈 D3: CME FUTURES</span>
-            <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);" id="d3StatusBadge">PID 12072</span>
+            <span class="pos-ticker" style="color:#a78bfa; font-size:12px;">📈 D3: CME FUTURES</span>
+            <span class="badge" style="background:rgba(167,139,250,0.15); color:#a78bfa; border:1px solid rgba(167,139,250,0.3);" id="d3StatusBadge">PID 12072</span>
           </div>
           <div class="pos-details">CME Simulated · 23h · MES/MNQ Brackets</div>
         </div>
@@ -515,6 +532,104 @@
       <div class="pos-pnl">
         <div class="pos-pnl-dollars" id="d3EquityVal" style="color:#fff;">$25,000.00</div>
         <div class="pos-pnl-pct" style="color:#38bdf8;">23H BRACKETS</div>
+      </div>
+    </div>
+
+    <!-- Desk 4 -->
+    <div class="position-row" style="margin-bottom: 0px;">
+      <div class="pos-left">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="pos-ticker" style="color:#2dd4bf; font-size:12px;">💱 D4: FOREX MACRO</span>
+            <span class="badge" style="background:rgba(45,212,191,0.15); color:#2dd4bf; border:1px solid rgba(45,212,191,0.3);" id="d4StatusBadge">PID 12864</span>
+          </div>
+          <div class="pos-details">Interbank FX · <span id="d4PosCount">0</span> Pos · 20:1 Macro</div>
+        </div>
+      </div>
+      <div class="pos-pnl">
+        <div class="pos-pnl-dollars" id="d4EquityVal" style="color:#fff;">$50,000.00</div>
+        <div class="pos-pnl-pct" id="d4MarginVal" style="color:#2dd4bf;">24/5 LIVE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dedicated Multi-Desk Fund & Capital Allocation Monitor Card -->
+  <div class="section-title">
+    <span>💼 Fund &amp; Capital Allocation Monitor</span>
+    <span style="font-size: 9px; color: #10b981;" id="fundTotalPill">POOL: $220.8k</span>
+  </div>
+  <div class="card" style="padding: 10px;">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <!-- Desk 1 Fund Row -->
+      <div class="fund-row" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:11px; font-weight:700; color:#8ab4ff;">🏛️ D1 Equities</span>
+            <span class="badge" id="d1FundWrBadge" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:9px; padding:1px 5px;">WR: 100%</span>
+            <span style="font-size:9px; color:var(--text-muted);" id="d1PostTrades">0 trades</span>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">
+            Fund: <span id="d1FundAllocated" style="color:#cbd5e1; font-family:'JetBrains Mono';">$95,808</span> · Cash: <span id="d1FundCash" style="color:#cbd5e1; font-family:'JetBrains Mono';">$95,808</span>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#10b981;" id="d1FundPnlVal">+$0.00</div>
+          <div style="font-size:9px; color:var(--text-muted);" id="d1FundMarginHeld">Margin: $0.00</div>
+        </div>
+      </div>
+
+      <!-- Desk 2 Fund Row -->
+      <div class="fund-row" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:11px; font-weight:700; color:#f59e0b;">⚡ D2 Crypto 3x</span>
+            <span class="badge" id="d2FundWrBadge" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:9px; padding:1px 5px;">WR: 100%</span>
+            <span style="font-size:9px; color:var(--text-muted);" id="d2PostTrades">0 trades</span>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">
+            Fund: <span id="d2FundAllocated" style="color:#cbd5e1; font-family:'JetBrains Mono';">$50,000</span> · Free: <span id="d2FundCash" style="color:#cbd5e1; font-family:'JetBrains Mono';">$50,000</span>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#10b981;" id="d2FundPnlVal">+$0.00</div>
+          <div style="font-size:9px; color:var(--text-muted);" id="d2FundMarginHeld">Margin: $0.00</div>
+        </div>
+      </div>
+
+      <!-- Desk 3 Fund Row -->
+      <div class="fund-row" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:11px; font-weight:700; color:#a78bfa;">📈 D3 CME Futures</span>
+            <span class="badge" id="d3FundWrBadge" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:9px; padding:1px 5px;">WR: 100%</span>
+            <span style="font-size:9px; color:var(--text-muted);" id="d3PostTrades">0 trades</span>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">
+            Fund: <span id="d3FundAllocated" style="color:#cbd5e1; font-family:'JetBrains Mono';">$25,000</span> · Free: <span id="d3FundCash" style="color:#cbd5e1; font-family:'JetBrains Mono';">$25,000</span>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#10b981;" id="d3FundPnlVal">+$0.00</div>
+          <div style="font-size:9px; color:var(--text-muted);" id="d3FundMarginHeld">Margin: $0.00</div>
+        </div>
+      </div>
+
+      <!-- Desk 4 Fund Row -->
+      <div class="fund-row" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:11px; font-weight:700; color:#2dd4bf;">💱 D4 Forex Macro</span>
+            <span class="badge" id="d4FundWrBadge" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:9px; padding:1px 5px;">WR: 100%</span>
+            <span style="font-size:9px; color:var(--text-muted);" id="d4PostTrades">0 trades</span>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">
+            Fund: <span id="d4FundAllocated" style="color:#cbd5e1; font-family:'JetBrains Mono';">$50,000</span> · Free: <span id="d4FundCash" style="color:#cbd5e1; font-family:'JetBrains Mono';">$50,000</span>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#10b981;" id="d4FundPnlVal">+$0.00</div>
+          <div style="font-size:9px; color:var(--text-muted);" id="d4FundMarginHeld">Margin: $0.00</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1008,6 +1123,126 @@
         document.getElementById('d3EquityVal').innerText = '$' + d3Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         const pidBadge = document.getElementById('d3StatusBadge');
         if (pidBadge) pidBadge.innerText = d.cme_futures.status === 'RUNNING' ? `PID ${d.cme_futures.pid}` : 'OFFLINE';
+      }
+
+      if (d.forex) {
+        const d4Eq = Number(d.forex.equity || 0);
+        document.getElementById('desk4CapVal').innerText = '$' + d4Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('d4EquityVal').innerText = '$' + d4Eq.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const pidBadge = document.getElementById('d4StatusBadge');
+        if (pidBadge) pidBadge.innerText = d.forex.status === 'RUNNING' ? `PID ${d.forex.pid}` : 'OFFLINE';
+        const posCount = document.getElementById('d4PosCount');
+        if (posCount) posCount.innerText = d.forex.positions_count || 0;
+      }
+
+      // Fund & Capital Monitoring Rows
+      const poolCap = Number(sum.combined_portfolio_capital || combinedCap);
+      const poolPill = document.getElementById('fundTotalPill');
+      if (poolPill) poolPill.innerText = `POOL: $${(poolCap / 1000).toFixed(1)}k`;
+
+      const formatPnlStr = (val) => {
+        const num = Number(val || 0);
+        return `${num >= 0 ? '+' : ''}$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      };
+
+      // D1 Fund Row
+      if (d.stocks) {
+        const pnl = Number(d.stocks.after_change_pnl !== undefined ? d.stocks.after_change_pnl : (d.stocks.post_upgrade_pnl || 0));
+        const wr = Number(d.stocks.after_change_win_rate !== undefined ? d.stocks.after_change_win_rate : (d.stocks.post_upgrade_win_rate || 100.0));
+        const trades = d.stocks.after_change_trades_count || 0;
+        const elPnl = document.getElementById('d1FundPnlVal');
+        if (elPnl) {
+          elPnl.innerText = formatPnlStr(pnl);
+          elPnl.style.color = pnl >= 0 ? '#10b981' : '#f43f5e';
+        }
+        const elWr = document.getElementById('d1FundWrBadge');
+        if (elWr) {
+          elWr.innerText = `WR: ${wr.toFixed(0)}%`;
+          elWr.style.color = wr >= 50 ? '#10b981' : '#f43f5e';
+        }
+        const elTrades = document.getElementById('d1PostTrades');
+        if (elTrades) elTrades.innerText = `${trades} trade${trades === 1 ? '' : 's'}`;
+        const elAlloc = document.getElementById('d1FundAllocated');
+        if (elAlloc) elAlloc.innerText = '$' + Number(d.stocks.capital || d.stocks.equity || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const elCash = document.getElementById('d1FundCash');
+        if (elCash) elCash.innerText = '$' + Number(d.stocks.cash || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const elMargin = document.getElementById('d1FundMarginHeld');
+        if (elMargin) elMargin.innerText = `Margin: $${Number(d.stocks.margin_held || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+      }
+
+      // D2 Fund Row
+      if (d.crypto_perp) {
+        const pnl = Number(d.crypto_perp.after_change_pnl !== undefined ? d.crypto_perp.after_change_pnl : (d.crypto_perp.post_upgrade_pnl || 0));
+        const wr = Number(d.crypto_perp.after_change_win_rate !== undefined ? d.crypto_perp.after_change_win_rate : (d.crypto_perp.post_upgrade_win_rate || 0));
+        const trades = d.crypto_perp.after_change_trades_count || 0;
+        const elPnl = document.getElementById('d2FundPnlVal');
+        if (elPnl) {
+          elPnl.innerText = formatPnlStr(pnl);
+          elPnl.style.color = pnl >= 0 ? '#10b981' : '#f43f5e';
+        }
+        const elWr = document.getElementById('d2FundWrBadge');
+        if (elWr) {
+          elWr.innerText = `WR: ${wr.toFixed(0)}%`;
+          elWr.style.color = wr >= 50 ? '#10b981' : (trades === 0 ? '#38bdf8' : '#f43f5e');
+        }
+        const elTrades = document.getElementById('d2PostTrades');
+        if (elTrades) elTrades.innerText = `${trades} trade${trades === 1 ? '' : 's'}`;
+        const elAlloc = document.getElementById('d2FundAllocated');
+        if (elAlloc) elAlloc.innerText = '$' + Number(d.crypto_perp.capital || 50000).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const elCash = document.getElementById('d2FundCash');
+        if (elCash) elCash.innerText = '$' + Number(d.crypto_perp.cash || 50000).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const elMargin = document.getElementById('d2FundMarginHeld');
+        if (elMargin) elMargin.innerText = `Margin: $${Number(d.crypto_perp.margin_held || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+      }
+
+      // D3 Fund Row
+      if (d.cme_futures) {
+        const pnl = Number(d.cme_futures.after_change_pnl !== undefined ? d.cme_futures.after_change_pnl : (d.cme_futures.post_upgrade_pnl || 0));
+        const wr = Number(d.cme_futures.after_change_win_rate !== undefined ? d.cme_futures.after_change_win_rate : (d.cme_futures.post_upgrade_win_rate || 0));
+        const trades = d.cme_futures.after_change_trades_count || 0;
+        const elPnl = document.getElementById('d3FundPnlVal');
+        if (elPnl) {
+          elPnl.innerText = formatPnlStr(pnl);
+          elPnl.style.color = pnl >= 0 ? '#10b981' : '#f43f5e';
+        }
+        const elWr = document.getElementById('d3FundWrBadge');
+        if (elWr) {
+          elWr.innerText = `WR: ${wr.toFixed(0)}%`;
+          elWr.style.color = wr >= 50 ? '#10b981' : (trades === 0 ? '#38bdf8' : '#f43f5e');
+        }
+        const elTrades = document.getElementById('d3PostTrades');
+        if (elTrades) elTrades.innerText = `${trades} trade${trades === 1 ? '' : 's'}`;
+        const elAlloc = document.getElementById('d3FundAllocated');
+        if (elAlloc) elAlloc.innerText = '$' + Number(d.cme_futures.capital || 25000).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const elCash = document.getElementById('d3FundCash');
+        if (elCash) elCash.innerText = '$' + Number(d.cme_futures.cash || 25000).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const elMargin = document.getElementById('d3FundMarginHeld');
+        if (elMargin) elMargin.innerText = `Margin: $${Number(d.cme_futures.margin_held || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+      }
+
+      // D4 Fund Row
+      if (d.forex) {
+        const pnl = Number(d.forex.after_change_pnl !== undefined ? d.forex.after_change_pnl : (d.forex.post_upgrade_pnl || 0));
+        const wr = Number(d.forex.after_change_win_rate !== undefined ? d.forex.after_change_win_rate : (d.forex.post_upgrade_win_rate || 0));
+        const trades = d.forex.after_change_trades_count || 0;
+        const elPnl = document.getElementById('d4FundPnlVal');
+        if (elPnl) {
+          elPnl.innerText = formatPnlStr(pnl);
+          elPnl.style.color = pnl >= 0 ? '#10b981' : '#f43f5e';
+        }
+        const elWr = document.getElementById('d4FundWrBadge');
+        if (elWr) {
+          elWr.innerText = `WR: ${wr.toFixed(0)}%`;
+          elWr.style.color = wr >= 50 ? '#10b981' : (trades === 0 ? '#38bdf8' : '#f43f5e');
+        }
+        const elTrades = document.getElementById('d4PostTrades');
+        if (elTrades) elTrades.innerText = `${trades} trade${trades === 1 ? '' : 's'}`;
+        const elAlloc = document.getElementById('d4FundAllocated');
+        if (elAlloc) elAlloc.innerText = '$' + Number(d.forex.capital || 50000).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const elCash = document.getElementById('d4FundCash');
+        if (elCash) elCash.innerText = '$' + Number(d.forex.cash || 50000).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const elMargin = document.getElementById('d4FundMarginHeld');
+        if (elMargin) elMargin.innerText = `Margin: $${Number(d.forex.margin_held || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
       }
 
       // Render Adaptive Self-Learning Intelligence

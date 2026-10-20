@@ -1,0 +1,22 @@
+{
+  "LONDON_NY_BREAKOUT": [
+    {
+      "pair": "GBP/USD",
+      "pnl": 626.0,
+      "r_multiple": 1.96,
+      "win": true,
+      "entry_price": 1.32001,
+      "exit_price": 1.32314,
+      "timestamp": 1792469538.6893282
+    },
+    {
+      "pair": "GBP/USD",
+      "pnl": 626.0,
+      "r_multiple": 1.96,
+      "win": true,
+      "entry_price": 1.32001,
+      "exit_price": 1.32314,
+      "timestamp": 1792469572.54861
+    }
+  ]
+}

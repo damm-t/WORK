@@ -461,11 +461,72 @@
     }
 
     /* ==========================================================================
-       3 ASSET DESKS GRID
+       4 ASSET DESKS GRID & FUND MONITOR
        ========================================================================== */
+    .fund-monitor-section {
+      margin-bottom: 24px;
+    }
+
+    .fund-monitor-card {
+      background: var(--bg-surface);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-ambient);
+      position: relative;
+    }
+
+    .fund-table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    .fund-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .fund-table th {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text-subtle);
+      letter-spacing: 0.05em;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+    }
+
+    .fund-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      white-space: nowrap;
+      font-family: var(--font-mono);
+    }
+
+    .fund-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .desk-perf-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--emerald-neon);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
     .desks-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, minmax(260px, 1fr));
       gap: 20px;
     }
 
@@ -783,10 +844,14 @@
     }
 
     /* Responsive */
-    @media (max-width: 1200px) {
+    @media (max-width: 1400px) {
       .hero-banner { grid-template-columns: 1fr 1fr; }
-      .desks-grid { grid-template-columns: 1fr; }
+      .desks-grid { grid-template-columns: repeat(2, 1fr); }
       .bottom-section { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 800px) {
+      .desks-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
@@ -806,14 +871,14 @@
         <div class="brand-badge">QD</div>
         <div class="brand-text">
           <h1>QUANTDESK <span class="tag">EXECUTIVE COCKPIT</span></h1>
-          <div class="subtext">3 CONCURRENT ASSET DESKS // PORT 8080 MASTER</div>
+          <div class="subtext">4 CONCURRENT ASSET DESKS // PORT 8080 MASTER</div>
         </div>
       </div>
 
       <div class="header-actions">
         <div class="status-pill" id="global-status-pill">
           <div class="pulse-dot"></div>
-          <span id="global-status-text">3 DESKS AUTONOMOUS</span>
+          <span id="global-status-text">4 DESKS AUTONOMOUS</span>
         </div>
         
         <button class="btn btn-secondary" id="btn-refresh" title="Force Refresh Telemetry">
@@ -836,7 +901,7 @@
       <div class="hero-card glow-cyan">
         <div class="hero-label">
           <span>Combined Total Equity</span>
-          <span style="color: var(--cyan-neon);">ALL 3 DESKS</span>
+          <span style="color: var(--cyan-neon);">ALL 4 CONCURRENT DESKS</span>
         </div>
         <div class="hero-value" id="val-total-equity">$0.00</div>
         <div class="hero-sub">
@@ -885,6 +950,39 @@
       </div>
     </section>
 
+    <!-- 4-DESK FUND & CAPITAL ALLOCATION MONITOR -->
+    <section class="fund-monitor-section">
+      <div class="fund-monitor-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.04em;">💼 Multi-Desk Capital &amp; Fund Allocation Monitor</span>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-family: var(--font-mono); font-size: 11px; padding: 2px 8px;" id="fm-pool-badge">COMBINED POOL: $220.8k</span>
+          </div>
+          <span style="font-size: 11px; font-family: var(--font-mono); color: var(--cyan-neon);">Real-Time Margin &amp; Edge Tracking</span>
+        </div>
+        <div class="fund-table-wrap">
+          <table class="fund-table">
+            <thead>
+              <tr>
+                <th>DESK / ASSET CLASS</th>
+                <th>BASE CAPITAL</th>
+                <th>CURRENT EQUITY</th>
+                <th>FREE CASH / MARGIN</th>
+                <th>MARGIN IN PLAY</th>
+                <th>AFTER-CHANGE PnL</th>
+                <th>AFTER-CHANGE WR</th>
+                <th>SELF-LEARNING EDGE</th>
+                <th>DAEMON ENGINE</th>
+              </tr>
+            </thead>
+            <tbody id="fund-monitor-tbody">
+              <!-- Dynamically populated via renderTelemetry -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- CONTROLS STRIP (TABS & FILTER) -->
     <div class="controls-strip">
       <div class="tab-group">
@@ -914,7 +1012,10 @@
               <div class="desk-meta" id="d1-meta">Alpaca Live Paper · PID 72697</div>
             </div>
           </div>
-          <span class="status-pill" id="d1-status-pill">RUNNING</span>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+            <span class="status-pill" id="d1-status-pill">RUNNING</span>
+            <span class="desk-perf-badge" id="d1-perf-badge">Post-Upgrade: +$0.00 (100% WR)</span>
+          </div>
         </div>
 
         <div class="desk-stats-bar">
@@ -943,7 +1044,10 @@
               <div class="desk-meta" id="d2-meta">24/7/365 CCXT · 3x Cross-Margin</div>
             </div>
           </div>
-          <span class="status-pill" id="d2-status-pill">24/7 LIVE</span>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+            <span class="status-pill" id="d2-status-pill">24/7 LIVE</span>
+            <span class="desk-perf-badge" id="d2-perf-badge">Post-Upgrade: +$0.00 (100% WR)</span>
+          </div>
         </div>
 
         <div class="desk-stats-bar">
@@ -972,7 +1076,10 @@
               <div class="desk-meta" id="d3-meta">23h Micro Brackets (MES, MNQ)</div>
             </div>
           </div>
-          <span class="status-pill" id="d3-status-pill">ACTIVE</span>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+            <span class="status-pill" id="d3-status-pill">ACTIVE</span>
+            <span class="desk-perf-badge" id="d3-perf-badge">Post-Upgrade: +$0.00 (100% WR)</span>
+          </div>
         </div>
 
         <div class="desk-stats-bar">
@@ -1001,7 +1108,10 @@
               <div class="desk-meta" id="d4-meta">London/NY Overlap &amp; Asian Reversion</div>
             </div>
           </div>
-          <span class="status-pill" id="d4-status-pill">ACTIVE</span>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+            <span class="status-pill" id="d4-status-pill">ACTIVE</span>
+            <span class="desk-perf-badge" id="d4-perf-badge">Post-Upgrade: +$0.00 (100% WR)</span>
+          </div>
         </div>
 
         <div class="desk-stats-bar">
@@ -1215,6 +1325,133 @@
       if (elD4Margin) elD4Margin.textContent = fmtUSD(forexMargin);
       if (elD4Meta && forex.pid) elD4Meta.textContent = `24/5 Interbank Feed · PID ${forex.pid}`;
       if (elD4Positions) renderPositionsList(forexPositions, elD4Positions, 'forex');
+
+      // Render Dedicated Fund & Capital Allocation Monitor Table
+      const elFundTbody = document.getElementById('fund-monitor-tbody');
+      const elPoolBadge = document.getElementById('fm-pool-badge');
+      const summary = data.summary || {};
+      const totalPoolCap = Number(summary.combined_portfolio_capital || totalEq);
+      if (elPoolBadge) elPoolBadge.textContent = `COMBINED POOL: ${fmtUSD(totalPoolCap)}`;
+
+      const deskConfigs = [
+        {
+          key: 'stocks',
+          icon: '🏛️',
+          name: 'Desk 1: US Equities',
+          broker: 'Alpaca Paper (Reg-T)',
+          data: stocks,
+          defCap: 100000.0,
+          strat: 'SMC_SWEEP_LONG',
+        },
+        {
+          key: 'crypto_perp',
+          icon: '⚡',
+          name: 'Desk 2: Crypto Perps',
+          broker: 'CCXT Demo (3x Cross)',
+          data: crypto,
+          defCap: 50000.0,
+          strat: 'LIQUIDATION_SCOOP',
+        },
+        {
+          key: 'cme_futures',
+          icon: '📈',
+          name: 'Desk 3: CME Micro',
+          broker: 'CME 23h Feed (Bracket)',
+          data: cme,
+          defCap: 25000.0,
+          strat: 'VWAP_RECLAIM',
+        },
+        {
+          key: 'forex',
+          icon: '💱',
+          name: 'Desk 4: Forex Macro',
+          broker: 'Interbank FX (20:1 Margin)',
+          data: forex,
+          defCap: 50000.0,
+          strat: 'LONDON_NY_BREAKOUT',
+        },
+      ];
+
+      if (elFundTbody) {
+        let rowsHtml = '';
+        deskConfigs.forEach(cfg => {
+          const dObj = cfg.data || {};
+          const cap = Number(dObj.capital || cfg.defCap);
+          const eq = Number(dObj.equity || cap);
+          const cash = Number(dObj.cash || (cfg.key === 'stocks' ? (dObj.cash || eq) : cap));
+          const margin = Number(dObj.margin_held || (cfg.key === 'cme_futures' ? cmeMargin : (cfg.key === 'forex' ? forexMargin : Math.max(0, eq - cash))));
+          const pnl = Number(dObj.after_change_pnl !== undefined ? dObj.after_change_pnl : (dObj.post_upgrade_pnl || 0.0));
+          const wr = Number(dObj.after_change_win_rate !== undefined ? dObj.after_change_win_rate : (dObj.post_upgrade_win_rate || (dObj.win_rate || 0.0)));
+          const trades = dObj.after_change_trades_count || dObj.post_upgrade_trades_count || 0;
+          
+          // Self-learning edge
+          const sl = dObj.self_learning || {};
+          const slItem = sl[cfg.strat] || Object.values(sl)[0] || {};
+          const mult = slItem.multiplier !== undefined ? Number(slItem.multiplier) : 1.0;
+          const edgeStr = mult > 1.0 ? `<span style="color:var(--emerald-neon); font-weight:700;">${mult.toFixed(2)}x BOOST</span>` :
+                          (mult === 0.0 ? `<span style="color:var(--rose-neon); font-weight:700;">0.00x VETO</span>` :
+                          `<span style="color:var(--cyan-neon);">${mult.toFixed(2)}x BASE</span>`);
+
+          const isRunning = dObj.status === 'RUNNING';
+          const pnlColor = pnl > 0 ? 'var(--emerald-neon)' : (pnl < 0 ? 'var(--rose-neon)' : 'var(--text-muted)');
+          const wrColor = wr >= 50 ? 'var(--emerald-neon)' : (trades === 0 ? 'var(--cyan-neon)' : 'var(--rose-neon)');
+
+          rowsHtml += `
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: #fff;">${cfg.icon} ${cfg.name}</div>
+                <div style="font-size: 10px; color: var(--text-muted); font-family: var(--font-sans);">${cfg.broker}</div>
+              </td>
+              <td style="color: #cbd5e1;">${fmtUSD(cap)}</td>
+              <td style="font-weight: 700; color: #fff;">${fmtUSD(eq)}</td>
+              <td style="color: var(--cyan-neon);">${fmtUSD(cash)}</td>
+              <td style="color: var(--amber-neon);">${fmtUSD(margin)}</td>
+              <td style="font-weight: 700; color: ${pnlColor};">${fmtSignUSD(pnl)}</td>
+              <td style="color: ${wrColor};">${wr.toFixed(1)}% <span style="font-size: 10px; color: var(--text-muted); font-family: var(--font-sans);">(${trades}t)</span></td>
+              <td>${edgeStr}</td>
+              <td>
+                <span class="status-pill ${isRunning ? 'status-up' : 'status-down'}" style="font-size: 9px; padding: 2px 6px;">
+                  ${isRunning ? `PID ${dObj.pid || 'ON'}` : 'OFFLINE'}
+                </span>
+              </td>
+            </tr>
+          `;
+
+          // Update individual desk column performance badge
+          const perfBadge = document.getElementById(`${cfg.key === 'stocks' ? 'd1' : (cfg.key === 'crypto_perp' ? 'd2' : (cfg.key === 'cme_futures' ? 'd3' : 'd4'))}-perf-badge`);
+          if (perfBadge) {
+            perfBadge.textContent = `Post-Upgrade: ${fmtSignUSD(pnl)} (${wr.toFixed(0)}% WR)`;
+            perfBadge.style.color = pnl >= 0 ? 'var(--emerald-neon)' : 'var(--rose-neon)';
+            perfBadge.style.borderColor = pnl >= 0 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)';
+            perfBadge.style.background = pnl >= 0 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)';
+          }
+        });
+
+        const totalAfterPnl = Number(summary.combined_portfolio_after_change_pnl !== undefined ? summary.combined_portfolio_after_change_pnl : (summary.combined_portfolio_session_pnl || 0.0));
+        const totalAfterWr = Number(summary.combined_portfolio_after_change_win_rate !== undefined ? summary.combined_portfolio_after_change_win_rate : 0.0);
+
+        rowsHtml += `
+          <tr style="border-top: 1px solid rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.03);">
+            <td>
+              <div style="font-weight: 800; color: #fff; letter-spacing: 0.04em;">🌐 4-DESK PORTFOLIO TOTAL</div>
+              <div style="font-size: 10px; color: var(--emerald-neon); font-family: var(--font-sans);">Institutional Master Pool</div>
+            </td>
+            <td style="font-weight: 800; color: #cbd5e1;">${fmtUSD(totalPoolCap)}</td>
+            <td style="font-weight: 800; color: #fff;">${fmtUSD(totalEq)}</td>
+            <td style="font-weight: 800; color: var(--cyan-neon);">${fmtUSD(totalCash)}</td>
+            <td style="font-weight: 800; color: var(--amber-neon);">${fmtUSD(totalMargin)}</td>
+            <td style="font-weight: 800; color: ${totalAfterPnl >= 0 ? 'var(--emerald-neon)' : 'var(--rose-neon)'};">${fmtSignUSD(totalAfterPnl)}</td>
+            <td style="font-weight: 800; color: var(--emerald-neon);">${totalAfterWr.toFixed(1)}%</td>
+            <td style="font-size: 10px; color: var(--text-subtle);">Kelly Optimized</td>
+            <td>
+              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 9px; padding: 2px 6px;">
+                ${summary.running_desks || 4}/4 ACTIVE
+              </span>
+            </td>
+          </tr>
+        `;
+        elFundTbody.innerHTML = rowsHtml;
+      }
 
       // Calculate Today's Combined PnL
       let combinedUnrealized = 0;

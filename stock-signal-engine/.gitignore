@@ -14,3 +14,5 @@ logs/
 *.db
 *.db-journal
 .remote_config
+scratch/
+instagram_extractor/output/

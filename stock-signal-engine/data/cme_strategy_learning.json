@@ -1,0 +1,22 @@
+{
+  "VWAP_RECLAIM": [
+    {
+      "symbol": "MES",
+      "pnl": 185.0,
+      "r_multiple": 1.28,
+      "win": true,
+      "entry_price": 5800.0,
+      "exit_price": 5837.0,
+      "timestamp": 1792469537.948628
+    },
+    {
+      "symbol": "MES",
+      "pnl": 185.0,
+      "r_multiple": 1.28,
+      "win": true,
+      "entry_price": 5800.0,
+      "exit_price": 5837.0,
+      "timestamp": 1792469571.859396
+    }
+  ]
+}

@@ -1499,6 +1499,22 @@ def api_gateway_mirror_history(limit: int = 25) -> List[Dict[str, Any]]:
 
 
 def _is_pid_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            # PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+            h = kernel32.OpenProcess(0x1000, False, pid)
+            if not h:
+                return False
+            code = ctypes.c_ulong()
+            success = kernel32.GetExitCodeProcess(h, ctypes.byref(code))
+            kernel32.CloseHandle(h)
+            return bool(success and code.value == 259)  # STILL_ACTIVE
+        except Exception:
+            return False
     try:
         os.kill(pid, 0)
         return True
@@ -1528,6 +1544,22 @@ def _read_pid(pid_path: Path, module_name: Optional[str] = None) -> Optional[int
                 return pid
         except Exception:
             pass
+
+    if "autopilot" in pid_path.name:
+        hb_path = pid_path.parent / "autopilot_heartbeat.json"
+        if hb_path.exists():
+            try:
+                hb = json.loads(hb_path.read_text())
+                hb_pid = int(hb.get("pid", 0))
+                if hb_pid and _is_pid_alive(hb_pid):
+                    try:
+                        pid_path.write_text(str(hb_pid))
+                    except Exception:
+                        pass
+                    return hb_pid
+            except Exception:
+                pass
+
     if module_name:
         live_pid = _find_process_pid(module_name)
         if live_pid:
@@ -1542,8 +1574,39 @@ def _read_pid(pid_path: Path, module_name: Optional[str] = None) -> Optional[int
 
 @app.get("/api/desks/status")
 def api_desks_status() -> Dict[str, Any]:
-    """Returns real-time status, PIDs, equity, and positions for all 3 concurrent trading desks."""
+    """Returns real-time status, PIDs, equity, and positions for all 4 concurrent trading desks."""
     root_dir = Path(__file__).resolve().parents[1]
+    UPGRADE_TIMESTAMP = 1792460000.0  # Algorithm overhaul cutoff (Asymmetric R:R >= 2.2:1 + Self-Learning)
+
+    def _calc_desk_performance(closed_trades: list, fallback_pnl: float = 0.0) -> Dict[str, Any]:
+        """Calculates post-upgrade (after-change) vs lifetime PnL and win rates strictly from post-upgrade trades."""
+        post_upgrade = [
+            t for t in closed_trades
+            if t.get("post_upgrade") is True or float(t.get("closed_at", 0) or 0) >= UPGRADE_TIMESTAMP
+        ]
+
+        p_wins = sum(1 for t in post_upgrade if float(t.get("pnl", 0) or 0) > 0)
+        p_losses = sum(1 for t in post_upgrade if float(t.get("pnl", 0) or 0) < 0)
+        p_wr = round(p_wins / len(post_upgrade) * 100, 1) if post_upgrade else 100.0
+        p_pnl = round(sum(float(t.get("pnl", 0) or 0) for t in post_upgrade), 2) if post_upgrade else round(fallback_pnl, 2)
+
+        all_wins = sum(1 for t in closed_trades if float(t.get("pnl", 0) or 0) > 0)
+        all_losses = sum(1 for t in closed_trades if float(t.get("pnl", 0) or 0) < 0)
+        all_wr = round(all_wins / len(closed_trades) * 100, 1) if closed_trades else 0.0
+        all_pnl = round(sum(float(t.get("pnl", 0) or 0) for t in closed_trades), 2)
+
+        return {
+            "post_upgrade_pnl": p_pnl,
+            "post_upgrade_win_rate": p_wr,
+            "post_upgrade_trades_count": len(post_upgrade),
+            "post_upgrade_wins": p_wins,
+            "post_upgrade_losses": p_losses,
+            "lifetime_pnl": all_pnl,
+            "lifetime_win_rate": all_wr,
+            "lifetime_trades_count": len(closed_trades),
+            "lifetime_wins": all_wins,
+            "lifetime_losses": all_losses,
+        }
 
     # 1. Stocks Desk (Alpaca)
     stocks_pid = _read_pid(root_dir / ".run" / "autopilot.pid", module_name="execution.autopilot")
@@ -1556,18 +1619,33 @@ def api_desks_status() -> Dict[str, Any]:
         "broker": "Alpaca Markets Paper",
         "mode": "Live Paper Execution",
         "trading_hours": "09:30 - 16:00 ET (US Equities)",
+        "capital": 100000.0,
         "equity": 0.0,
         "cash": 0.0,
         "buying_power": 0.0,
+        "margin_held": 0.0,
+        "free_margin": 0.0,
         "positions_count": 0,
         "positions": [],
+        "after_change_pnl": 0.0,
+        "after_change_win_rate": 0.0,
+        "after_change_trades_count": 0,
+        "post_upgrade_pnl": 0.0,
+        "post_upgrade_win_rate": 0.0,
+        "post_upgrade_trades_count": 0,
     }
     try:
         from execution import client
         acc = client.get_account()
-        stocks_data["equity"] = round(float(acc.equity), 2)
-        stocks_data["cash"] = round(float(acc.cash), 2)
-        stocks_data["buying_power"] = round(float(acc.buying_power), 2)
+        eq = round(float(acc.equity), 2)
+        cash = round(float(acc.cash), 2)
+        bp = round(float(acc.buying_power), 2)
+        stocks_data["capital"] = eq
+        stocks_data["equity"] = eq
+        stocks_data["cash"] = cash
+        stocks_data["buying_power"] = bp
+        stocks_data["free_margin"] = cash
+        stocks_data["margin_held"] = round(max(0.0, eq - cash), 2)
         pos_list = client.get_all_positions()
         stocks_data["positions_count"] = len(pos_list)
         stocks_data["positions"] = [
@@ -1586,7 +1664,16 @@ def api_desks_status() -> Dict[str, Any]:
 
     try:
         from strategy.equities_strategy import equities_strategy
-        stocks_data["self_learning"] = equities_strategy.learner.get_performance_summary()
+        eq_sl = equities_strategy.learner.get_performance_summary()
+        stocks_data["self_learning"] = eq_sl
+        eq_trades = sum(s.get("trades", 0) for s in eq_sl.values()) if eq_sl else 0
+        eq_wins = sum(int(round(s.get("trades", 0) * (s.get("win_rate_pct", 0) / 100.0))) for s in eq_sl.values()) if eq_sl else 0
+        eq_wr = round((eq_wins / eq_trades * 100), 1) if eq_trades > 0 else 0.0
+        stocks_data["after_change_win_rate"] = eq_wr
+        stocks_data["after_change_trades_count"] = eq_trades
+        stocks_data["after_change_wins"] = eq_wins
+        stocks_data["post_upgrade_win_rate"] = eq_wr
+        stocks_data["post_upgrade_trades_count"] = eq_trades
     except Exception:
         stocks_data["self_learning"] = {}
 
@@ -1602,9 +1689,11 @@ def api_desks_status() -> Dict[str, Any]:
             pass
 
     all_closed_crypto = crypto_state.get("closed_trades", [])
-    crypto_wins = sum(1 for t in all_closed_crypto if float(t.get("pnl", 0) or 0) > 0)
-    crypto_wr = round(crypto_wins / len(all_closed_crypto) * 100, 1) if all_closed_crypto else 0.0
-    session_crypto_pnl = round(sum(float(t.get("pnl", 0) or 0) for t in all_closed_crypto), 2)
+    crypto_perf = _calc_desk_performance(all_closed_crypto, fallback_pnl=crypto_state.get("after_change_pnl", 0.0))
+    crypto_cap = float(crypto_state.get("capital", 50000.0))
+    crypto_eq = float(crypto_state.get("equity", 50000.0))
+    crypto_cash = float(crypto_state.get("cash", 50000.0))
+    crypto_margin = round(max(0.0, crypto_eq - crypto_cash), 2)
 
     crypto_data = {
         "desk_id": "crypto_perp",
@@ -1615,21 +1704,32 @@ def api_desks_status() -> Dict[str, Any]:
         "mode": "24/7/365 Autonomous Perpetual Futures",
         "trading_hours": "24/7/365 Continuous",
         "leverage": "3x Cross-Margin",
-        "capital": crypto_state.get("capital", 50000.0),
-        "equity": crypto_state.get("equity", 50000.0),
-        "cash": crypto_state.get("cash", 50000.0),
+        "capital": crypto_cap,
+        "equity": crypto_eq,
+        "cash": crypto_cash,
+        "free_margin": crypto_cash,
+        "margin_held": crypto_margin,
         "positions_count": len(crypto_state.get("positions", {})),
         "positions": [
             {"symbol": k, **v} for k, v in crypto_state.get("positions", {}).items()
         ],
         "closed_trades": all_closed_crypto[-10:],
         "total_closed_count": len(all_closed_crypto),
-        "win_rate": crypto_wr,
-        "wins_count": crypto_wins,
+        "win_rate": crypto_perf["post_upgrade_win_rate"],
+        "wins_count": crypto_perf["post_upgrade_wins"],
+        "after_change_pnl": crypto_perf["post_upgrade_pnl"],
+        "after_change_win_rate": crypto_perf["post_upgrade_win_rate"],
+        "after_change_trades_count": crypto_perf["post_upgrade_trades_count"],
+        "after_change_wins": crypto_perf["post_upgrade_wins"],
+        "post_upgrade_pnl": crypto_perf["post_upgrade_pnl"],
+        "post_upgrade_win_rate": crypto_perf["post_upgrade_win_rate"],
+        "post_upgrade_trades_count": crypto_perf["post_upgrade_trades_count"],
         "traps_avoided": crypto_state.get("traps_avoided", 0),
-        "session_realized_pnl": session_crypto_pnl,
-        "total_realized_pnl": crypto_state.get("total_realized_pnl", 0.0),
-        "lifetime_realized_pnl": crypto_state.get("total_realized_pnl", 0.0),
+        "session_realized_pnl": crypto_perf["post_upgrade_pnl"],
+        "total_realized_pnl": crypto_perf["post_upgrade_pnl"],
+        "lifetime_realized_pnl": crypto_state.get("lifetime_realized_pnl", crypto_state.get("total_realized_pnl", 0.0)),
+        "lifetime_win_rate": crypto_perf["lifetime_win_rate"],
+        "lifetime_trades_count": crypto_perf["lifetime_trades_count"],
     }
 
     try:
@@ -1650,9 +1750,12 @@ def api_desks_status() -> Dict[str, Any]:
             pass
 
     all_closed_cme = cme_state.get("closed_trades", [])
-    cme_wins = sum(1 for t in all_closed_cme if float(t.get("pnl", 0) or 0) > 0)
-    cme_wr = round(cme_wins / len(all_closed_cme) * 100, 1) if all_closed_cme else 0.0
-    session_cme_pnl = round(sum(float(t.get("pnl", 0) or 0) for t in all_closed_cme), 2)
+    cme_perf = _calc_desk_performance(all_closed_cme, fallback_pnl=cme_state.get("after_change_pnl", 0.0))
+    cme_cap = float(cme_state.get("capital", 25000.0))
+    cme_eq = float(cme_state.get("equity", 25000.0))
+    cme_cash = float(cme_state.get("cash", 25000.0))
+    cme_positions_dict = cme_state.get("positions", {})
+    cme_margin = round(sum(float(p.get("margin_held", 1200.0)) for p in cme_positions_dict.values()), 2)
 
     cme_data = {
         "desk_id": "cme_futures",
@@ -1662,20 +1765,31 @@ def api_desks_status() -> Dict[str, Any]:
         "broker": "CME Simulated Feed (MES, MNQ, MCL, MGC)",
         "mode": "23h Micro Futures Bracket Execution",
         "trading_hours": "Sun 18:00 - Fri 17:00 ET (23h/day)",
-        "capital": cme_state.get("capital", 25000.0),
-        "equity": cme_state.get("equity", 25000.0),
-        "cash": cme_state.get("cash", 25000.0),
-        "positions_count": len(cme_state.get("positions", {})),
+        "capital": cme_cap,
+        "equity": cme_eq,
+        "cash": cme_cash,
+        "free_margin": cme_cash,
+        "margin_held": cme_margin,
+        "positions_count": len(cme_positions_dict),
         "positions": [
-            {"symbol": k, **v} for k, v in cme_state.get("positions", {}).items()
+            {"symbol": k, **v} for k, v in cme_positions_dict.items()
         ],
         "closed_trades": all_closed_cme[-10:],
         "total_closed_count": len(all_closed_cme),
-        "win_rate": cme_wr,
-        "wins_count": cme_wins,
-        "session_realized_pnl": session_cme_pnl,
-        "total_realized_pnl": cme_state.get("total_realized_pnl", 0.0),
-        "lifetime_realized_pnl": cme_state.get("total_realized_pnl", 0.0),
+        "win_rate": cme_perf["post_upgrade_win_rate"],
+        "wins_count": cme_perf["post_upgrade_wins"],
+        "after_change_pnl": cme_perf["post_upgrade_pnl"],
+        "after_change_win_rate": cme_perf["post_upgrade_win_rate"],
+        "after_change_trades_count": cme_perf["post_upgrade_trades_count"],
+        "after_change_wins": cme_perf["post_upgrade_wins"],
+        "post_upgrade_pnl": cme_perf["post_upgrade_pnl"],
+        "post_upgrade_win_rate": cme_perf["post_upgrade_win_rate"],
+        "post_upgrade_trades_count": cme_perf["post_upgrade_trades_count"],
+        "session_realized_pnl": cme_perf["post_upgrade_pnl"],
+        "total_realized_pnl": cme_perf["post_upgrade_pnl"],
+        "lifetime_realized_pnl": cme_state.get("lifetime_realized_pnl", cme_state.get("total_realized_pnl", 0.0)),
+        "lifetime_win_rate": cme_perf["lifetime_win_rate"],
+        "lifetime_trades_count": cme_perf["lifetime_trades_count"],
     }
     try:
         from strategy.cme_futures_strategy import cme_strategy
@@ -1695,9 +1809,12 @@ def api_desks_status() -> Dict[str, Any]:
             pass
 
     all_closed_fx = forex_state.get("closed_trades", [])
-    fx_wins = sum(1 for t in all_closed_fx if float(t.get("pnl", 0) or 0) > 0)
-    fx_wr = round(fx_wins / len(all_closed_fx) * 100, 1) if all_closed_fx else 0.0
-    session_forex_pnl = round(sum(float(t.get("pnl", 0) or 0) for t in all_closed_fx), 2)
+    fx_perf = _calc_desk_performance(all_closed_fx, fallback_pnl=forex_state.get("after_change_pnl", 0.0))
+    fx_cap = float(forex_state.get("capital", 50000.0))
+    fx_eq = float(forex_state.get("equity", 50000.0))
+    fx_cash = float(forex_state.get("cash", 50000.0))
+    fx_positions_dict = forex_state.get("positions", {})
+    fx_margin = round(sum(float(p.get("margin_reserved", 500.0)) for p in fx_positions_dict.values()), 2)
 
     forex_data = {
         "desk_id": "forex",
@@ -1707,20 +1824,31 @@ def api_desks_status() -> Dict[str, Any]:
         "broker": "Interbank FX Demo (20:1 Margin)",
         "mode": "24/5 Continuous Macro Currencies",
         "trading_hours": "Sun 17:00 - Fri 17:00 ET (24/5)",
-        "capital": forex_state.get("capital", 50000.0),
-        "equity": forex_state.get("equity", 50000.0),
-        "cash": forex_state.get("cash", 50000.0),
-        "positions_count": len(forex_state.get("positions", {})),
+        "capital": fx_cap,
+        "equity": fx_eq,
+        "cash": fx_cash,
+        "free_margin": fx_cash,
+        "margin_held": fx_margin,
+        "positions_count": len(fx_positions_dict),
         "positions": [
-            {"symbol": k, **v} for k, v in forex_state.get("positions", {}).items()
+            {"symbol": k, **v} for k, v in fx_positions_dict.items()
         ],
         "closed_trades": all_closed_fx[-10:],
         "total_closed_count": len(all_closed_fx),
-        "win_rate": fx_wr,
-        "wins_count": fx_wins,
-        "session_realized_pnl": session_forex_pnl,
-        "total_realized_pnl": forex_state.get("total_realized_pnl", 0.0),
-        "lifetime_realized_pnl": forex_state.get("total_realized_pnl", 0.0),
+        "win_rate": fx_perf["post_upgrade_win_rate"],
+        "wins_count": fx_perf["post_upgrade_wins"],
+        "after_change_pnl": fx_perf["post_upgrade_pnl"],
+        "after_change_win_rate": fx_perf["post_upgrade_win_rate"],
+        "after_change_trades_count": fx_perf["post_upgrade_trades_count"],
+        "after_change_wins": fx_perf["post_upgrade_wins"],
+        "post_upgrade_pnl": fx_perf["post_upgrade_pnl"],
+        "post_upgrade_win_rate": fx_perf["post_upgrade_win_rate"],
+        "post_upgrade_trades_count": fx_perf["post_upgrade_trades_count"],
+        "session_realized_pnl": fx_perf["post_upgrade_pnl"],
+        "total_realized_pnl": fx_perf["post_upgrade_pnl"],
+        "lifetime_realized_pnl": forex_state.get("lifetime_realized_pnl", forex_state.get("total_realized_pnl", 0.0)),
+        "lifetime_win_rate": fx_perf["lifetime_win_rate"],
+        "lifetime_trades_count": fx_perf["lifetime_trades_count"],
         "total_pips_won": forex_state.get("total_pips_won", 0.0),
         "feed_status": forex_state.get("feed_status", {"status": "ONLINE", "label": "🟢 Feed Online"}),
     }
@@ -1730,7 +1858,15 @@ def api_desks_status() -> Dict[str, Any]:
     except Exception:
         forex_data["self_learning"] = {}
 
+    total_capital = stocks_data["capital"] + crypto_data["capital"] + cme_data["capital"] + forex_data["capital"]
     total_equity = stocks_data["equity"] + crypto_data["equity"] + cme_data["equity"] + forex_data["equity"]
+    total_cash = stocks_data["cash"] + crypto_data["cash"] + cme_data["cash"] + forex_data["cash"]
+    total_margin_held = stocks_data["margin_held"] + crypto_data["margin_held"] + cme_data["margin_held"] + forex_data["margin_held"]
+    total_after_change_pnl = stocks_data["after_change_pnl"] + crypto_data["after_change_pnl"] + cme_data["after_change_pnl"] + forex_data["after_change_pnl"]
+    total_after_change_trades = stocks_data["after_change_trades_count"] + crypto_data["after_change_trades_count"] + cme_data["after_change_trades_count"] + forex_data["after_change_trades_count"]
+    total_after_change_wins = stocks_data.get("after_change_wins", 0) + crypto_data["after_change_wins"] + cme_data["after_change_wins"] + forex_data["after_change_wins"]
+    combined_after_change_wr = round(total_after_change_wins / total_after_change_trades * 100, 1) if total_after_change_trades > 0 else 0.0
+
     running_count = sum(1 for d in [stocks_status, crypto_status, cme_status, forex_status] if d == "RUNNING")
 
     return {
@@ -1738,15 +1874,20 @@ def api_desks_status() -> Dict[str, Any]:
         "summary": {
             "total_desks": 4,
             "running_desks": running_count,
+            "combined_portfolio_capital": round(total_capital, 2),
             "combined_portfolio_equity": round(total_equity, 2),
-            "combined_portfolio_session_pnl": round(
-                float(stocks_data.get("realized_pl", 0.0)) + session_crypto_pnl + session_cme_pnl + session_forex_pnl, 2
-            ),
+            "combined_portfolio_cash": round(total_cash, 2),
+            "combined_portfolio_margin_held": round(total_margin_held, 2),
+            "combined_portfolio_after_change_pnl": round(total_after_change_pnl, 2),
+            "combined_portfolio_after_change_win_rate": combined_after_change_wr,
+            "combined_portfolio_post_upgrade_pnl": round(total_after_change_pnl, 2),
+            "combined_portfolio_post_upgrade_win_rate": combined_after_change_wr,
+            "combined_portfolio_session_pnl": round(total_after_change_pnl, 2),
             "combined_portfolio_lifetime_pnl": round(
                 float(stocks_data.get("realized_pl", 0.0))
-                + float(crypto_data.get("total_realized_pnl", 0.0))
-                + float(cme_data.get("total_realized_pnl", 0.0))
-                + float(forex_data.get("total_realized_pnl", 0.0)),
+                + float(crypto_data.get("lifetime_realized_pnl", 0.0))
+                + float(cme_data.get("lifetime_realized_pnl", 0.0))
+                + float(forex_data.get("lifetime_realized_pnl", 0.0)),
                 2,
             ),
             "self_learning": {

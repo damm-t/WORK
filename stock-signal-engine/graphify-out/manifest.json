@@ -450,9 +450,9 @@
     "semantic_hash": ""
   },
   "execution/autopilot.py": {
-    "mtime": 1792465937.329681,
-    "seen": 1792468300.0946019,
-    "ast_hash": "dc02d0220d9abc2b07a900cd878c6c79",
+    "mtime": 1792472986.7657518,
+    "seen": 1792473036.860189,
+    "ast_hash": "9850ec10fdcef7a5e1cb5204527fa727",
     "semantic_hash": ""
   },
   "execution/autopilot_state.json": {
@@ -462,27 +462,27 @@
     "semantic_hash": ""
   },
   "execution/cme_futures_autopilot.py": {
-    "mtime": 1792469510.4917862,
-    "seen": 1792469737.334961,
-    "ast_hash": "663e72e938e9ba9bfbdb856c37c94fb4",
+    "mtime": 1792471166.2873492,
+    "seen": 1792473036.860211,
+    "ast_hash": "4cb04b572a550dab45a6eb2a054f9483",
     "semantic_hash": ""
   },
   "execution/cme_futures_state.json": {
-    "mtime": 1792391906.0314493,
-    "seen": 1792400211.4023108,
-    "ast_hash": "6b11ab30c15eabcab2cf1579489efc72",
+    "mtime": 1792471141.2470636,
+    "seen": 1792473036.8602118,
+    "ast_hash": "f27b6e15c7f0fceacc1f54046d5a36fd",
     "semantic_hash": ""
   },
   "execution/crypto_futures_autopilot.py": {
-    "mtime": 1792469522.2630675,
-    "seen": 1792469737.3349829,
-    "ast_hash": "63d4625056164fb44acf227bc92ee591",
+    "mtime": 1792471154.072878,
+    "seen": 1792473036.860213,
+    "ast_hash": "dd0d244769be93e458bba8fd0cf316da",
     "semantic_hash": ""
   },
   "execution/crypto_futures_state.json": {
-    "mtime": 1792391906.0400991,
-    "seen": 1792400211.402338,
-    "ast_hash": "920a3268b9903acdd6148149fa9cb182",
+    "mtime": 1792471141.2458556,
+    "seen": 1792473036.860215,
+    "ast_hash": "13d2f37ff4d73460f5342529f17eba1c",
     "semantic_hash": ""
   },
   "execution/deadmans_switch.py": {
@@ -492,15 +492,15 @@
     "semantic_hash": "aadba679ab03d8707730989eb49f289c"
   },
   "execution/forex_autopilot.py": {
-    "mtime": 1792469315.0605392,
-    "seen": 1792469737.3350642,
-    "ast_hash": "4b9730f1cacb58b410582b949c25a434",
+    "mtime": 1792471197.6028397,
+    "seen": 1792473036.8602738,
+    "ast_hash": "4d9dfcd86c36231c1231d48996a34667",
     "semantic_hash": ""
   },
   "execution/forex_state.json": {
-    "mtime": 1792391906.043264,
-    "seen": 1792400211.402425,
-    "ast_hash": "0eaac61786433e8e1d7532d62606526d",
+    "mtime": 1792471141.2490444,
+    "seen": 1792473036.860276,
+    "ast_hash": "d5ceafdc548e9698dc75fcc09c5a5a10",
     "semantic_hash": ""
   },
   "execution/jev_execution.py": {
@@ -744,9 +744,9 @@
     "semantic_hash": "6352537ece95eaaafd0c6939aa405add"
   },
   "quant": {
-    "mtime": 1792469411.1876185,
-    "seen": 1792469737.3361542,
-    "ast_hash": "3a6df24dbe4e14075d2501ca47fa095f",
+    "mtime": 1792472552.6439116,
+    "seen": 1792473036.86132,
+    "ast_hash": "7261273521a3a186d5cb9438e4094286",
     "semantic_hash": ""
   },
   "reports/__init__.py": {
@@ -1014,9 +1014,9 @@
     "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "webapp/app.py": {
-    "mtime": 1792469360.7104602,
-    "seen": 1792469737.337276,
-    "ast_hash": "984ee26e0bc119f6570f26f626870094",
+    "mtime": 1792472973.021696,
+    "seen": 1792473036.862565,
+    "ast_hash": "a4bc1ad4560ff0b861af1ed1b5edaa99",
     "semantic_hash": ""
   },
   "webapp/static/manifest.json": {
@@ -1230,15 +1230,15 @@
     "semantic_hash": ""
   },
   "webapp/static/overview.html": {
-    "mtime": 1791808443.4283497,
-    "seen": 1791808512.609783,
-    "ast_hash": "8c77dfeb9db556c671ea31cc665a5bd1",
+    "mtime": 1792471491.2592282,
+    "seen": 1792473036.863599,
+    "ast_hash": "91cdd50b370c50f60a03801aa9330678",
     "semantic_hash": ""
   },
   "webapp/static/widget.html": {
-    "mtime": 1792469443.1819372,
-    "seen": 1792469737.338237,
-    "ast_hash": "78891b3c170fb5a6f28524a0cb5afd5c",
+    "mtime": 1792471321.5139241,
+    "seen": 1792473036.8636,
+    "ast_hash": "889209a574a7d70e613d954288c8a1d3",
     "semantic_hash": ""
   },
   "dashboard/public/file.svg": {
@@ -2253,6 +2253,30 @@
     "mtime": 1792469475.0578573,
     "seen": 1792469737.336959,
     "ast_hash": "80d5729a208c44b2be978fd81087df2d",
+    "semantic_hash": ""
+  },
+  "execution/cme_futures_pre_upgrade_archive.json": {
+    "mtime": 1792471141.2467685,
+    "seen": 1792473036.8602118,
+    "ast_hash": "6379ae5a30ec20cb54db0b7401285158",
+    "semantic_hash": ""
+  },
+  "execution/crypto_futures_pre_upgrade_archive.json": {
+    "mtime": 1792471141.2454336,
+    "seen": 1792473036.860214,
+    "ast_hash": "4163a3760357a34e73cd498e2b25561c",
+    "semantic_hash": ""
+  },
+  "execution/forex_pre_upgrade_archive.json": {
+    "mtime": 1792471141.2485926,
+    "seen": 1792473036.860275,
+    "ast_hash": "dcf4e5727c7faf96058f901f943c3b8f",
+    "semantic_hash": ""
+  },
+  "scripts/archive_pre_upgrade_trades.py": {
+    "mtime": 1792471544.1482441,
+    "seen": 1792473036.8618398,
+    "ast_hash": "ff738104516d9bc3ee6d5e6b66f27846",
     "semantic_hash": ""
   }
 }

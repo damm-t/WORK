@@ -97,6 +97,9 @@ def update_heartbeat(cycle: int = 0, status: str = "running", extra: Optional[di
         if extra:
             payload.update(extra)
         atomic_json_write(HEARTBEAT_PATH, payload)
+        pid_file = HEARTBEAT_PATH.parent / "autopilot.pid"
+        if not pid_file.exists() or pid_file.read_text().strip() != str(os.getpid()):
+            pid_file.write_text(str(os.getpid()))
     except Exception as e:
         logger.debug(f"[autopilot] Could not write heartbeat: {e}")
 
